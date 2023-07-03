@@ -1,4 +1,4 @@
-package competnion.domain.community.controller;
+package competnion.domain.user.controller;
 
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class TestController {
+public class UserController {
 
     private final UserRepository userRepository;
 
-    @PostMapping("/test/point")
+    @PostMapping("/point")
     public ResponseEntity<?> testPoint() throws ParseException {
         userRepository.save(
                 User.builder()
@@ -36,7 +36,7 @@ public class TestController {
         return null;
     }
 
-    @GetMapping("/test/getpoint")
+    @GetMapping("/getpoint")
     public ResponseEntity<?> testGetPoint() throws ParseException {
         User user = userRepository.findById(1L).orElseThrow();
         System.out.println(user.getPoint());
