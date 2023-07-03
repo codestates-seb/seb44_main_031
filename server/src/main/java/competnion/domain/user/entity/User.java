@@ -1,34 +1,38 @@
 package competnion.domain.user.entity;
 
 import com.sun.istack.NotNull;
+import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.util.Assert.*;
 
 @Getter
 @Entity
 @Table(name = "users")
 @NoArgsConstructor(access = PROTECTED)
-public class User {
+public class User extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = IDENTITY)
+    @Column(name = "user_id", nullable = false)
     private Long id;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     @NotNull
     private String username;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     @NotNull
     private String email;
+    @Column(unique = true, nullable = false)
     @NotNull
     private String password;
 
@@ -37,24 +41,24 @@ public class User {
 
     private String imgUrl;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
-    @Builder
-    private User(String username, String email, String password, Point point, String location, String imgUrl) {
+    @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
+    public User(final String username, final String email, final String password) {
+        hasText(username, "username must not be null");
+        hasText(email, "email must not be null");
+        hasText(password, "password must not be null");
         this.username = username;
         this.email = email;
         this.password = password;
-        this.point = point;
-        this.location = location;
-        this.imgUrl = imgUrl;
     }
 
-    public void savePoint(Double latitude, Double longitude) throws ParseException {
-        this.point =
-                latitude != null && longitude != null ?
-                        (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude))
-                        : null;
-
+    @Builder(builderClassName = "RegisterLocation", builderMethodName = "RegisterLocation")
+    public User(final String location, final Point point) {
+        hasText(location, "location must not be null");
+        notNull(point, "point must not be null");
+        this.location = location;
+        this.point = point;
     }
 }
