@@ -27,7 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.h2database:h2'
@@ -35,6 +35,24 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// jasypt
+	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
+
+	// Spatial type
+	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.9.Final'
+
+//	// Websocket + STOMP
+//	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+//	implementation 'org.webjars:stomp-websocket:2.3.3-1'
+//	implementation 'org.webjars:sockjs-client:1.5.1'
+
+//	// Gson
+//	implementation 'com.google.code.gson:gson:2.8.8'
+
 }
 
 tasks.named('test') {
