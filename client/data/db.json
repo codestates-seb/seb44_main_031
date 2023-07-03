@@ -1,0 +1,79 @@
+{
+  "question:1": {
+    "success": true,
+    "result": {
+      "data": {
+        "question": {
+          "questionId": 1,
+          "title": "How to overlay an image with text that has a background with rounded corners",
+          "content": "The issue is that the text is overlaying a div with a background image. If there wasn't an image in the outer div and a solid colour, I can imagine that I'd be able to do this fairly easily with a few small html elements with rounded corners placed in the correct places, however the background image is what adds the complexity.",
+          "likeCount": 12,
+          "viewCount": 120,
+          "selectedAnswer": false,
+          "answerCount": 3,
+          "questionCreatedAt": "2023-04-10T15:47:20",
+          "questionUpdatedAt": "2023-04-12T13:30:20",
+          "displayName": "Tim",
+          "reputation": 15
+        },
+        "answers": {
+          "content": [
+            {
+              "questionId": 1,
+              "answerId": 1,
+              "content": "you need to add :before and :after to the .innertext element. UPDATE: to have multiple lines, just add a flex-direction: column container, and every line will have the :after (right) corner, and only the first child will have the :before (top) corner",
+              "selected": true,
+              "answerCreatedAt": "2023-06-10T15:48:13",
+              "answerUpdatedAt": "2023-06-17T15:48:13",
+              "displayName": "peter",
+              "reputation": 100
+            },
+            {
+              "answerId": 2,
+              "content": "I will reuse the same idea I used in a previous answer where I considered and SVG filter to create the rounded corners.",
+              "selected": false,
+              "answerCreatedAt": "2023-05-21T15:48:13",
+              "answerUpdatedAt": "2023-05-28T15:48:13",
+              "displayName": "Harry",
+              "reputation": 0
+            },
+            {
+              "answerId": 3,
+              "content": "This adds a few pseudo elements to the text that create the shapes around the text. I had to modify the HTML a bit to accommodate these pseudo elements; was not sure if that was okay. Try this out and see if it works in all your required browsers.",
+              "selected": false,
+              "answerCreatedAt": "2023-04-20T15:48:13",
+              "answerUpdatedAt": "2023-04-27T15:48:13",
+              "displayName": "Lisa",
+              "reputation": 23
+            }
+          ],
+          "pageable": {
+            "sort": {
+              "sorted": false,
+              "unsorted": true,
+              "empty": true
+            },
+            "pageNumber": 0,
+            "pageSize": 30,
+            "offset": 0,
+            "paged": true,
+            "unpaged": false
+          },
+          "last": true,
+          "totalPages": 1,
+          "totalElements": 1,
+          "sort": {
+            "sorted": false,
+            "unsorted": true,
+            "empty": true
+          },
+          "first": true,
+          "numberOfElements": 1,
+          "size": 30,
+          "number": 0,
+          "empty": false
+        }
+      }
+    }
+  }
+}
