@@ -23,7 +23,7 @@ Spring:
 
 #  datasource:
 #    url: jdbc:mysql://localhost:3306/?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-#    username: 
+#    username:
 #    password:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
 #
