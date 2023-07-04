@@ -45,6 +45,9 @@ dependencies {
 	// Spatial type
 	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.9.Final'
 
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 //	// Websocket + STOMP
 //	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 //	implementation 'org.webjars:stomp-websocket:2.3.3-1'

@@ -1,5 +1,22 @@
 Spring:
 
+  mail:
+    host: smtp.gmail.com # gmail SMTP 서버
+    port: 587 # gmail SMTP 서버
+    username: dlawjdals02182@gmail.com
+    password:
+    properties: # 추가 속성
+      mail:
+        smtp:
+          auth: true # SMTP 서버에 인증
+          starttls: # TLS 를 사용하여 안전한 연결 설정
+            enable: true
+            required: true
+
+  redis:
+    host:
+    port: 6379
+
   h2:
     console:
       enabled: true
