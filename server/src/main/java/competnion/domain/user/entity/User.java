@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
-import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,7 +14,8 @@ import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.hasText;
+import static org.springframework.util.Assert.notNull;
 
 @Getter
 @Entity

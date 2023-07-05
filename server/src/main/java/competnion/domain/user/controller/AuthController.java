@@ -20,6 +20,7 @@ public class AuthController {
     // 회원가입 유저네임 중복체크
     @GetMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestParam("username") final String username) {
+        authService.isDuplicateUsername(username);
         return ResponseEntity.ok().build();
     }
 
@@ -43,6 +44,7 @@ public class AuthController {
             @RequestParam("code") final String code,
             @RequestParam("email") final String email
     ) {
+        authService.verifyEmailCode(code, email);
         return ResponseEntity.ok().build();
     }
 

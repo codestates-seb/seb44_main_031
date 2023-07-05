@@ -22,7 +22,7 @@ import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
     public void sendEmail(String toEmail, String title, String content) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();

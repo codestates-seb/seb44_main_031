@@ -7,7 +7,6 @@ import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessException;
 import competnion.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +18,10 @@ import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final RedisUtil redisUtil;
 
@@ -49,7 +48,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public void verifyEmail(final String code, final String email) {
+    public void verifyEmailCode(final String code, final String email) {
         if (code.equals(redisUtil.getData(email)))
             isAuthedEmail = true;
         else
@@ -72,8 +71,9 @@ public class AuthServiceImpl implements AuthService{
     private User buildUser(final SignUpRequest signUpRequest) {
         return User.SignUp()
                 .email(signUpRequest.getEmail())
-                .username(signUpRequest.getEmail())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .username(signUpRequest.getUsername())
+//                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .password((signUpRequest.getPassword()))
                 .build();
     }
 

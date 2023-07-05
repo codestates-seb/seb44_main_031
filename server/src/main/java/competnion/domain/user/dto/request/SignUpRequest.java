@@ -1,5 +1,6 @@
 package competnion.domain.user.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.constraints.Email;
@@ -7,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Getter
+@AllArgsConstructor
 public class SignUpRequest {
     @Pattern(regexp = "^([a-zA-Z0-9가-힣]){2,10}$",
              message = "유저네임은 영문자, 숫자, 한글 중 하나 이상을 포함해야 하며, 2~10자 여야 합니다.")
