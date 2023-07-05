@@ -45,7 +45,7 @@ public class User extends BaseEntity {
     private List<Pet> pets = new ArrayList<>();
 
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
-    public User(final String username, final String email, final String password) {
+    private User(final String username, final String email, final String password) {
         hasText(username, "username must not be null");
         hasText(email, "email must not be null");
         hasText(password, "password must not be null");
@@ -55,7 +55,7 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderClassName = "RegisterLocation", builderMethodName = "RegisterLocation")
-    public User(final String location, final Point point) {
+    private User(final String location, final Point point) {
         hasText(location, "location must not be null");
         notNull(point, "point must not be null");
         this.location = location;
