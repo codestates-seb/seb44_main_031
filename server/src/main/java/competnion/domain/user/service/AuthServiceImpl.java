@@ -5,68 +5,84 @@ import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessException;
-import competnion.global.exception.ErrorCode;
+import competnion.global.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
 
-import static competnion.global.exception.ErrorCode.*;
-
+/**
+ * TODO : 예외처리 에러코드 추가 필요
+ */
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final RedisUtil redisUtil;
 
-    /**
-     * TODO : 예외처리 에러코드 추가 필요
-     */
+    private Boolean isCheckedUsername = false;
+    private Boolean isAuthedEmail = false;
+
     @Override
-    public void signUp(SignUpRequest signUpRequest) {
-        if (isDuplicateEmail(signUpRequest.getEmail()))
+    public void signUp(final SignUpRequest signUpRequest) {
+        if (!isAuthedEmail)     throw new BusinessException(INVALID_INPUT_VALUE);
+        if (!isCheckedUsername) throw new BusinessException(INVALID_INPUT_VALUE);
+
+        userRepository.save(buildUser(signUpRequest));
+    }
+
+    @Override
+    public void sendVerificationEmail(final String email) {
+        if (userRepository.findByEmail(email).isPresent())
             throw new BusinessException(INVALID_INPUT_VALUE);
 
-        if (isDuplicateUsername(signUpRequest.getUsername()))
-            throw new BusinessException(INVALID_INPUT_VALUE);
+        String code = emailService.generateRandomCode();
+        redisUtil.setDataAndExpire(email, code, 600000L);
+
+        emailService.sendVerificationEmail(email, code);
     }
 
     @Override
-    public void sendVerificationEmail(String email) {
-
-    }
-
-    @Override
-    public void verifyEmail(String code, String email) {
-
-    }
-
-    @Override
-    public Boolean isDuplicateEmail(String email) {
-        return userRepository.findByEmail(email).isPresent();
-    }
-
-    @Override
-    public Boolean isDuplicateUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
-    }
-
-    @Override
-    public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
-
-    }
-
-    /**
-     * TODO : 예외처리 에러코드 추가 필요
-     */
-    @Override
-    public Point coordinateToPoint(Double latitude, Double longitude) throws ParseException {
-        if (latitude != null && longitude != null)
-            return (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude));
+    public void verifyEmail(final String code, final String email) {
+        if (code.equals(redisUtil.getData(email)))
+            isAuthedEmail = true;
         else
             throw new BusinessException(INVALID_INPUT_VALUE);
     }
+
+    @Override
+    public void isDuplicateUsername(final String username) {
+        if (userRepository.findByUsername(username).isEmpty())
+            isCheckedUsername = true;
+        else
+            throw new BusinessException(INVALID_INPUT_VALUE);
+    }
+
+    @Override
+    public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
+
+    }
+
+    private User buildUser(final SignUpRequest signUpRequest) {
+        return User.SignUp()
+                .email(signUpRequest.getEmail())
+                .username(signUpRequest.getEmail())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .build();
+    }
+
+
+//    @Override
+//    public Point coordinateToPoint(Double latitude, Double longitude) throws ParseException {
+//        if (latitude != null && longitude != null)
+//            return (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude));
+//        else
+//            throw new BusinessException(INVALID_INPUT_VALUE);
+//    }
 }

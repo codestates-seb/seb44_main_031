@@ -38,6 +38,7 @@ dependencies {
 
 	// mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
 
 	// jasypt
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
