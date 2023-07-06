@@ -5,7 +5,8 @@ import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessException;
-import competnion.global.util.RedisUtil;
+import competnion.infra.mail.util.EmailUtil;
+import competnion.infra.redis.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +23,11 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
 //    private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
 
-    private Boolean isCheckedUsername = false;
     private Boolean isAuthedEmail = false;
+    private Boolean isCheckedUsername = false;
 
     @Override
     public void signUp(final SignUpRequest signUpRequest) {
@@ -37,14 +38,14 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void sendVerificationEmail(final String email) {
+    public void checkDuplicateAndSendVerificationEmail(final String email) {
         if (userRepository.findByEmail(email).isPresent())
             throw new BusinessException(INVALID_INPUT_VALUE);
 
-        String code = emailService.generateRandomCode();
+        String code = emailUtil.generateRandomCode();
         redisUtil.setDataAndExpire(email, code, 600000L);
 
-        emailService.sendVerificationEmail(email, code);
+        emailUtil.sendVerificationEmail(email, code);
     }
 
     @Override
@@ -76,13 +77,4 @@ public class AuthServiceImpl implements AuthService {
                 .password((signUpRequest.getPassword()))
                 .build();
     }
-
-
-//    @Override
-//    public Point coordinateToPoint(Double latitude, Double longitude) throws ParseException {
-//        if (latitude != null && longitude != null)
-//            return (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude));
-//        else
-//            throw new BusinessException(INVALID_INPUT_VALUE);
-//    }
 }

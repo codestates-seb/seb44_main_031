@@ -1,10 +1,27 @@
+cloud:
+  aws:
+    s3:
+      bucket: ${S3_BUCKET_NAME}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false # CloudFormation 구성을 사용하지 않도록 설정
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+
 Spring:
+
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 3MB
 
   mail:
     host: smtp.gmail.com # gmail SMTP 서버
     port: 587 # gmail SMTP 서버
     username: dlawjdals02182@gmail.com
-    password:
+    password: drelllucumyedmkk
     properties: # 추가 속성
       mail:
         smtp:
@@ -18,6 +35,8 @@ Spring:
   redis:
     host: 127.0.0.1
     port: 6379
+
+
 
 #  h2:
 #    console:
@@ -41,9 +60,9 @@ Spring:
 #        format_sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3307/?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username:
-    password:
+    url: jdbc:mysql://localhost:3307/competnion?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: jeongmin0218
+    password: 1q2w3e
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

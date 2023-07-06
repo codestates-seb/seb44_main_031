@@ -1,4 +1,4 @@
-package competnion.global.util;
+package competnion.infra.redis.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

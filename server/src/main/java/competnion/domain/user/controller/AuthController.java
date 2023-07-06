@@ -33,15 +33,15 @@ public class AuthController {
 
     // 이메일 중복체크 & 인증 코드 전송
     @GetMapping("/send-verification-email")
-    public ResponseEntity<?> sendVerificationEmail(@RequestParam("email") final String email) {
-        authService.sendVerificationEmail(email);
+    public ResponseEntity<?> checkDuplicateAndSendVerificationEmail(@RequestParam("email") final String email) {
+        authService.checkDuplicateAndSendVerificationEmail(email);
         return ResponseEntity.ok().build();
     }
 
     // 이메일 인증
     @GetMapping("/verify-email")
     public ResponseEntity<?> verifyEmail(
-            @RequestParam("code") final String code,
+            @RequestParam("code")  final String code,
             @RequestParam("email") final String email
     ) {
         authService.verifyEmailCode(code, email);

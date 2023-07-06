@@ -1,6 +1,7 @@
-package competnion.domain.user.entity;
+package competnion.domain.dog;
 
 import com.sun.istack.NotNull;
+import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
