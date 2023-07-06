@@ -246,7 +246,7 @@ const SignUp = () => {
 
       console.log([displayName, email, emailAuth, password]);
       dispatch(actionS({ displayName, email, emailAuth, password })).then(
-        (resultAction: { payload: { success: boolean } }) => {
+        (resultAction: any) => {
           const { success } = resultAction.payload;
           if (success === true) {
             alert('회원가입 성공');
@@ -256,6 +256,7 @@ const SignUp = () => {
           }
         }
       );
+      // .catch((err) => console.log(err.message));
     },
     [displayName, email, emailAuth, password, dispatch, navigate]
   );

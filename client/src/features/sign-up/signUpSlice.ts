@@ -17,49 +17,64 @@ export const actionS = createAsyncThunk(
   'user/join',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (data: JoinData) => {
-    const result = await axios.post<JoinResponse>(
-      'http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/sign-up',
-      {
-        displayName: data.displayName,
-        email: data.email,
-        code: data.emailAuth,
-        password: data.password,
-      }
-    );
+    try {
+      const result = await axios.post<JoinResponse>(
+        'http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/sign-up',
+        {
+          displayName: data.displayName,
+          email: data.email,
+          code: data.emailAuth,
+          password: data.password,
+        }
+      );
 
-    if (result.data.success === true) {
-      console.log('박지훈');
-      const success = result.data.success;
-      return { success };
+      if (result.data.success === true) {
+        // console.log('박지훈');
+        // const success = result.data.success;
+        return true;
+      } else if (result.data.success === false) {
+        return false;
+      }
+    } catch (err: any) {
+      console.log(err.message);
+      return err.message;
     }
-    console.log(result);
+
+    // console.log(result);
   }
 );
-interface initialState {
-  isJoined: boolean;
-  isJoining: boolean;
-  joinUser: boolean;
-  joinRejectReason: string;
-}
+// interface initialStateType {
+//   isJoined: boolean | undefined;
+//   isJoining: boolean | undefined;
+//   joinUser: boolean | undefined;
+//   joinRejectReason: string | undefined;
+// }
+
 export const signupSlice = createSlice({
   name: 'signupUser',
-  initialState,
+  initialState: {
+    isJoined: false,
+    isJoining: false,
+    joinUser: false,
+    joinRejectReason: '',
+    joinErrorReasion: '',
+  },
   reducers: {},
   extraReducers: (builder) => {
     builder
       // eslint-disable-next-line no-unused-vars
-      .addCase(actionS.pending, (state, action) => {
+      .addCase(actionS.pending, (state) => {
         state.isJoining = true;
       })
       .addCase(actionS.fulfilled, (state, action) => {
         state.isJoined = true;
         state.isJoining = false;
-        state.joinUser = action.payload.data;
+        state.joinUser = action.payload as boolean;
         state.joinRejectReason = '';
       })
       .addCase(actionS.rejected, (state, action) => {
         state.isJoining = false;
-        state.joinErrorReasion = action.error;
+        state.joinErrorReasion = action.payload as string;
       });
   },
 });
