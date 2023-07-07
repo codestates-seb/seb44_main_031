@@ -1,5 +1,4 @@
 import { styled } from 'styled-components';
-
 const UserCard: React.FC = () => {
   return (
     <UserCardContainer>
