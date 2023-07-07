@@ -109,7 +109,15 @@ const WalkMateCreate = () => {
         </div>
         <div className="btn-submit-container">
           <StyledPinkButton3D type="button" role="button">
-            산책 모임 개설하기 🐾
+            <span className="span-img-container">
+              <span>산책 모임 개설하기</span>
+              <img
+                src="/src/assets/petmily-logo-white.png"
+                alt=""
+                width={25}
+                height={25}
+              />
+            </span>
           </StyledPinkButton3D>
         </div>
       </StyledForm>
@@ -199,6 +207,13 @@ const StyledForm = styled.form`
     color: var(--black-800);
     font-size: 12px;
   }
+
+  .span-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+  }
 `;
 
 const StyledPinkButton3D = styled.button`
@@ -222,7 +237,6 @@ const StyledPinkButton3D = styled.button`
   &:hover {
     background-color: rgb(255, 84, 141);
     border: 2px solid rgb(255, 84, 141);
-    /* color: black; */
   }
 
   &:active {
