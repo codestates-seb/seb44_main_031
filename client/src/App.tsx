@@ -1,11 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 import GlobalStyle from './components/styles/GlobalStyled';
-<<<<<<< HEAD
 import SignUp from './features/sign-up/SignUp';
 
-=======
-import WalkMateDetail from './features/walk-Mate-Detail/WalkMateDetail';
->>>>>>> 98dc4b061b37a353395e42bdfaa14352cfa3fe95
+import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
 function App() {
   return (
     <div>
