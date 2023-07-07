@@ -16,6 +16,8 @@
   },
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    // any 관련 추가함
+    "@typescript-eslint/no-explicit-any": "off",
     "react-refresh/only-export-components": "warn",
     "prettier/prettier": [
       "error",
