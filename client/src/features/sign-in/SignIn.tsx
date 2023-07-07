@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
 import { useCallback, useState } from 'react';
-import { actionL } from './loginSlice';
+import { actionL } from './signInSlice';
 import { useAppDispatch } from '../../store/store';
 // import { userInfo } from '../slices/tokenSlice';
 const Container = styled.div`
