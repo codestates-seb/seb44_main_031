@@ -104,7 +104,7 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
 `;
-const InputDisplayName = styled.div`
+const InputUsername = styled.div`
   display: flex;
   flex-direction: column;
   margin: 6px 0 6px;
@@ -202,13 +202,18 @@ const EmailAuthForm = styled.div`
   justify-content: space-between;
   align-itme: center;
 `;
+const IdCheckForm = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-itme: center;
+`;
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [emailAuth, setEmailAuth] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setdisplayName] = useState('');
+  const [username, setUsername] = useState('');
   const [address, setAddress] = useState('');
-
+  const [validId, setValidId] = useState('');
   const open = useDaumPostcodePopup(
     'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
   );
@@ -235,7 +240,7 @@ const SignUp = () => {
   );
   const onChangeDisplay = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      setdisplayName(e.target.value);
+      setUsername(e.target.value);
     },
     []
   );
@@ -243,9 +248,12 @@ const SignUp = () => {
   const onSubmitJoin = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-
-      console.log([displayName, email, emailAuth, password]);
-      dispatch(actionS({ displayName, email, emailAuth, password })).then(
+      if (validId !== username) {
+        alert('중복확인한 아이디와 일치하지 않습니다');
+        return;
+      }
+      console.log([username, email, emailAuth, password]);
+      dispatch(actionS({ username, email, emailAuth, password })).then(
         (resultAction: any) => {
           const { success } = resultAction.payload;
           if (success === true) {
@@ -258,7 +266,7 @@ const SignUp = () => {
       );
       // .catch((err) => console.log(err.message));
     },
-    [displayName, email, emailAuth, password, dispatch, navigate]
+    [validId, username, email, emailAuth, password, dispatch, navigate]
   );
   const goEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -273,9 +281,28 @@ const SignUp = () => {
         })
         .catch((error) => {
           console.error(error);
+          alert('다시 요청해주세요');
         });
     },
     [email]
+  );
+  const goId = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      axios
+        .get(
+          `http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/username?username=${username}`
+        )
+        .then((response) => {
+          // 아이디 확인
+          console.log(response);
+          setValidId(username);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    [username]
   );
   const handleComplete = (data: any) => {
     console.log(1);
@@ -398,16 +425,19 @@ const SignUp = () => {
                 </OuthContents>
               </Outh>
             </Ouths>
-            <InputDisplayName>
+            <InputUsername>
               <div>닉네임</div>
-              <input
-                type="name"
-                id="signupDisplayName"
-                placeholder="닉네임 만들기"
-                value={displayName}
-                onChange={onChangeDisplay}
-              ></input>
-            </InputDisplayName>
+              <IdCheckForm>
+                <input
+                  type="name"
+                  id="signupusername"
+                  placeholder="닉네임 만들기"
+                  value={username}
+                  onChange={onChangeDisplay}
+                ></input>
+                <button onClick={goId}>중복 확인 발급</button>
+              </IdCheckForm>
+            </InputUsername>
             <InputEmail>
               <div>E-mail</div>
               <input

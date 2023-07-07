@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 interface JoinData {
-  displayName: string;
+  username: string;
   email: string;
   emailAuth: string;
   password: string;
@@ -21,7 +21,7 @@ export const actionS = createAsyncThunk(
       const result = await axios.post<JoinResponse>(
         'http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/sign-up',
         {
-          displayName: data.displayName,
+          username: data.username,
           email: data.email,
           code: data.emailAuth,
           password: data.password,
