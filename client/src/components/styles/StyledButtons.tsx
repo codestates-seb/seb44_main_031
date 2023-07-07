@@ -4,7 +4,7 @@ export const StyledButtonPink3D = styled.button`
   background-color: var(--pink-400);
   border: 2px solid var(--pink-400);
   border-radius: 30px;
-  box-shadow: var(--pink-100) 4px 4px 0 0;
+  box-shadow: var(--pink-200) 4px 4px 0 0;
   color: white;
   cursor: pointer;
   display: inline-block;
