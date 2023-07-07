@@ -100,7 +100,7 @@ const Message = styled.div`
   }
 `;
 
-const Login: React.FC = () => {
+const SignIn: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -194,4 +194,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default SignIn;

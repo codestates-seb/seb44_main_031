@@ -6,7 +6,7 @@ const WalkMateDetailBody: React.FC = () => {
   return (
     <BodyContainer>
       <WalkMateBodyContainer>
-        <WalkDogImage src="src/assets/Walkdog.png" alt="강아지사진" />
+        <WalkDogImage src="/src/assets/Walkdog.png" alt="강아지사진" />
         <TextBox>
           <div className="TextBoxTitle">간단한 소개! (글제목)</div>
           <div className="TextBoxBody">

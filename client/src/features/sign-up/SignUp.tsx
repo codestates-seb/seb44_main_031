@@ -25,75 +25,6 @@ const Contents = styled.div`
   flex-direction: column;
   width: 30em;
 `;
-const Outh = styled.button`
-  margin: 4px 0 4px;
-  border: 1px solid;
-  padding: 10.4px;
-  border-radius: 5px;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &#Google {
-    background-color: white;
-    border-color: #d6d9dc;
-    &:hover {
-      background-color: #f8f9f9;
-    }
-    &:active {
-      background-color: #f1f2f3;
-    }
-    &img {
-      width: 25px;
-      height: 25px;
-    }
-  }
-
-  &#GitHub {
-    background-color: #2f3337;
-    color: white;
-    border-color: transparent;
-    &:hover {
-      background-color: #232629;
-    }
-    &:active {
-      background-color: black;
-    }
-  }
-
-  &#Facebook {
-    background-color: #385499;
-    color: white;
-    border-color: transparent;
-    &:hover {
-      background-color: #314a86;
-    }
-    &:active {
-      background-color: #2a4074;
-    }
-  }
-`;
-
-const Ouths = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: -4px 0 16px;
-
-  > a {
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-  }
-`;
-const OuthContents = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  span {
-    margin-left: 10px;
-  }
-`;
 const SignUpForm = styled.div`
   display: flex;
   flex-direction: column;
@@ -411,20 +342,6 @@ const SignUp = () => {
       <Contents>
         <form onSubmit={onSubmitJoin}>
           <SignUpForm>
-            <Ouths>
-              <Outh id="Google">
-                <OuthContents>
-                  <img src="/images/google.png" alt="googlr logo"></img>
-                  <span>Sign up with Google</span>
-                </OuthContents>
-              </Outh>
-              <Outh id="GitHub">
-                <OuthContents>
-                  <img src="/images/github.png" alt="googlr logo"></img>
-                  <span>Sign up with GitHub</span>
-                </OuthContents>
-              </Outh>
-            </Ouths>
             <InputUsername>
               <div>닉네임</div>
               <IdCheckForm>
