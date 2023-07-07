@@ -1,5 +1,6 @@
 package competnion.domain.community.dto.request;
 
+import competnion.domain.community.entity.Article;
 import competnion.domain.user.entity.User;
 import lombok.*;
 
@@ -11,42 +12,61 @@ import java.time.*;
 public class ArticleDto {
 
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class ArticlePostDto {
-        @NotBlank
+
         private String title;
-
-        @NotBlank
         private String body;
-
-        @NotBlank
         private String location;
-
-        @NotBlank
-        private LocalDateTime time;
-
-        @NotBlank
+        private LocalDateTime date;
         private int attendant;
-    }
 
+        @Builder
+        public ArticlePostDto(String title, String body, String location, LocalDateTime date, int attendant) {
+            this.title = title;
+            this.body = body;
+            this.location = location;
+            this.date = date;
+            this.attendant = attendant;
+        }
+
+        public Article toEntity() {
+            return Article.builder()
+                    .title(title)
+                    .body(body)
+                    .location(location)
+                    .date(date)
+                    .attendant(attendant)
+                    .build();
+        }
+    }
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ArticlePatchDto {
         private Long articleId;
-        @NotBlank
         private String title;
-
-        @NotBlank
         private String body;
-
-        @NotBlank
         private String location;
-
-        @NotBlank
-        private LocalDateTime time;
-
-        @NotBlank
+        private LocalDateTime date;
         private int attendant;
+
+        @Builder
+        public ArticlePatchDto(String title, String body, String location, LocalDateTime date,
+                               int attendant) {
+            this.title = title;
+            this.body = body;
+            this.location = location;
+            this.date = date;
+            this.attendant = attendant;
+        }
+        public Article toEntity() {
+            return Article.builder()
+                    .title(title)
+                    .body(body)
+                    .location(location)
+                    .date(date)
+                    .attendant(attendant)
+                    .build();
+        }
     }
 }

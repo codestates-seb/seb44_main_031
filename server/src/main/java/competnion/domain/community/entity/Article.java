@@ -2,10 +2,10 @@ package competnion.domain.community.entity;
 
 import competnion.domain.comment.entity.Comment;
 import competnion.domain.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import net.bytebuddy.asm.Advice;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -17,18 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-@Setter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "articles")
-@NoArgsConstructor
-@AllArgsConstructor
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "article_id")
     private Long articleId;
-
     @Column(nullable = false)
+
     private String title;
 
     @Column(nullable = false)
@@ -65,31 +63,56 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
-    private List<Comment> comments = new ArrayList<>();
-    private Duration timeDifference;
+//    @OnDelete(action= OnDeleteAction.CASCADE)
+//    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
+//    private List<Comment> comments = new ArrayList<>();
+//    private Duration timeDifference;
+//
+//    public Article(LocalDateTime date) {
+//        this.date = date;
+//        this.timeDifference = calculateTimeDifference(date);
+//    }
+//
+//    // 게시글의 date 필드와 현재 시간 간의 차이 계산 메소드
+//    private Duration calculateTimeDifference(LocalDateTime date) {
+//        LocalDateTime now = LocalDateTime.now();
+//        return Duration.between(date, now);
+//    }
 
-    public Article(LocalDateTime date) {
-        this.date = date;
-        this.timeDifference = calculateTimeDifference(date);
-    }
-
-    // 게시글의 date 필드와 현재 시간 간의 차이 계산 메소드
-    private Duration calculateTimeDifference(LocalDateTime date) {
-        LocalDateTime now = LocalDateTime.now();
-        return Duration.between(date, now);
-    }
-
-
-    public Article(Long articleId, String title, String body, boolean isPassed, boolean isAttended, String location,
-                        LocalDateTime createdAt, LocalDateTime modifiedAt) {
-        this.articleId = articleId;
+    @Builder
+    private Article(User user, String title, String body, String location, int attendant, LocalDateTime date) {
+        this.user = user;
         this.title = title;
-        this.body =body;
-        this.isPassed = isPassed;
-        this.isAttended = isAttended;
+        this.body = body;
+        this.isPassed = false;
+        this.isAttended = false;
+        this.attendant = attendant;
         this.location = location;
-        this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
+        this.date = date;
+    }
+
+    public static Article of(User user, Article article) {
+        return Article.builder()
+                .user(user)
+                .title(article.getTitle())
+                .body(article.getBody())
+                .attendant(article.getAttendant())
+                .date(article.getDate())
+                .location(article.getLocation())
+                .build();
+    }
+
+
+    /** 게시글 수정 */
+    public void update(Article article) {
+        this.title = article.title;
+        this.body = article.body;
+        this.location = article.location;
+        this.date = article.date;
+        this.attendant = article.attendant;
+    }
+
+    public void attend() {
+        this.attendant--;
     }
 }
