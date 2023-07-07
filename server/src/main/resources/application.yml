@@ -21,7 +21,7 @@ Spring:
     host: smtp.gmail.com # gmail SMTP 서버
     port: 587 # gmail SMTP 서버
     username: dlawjdals02182@gmail.com
-    password: drelllucumyedmkk
+    password:
     properties: # 추가 속성
       mail:
         smtp:

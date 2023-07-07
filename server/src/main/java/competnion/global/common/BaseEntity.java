@@ -11,8 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @MappedSuperclass
 public abstract class BaseEntity {
-    @Column(updatable = false, nullable = false)
+    @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
+    @Column(name = "modified_at")
     private LocalDateTime modifiedAt;
 
     @PrePersist

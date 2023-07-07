@@ -1,4 +1,4 @@
 package competnion.domain.user.dto.request;
 
-public class EditUsernameRequest {
+public class UpdateUsernameRequest {
 }

@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void isDuplicateUsername(final String username) {
+    public void checkDuplicateUsername(final String username) {
         if (userRepository.findByUsername(username).isEmpty())
             isCheckedUsername = true;
         else

@@ -12,6 +12,6 @@ public interface AuthService {
     void checkDuplicateAndSendVerificationEmail(String email);
     void verifyEmailCode(String code, String email);
 //    Boolean isDuplicateEmail(String email);
-    void isDuplicateUsername(String username);
+    void checkDuplicateUsername(String username);
     void resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

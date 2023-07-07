@@ -1,49 +1,78 @@
 package competnion.domain.user.service;
 
+import competnion.domain.pet.dto.response.PetResponse;
+import competnion.domain.pet.entity.Pet;
+import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
-import competnion.domain.user.dto.request.EditUsernameRequest;
+import competnion.domain.user.dto.request.UpdateUsernameRequest;
+import competnion.domain.user.dto.response.UpdateAddressResponse;
+import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessException;
 import competnion.infra.s3.util.S3Util;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.io.FilenameUtils;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static java.util.Objects.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final PetRepository petRepository;
     private final S3Util s3Util;
 
     @Override
     public UserResponse getProfile(final Long userId) {
+        User existsUser = isExistsUser(userId);
+        List<Pet> pets = petRepository.findAllByUserId(userId);
+        List<PetResponse> petList = pets.stream()
+                .map(PetResponse::of)
+                .collect(Collectors.toList());
 
-        return null;
+        return UserResponse.of(existsUser, petList);
     }
 
     @Override
-    public UserResponse editUsername(final Long userId, final EditUsernameRequest editUsernameRequest) {
-        return null;
+    public UpdateUsernameResponse updateUsername(
+            final Long userId,
+            final UpdateUsernameRequest updateUsernameRequest
+    ) {
+        return UpdateUsernameResponse.of("임시");
     }
 
     @Override
-    public UserResponse editAddress(final Long userId, final AddressRequest addressRequest) {
+    public UpdateAddressResponse updateAddress(
+            final Long userId,
+            final AddressRequest addressRequest
+    ) {
         User  existsUser = isExistsUser(userId);
         Point point = coordinateToPoint(addressRequest.getLatitude(), addressRequest.getLongitude());
         existsUser.updateAddressAndCoordinates(addressRequest.getAddress(), point);
-        return UserResponse.of(existsUser);
+
+        return UpdateAddressResponse.of(
+                addressRequest.getLatitude(), addressRequest.getLongitude(), addressRequest.getAddress()
+        );
     }
 
     @Override
-    public String uploadProfileImage(final Long userId, final MultipartFile image) {
+    public String uploadProfileImage(
+            final Long userId,
+            final MultipartFile image
+    ) {
+        isFileAnImage(image);
         User existsUser = isExistsUser(userId);
         String imgUrl = s3Util.uploadImage(image);
 
@@ -51,15 +80,32 @@ public class UserServiceImpl implements UserService{
             s3Util.deleteImage(existsUser.getImgUrl());
 
         existsUser.updateImgUrl(imgUrl);
+
         return imgUrl;
     }
 
-    public User isExistsUser(Long userId) {
+    private User isExistsUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
     }
 
-    public Point coordinateToPoint(Double latitude, Double longitude) {
+    private void isFileAnImage(MultipartFile image) {
+        String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
+        if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
+            throw new BusinessException(INVALID_INPUT_VALUE);
+    }
+
+//    private Long getAuthenticatedUserId() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        User user = userRepository.findByEmail(authentication.getName())
+//                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
+//        return user.getId();
+//    }
+
+    private Point coordinateToPoint(
+            Double latitude,
+            Double longitude
+    ) {
         if (latitude != null && longitude != null) {
             try {
                 return (Point) new WKTReader().read(String.format("POINT(%s %s)", latitude, longitude));

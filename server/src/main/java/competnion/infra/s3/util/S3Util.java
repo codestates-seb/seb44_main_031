@@ -10,10 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Component
 public class S3Util {
@@ -45,7 +45,7 @@ public class S3Util {
 
     public void deleteImage(String imgUrl) {
         String key = imgUrl.substring(imgUrl.lastIndexOf("/") + 1);
-        String decodeKey = URLDecoder.decode(key, StandardCharsets.UTF_8);
+        String decodeKey = URLDecoder.decode(key, UTF_8);
 
         delete(decodeKey);
     }
