@@ -65,10 +65,7 @@ public class UserServiceImpl implements UserService{
     ) {
         User existsUser = isExistsUser(userId);
         Point point = coordinateUtil.coordinateToPoint(addressRequest.getLatitude(), addressRequest.getLongitude());
-
-        existsUser.setAddress(addressRequest.getAddress());
-        existsUser.setPoint(point);
-
+        existsUser.updateAddressAndCoordinates(addressRequest.getAddress(), point);
         return UpdateAddressResponse.of(
                 addressRequest.getLatitude(), addressRequest.getLongitude(), addressRequest.getAddress()
         );
