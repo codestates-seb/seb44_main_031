@@ -1,14 +1,14 @@
-cloud:
-  aws:
-    s3:
-      bucket: ${S3_BUCKET_NAME}
-    region:
-      static: ap-northeast-2
-    stack:
-      auto: false # CloudFormation 구성을 사용하지 않도록 설정
-    credentials:
-      accessKey: ${S3_ACCESS_KEY}
-      secretKey: ${S3_SECRET_KEY}
+#cloud:
+#  aws:
+#    s3:
+#      bucket: ${S3_BUCKET_NAME}
+#    region:
+#      static: ap-northeast-2
+#    stack:
+#      auto: false # CloudFormation 구성을 사용하지 않도록 설정
+#    credentials:
+#      accessKey: ${S3_ACCESS_KEY}
+#      secretKey: ${S3_SECRET_KEY}
 
 Spring:
 
@@ -21,7 +21,7 @@ Spring:
     host: smtp.gmail.com # gmail SMTP 서버
     port: 587 # gmail SMTP 서버
     username: dlawjdals02182@gmail.com
-    password:
+    password: 
     properties: # 추가 속성
       mail:
         smtp:

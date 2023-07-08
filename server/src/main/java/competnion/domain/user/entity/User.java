@@ -5,6 +5,7 @@ import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
@@ -45,7 +46,9 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String password;
+    @Setter
     private Point point;
+    @Setter
     private String address;
     private String imgUrl;
     @Column(name = "deleted_at")
@@ -54,14 +57,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
-    public void updateAddressAndCoordinates(String address, Point point) {
+    public void updateAddressAndCoordinates(final String address, final Point point) {
         hasText(address, "address must not be null");
         notNull(point, "point must not be null");
         this.address = address;
         this.point = point;
     }
 
-    public void updateImgUrl(String imgUrl) {
+    public void updateImgUrl(final String imgUrl) {
         hasText(imgUrl, "imgUrl must not be null");
         this.imgUrl = imgUrl;
     }
@@ -71,12 +74,16 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
-    private User(final String username, final String email, final String password) {
+    private User(final String username, final String email, final String password, final String address, final Point point) {
         hasText(username, "username must not be null");
         hasText(email, "email must not be null");
         hasText(password, "password must not be null");
+        hasText(address, "address must not be null");
+        notNull(point, "password must not be null");
         this.username = username;
         this.email = email;
         this.password = password;
+        this.address = address;
+        this.point = point;
     }
 }

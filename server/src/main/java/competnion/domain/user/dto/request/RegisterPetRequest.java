@@ -13,6 +13,6 @@ public class RegisterPetRequest {
     private LocalDateTime birth;
     private Boolean gender;
     private Boolean isNeutered;
-    private MultipartFile image;
+//    private MultipartFile image;
     private String inoculated;
 }

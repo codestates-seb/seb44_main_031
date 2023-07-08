@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Getter
@@ -23,4 +24,11 @@ public class SignUpRequest {
              message = "비밀번호는 특수문자, 영문자, 숫자 포함 8~20자 여야 합니다.")
     @NotBlank(message = "비밀번호는 필수 항목입니다.")
     private String password;
+    @NotNull
+    private Double latitude;
+    @NotNull
+    private Double longitude;
+    @NotBlank
+    private String address;
+    private Boolean isEmailAuthed;
 }

@@ -9,9 +9,9 @@ import javax.mail.MessagingException;
 
 public interface AuthService {
     void signUp(SignUpRequest signUpRequest);
-    void checkDuplicateAndSendVerificationEmail(String email);
-    void verifyEmailCode(String code, String email);
-//    Boolean isDuplicateEmail(String email);
-    void checkDuplicateUsername(String username);
+    void checkDuplicateEmailAndSendVerificationEmail(String email);
+    Boolean verifyEmailCode(String code, String email);
+    Boolean checkDuplicatedUsername(String username);
+    Boolean checkDuplicatedEmail(String email);
     void resetPassword(ResetPasswordRequest resetPasswordRequest);
 }

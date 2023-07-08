@@ -48,13 +48,13 @@ public class UserController {
         return ResponseEntity.ok(Response.success(usernameResponse));
     }
 
-    @PatchMapping("/image")
-    public ResponseEntity<Response> uploadProfileImage(
-            @PathVariable("userId") final Long userId,
-            @RequestParam("image")  final MultipartFile image
-    ) {
-        String imgUrl = userService.uploadProfileImage(userId, image);
-
-        return ResponseEntity.ok(Response.success(imgUrl));
-    }
+//    @PatchMapping("/image")
+//    public ResponseEntity<Response> uploadProfileImage(
+//            @PathVariable("userId") final Long userId,
+//            @RequestParam("image")  final MultipartFile image
+//    ) {
+//        String imgUrl = userService.uploadProfileImage(userId, image);
+//
+//        return ResponseEntity.ok(Response.success(imgUrl));
+//    }
 }

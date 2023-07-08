@@ -22,7 +22,7 @@ public class PetServiceImpl implements PetService{
 
     private final PetRepository petRepository;
     private final UserRepository userRepository;
-    private final S3Util s3Util;
+//    private final S3Util s3Util;
 
     @Override
     public PetResponse registerPet(
@@ -31,7 +31,7 @@ public class PetServiceImpl implements PetService{
     ) {
         User existsUser = isExistsUser(userId);
         hasSpaceForMoreDog(userId);
-        isFileAnImage(registerPetRequest.getImage());
+//        isFileAnImage(registerPetRequest.getImage());
         Pet pet = postPet(existsUser, registerPetRequest);
         petRepository.save(pet);
         existsUser.addPet(pet);
@@ -48,11 +48,11 @@ public class PetServiceImpl implements PetService{
                 .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
     }
 
-    private void isFileAnImage(MultipartFile image) {
-        String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
-        if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
-            throw new BusinessException(INVALID_INPUT_VALUE);
-    }
+//    private void isFileAnImage(MultipartFile image) {
+//        String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
+//        if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
+//            throw new BusinessException(INVALID_INPUT_VALUE);
+//    }
 
     private Pet postPet(User user, RegisterPetRequest registerPetRequest) {
         return Pet.RegisterPet()
@@ -60,7 +60,8 @@ public class PetServiceImpl implements PetService{
                 .birth(registerPetRequest.getBirth())
                 .gender(registerPetRequest.getGender())
                 .isNeutered(registerPetRequest.getIsNeutered())
-                .imgUrl(s3Util.uploadImage(registerPetRequest.getImage()))
+//                .imgUrl(s3Util.uploadImage(registerPetRequest.getImage()))
+                .imgUrl("test.jpg")
                 .inoculated(registerPetRequest.getInoculated())
                 .user(user)
                 .build();

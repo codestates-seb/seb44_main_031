@@ -20,16 +20,13 @@ public class AuthController {
     // 회원가입 유저네임 중복체크
     @GetMapping("/check-username")
     public ResponseEntity<Response> checkUsername(@RequestParam("username") final String username) {
-        authService.checkDuplicateUsername(username);
-
-        return ResponseEntity.ok(Response.success());
+        return ResponseEntity.ok(Response.success(authService.checkDuplicatedUsername(username)));
     }
 
     // 이메일 중복체크 & 인증 코드 전송
     @GetMapping("/send-verification-email")
-    public ResponseEntity<Response> checkDuplicateAndSendVerificationEmail(@RequestParam("email") final String email) {
-        authService.checkDuplicateAndSendVerificationEmail(email);
-
+    public ResponseEntity<Response> checkDuplicateEmailAndSendVerificationEmail(@RequestParam("email") final String email) {
+        authService.checkDuplicateEmailAndSendVerificationEmail(email);
         return ResponseEntity.ok(Response.success());
     }
 
@@ -37,7 +34,6 @@ public class AuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<Response> signUp(@Valid @RequestBody final SignUpRequest signUpRequest) {
         authService.signUp(signUpRequest);
-
         return ResponseEntity.ok(Response.success());
     }
 
@@ -47,16 +43,13 @@ public class AuthController {
             @RequestParam("code")  final String code,
             @RequestParam("email") final String email
     ) {
-        authService.verifyEmailCode(code, email);
-
-        return ResponseEntity.ok(Response.success());
+        return ResponseEntity.ok(Response.success(authService.verifyEmailCode(code, email)));
     }
 
     // 비밃번호 재설정
     @PatchMapping("/reset-password")
     public ResponseEntity<Response> resetPassword(@Valid @RequestBody final ResetPasswordRequest resetPasswordRequest) {
         authService.resetPassword(resetPasswordRequest);
-
         return ResponseEntity.ok(Response.success());
     }
 }
