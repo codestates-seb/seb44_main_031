@@ -1,7 +1,30 @@
 import { styled } from 'styled-components';
 import { FaRegClock, FaMapMarkerAlt } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+declare global {
+  interface Window {
+    kakao: any;
+  }
+}
 
 const WalkMateDetailSide: React.FC = () => {
+  const [map, setMap] = useState<any>();
+  const [marker, setMarker] = useState<any>();
+  console.log(map, marker);
+
+  useEffect(() => {
+    window.kakao.maps.load(() => {
+      const container = document.getElementById('map');
+      const options = {
+        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3,
+      };
+
+      setMap(new window.kakao.maps.Map(container, options));
+      setMarker(new window.kakao.maps.Marker());
+    });
+  }, []);
+
   return (
     <SlideBox>
       <SlideContainer>
@@ -25,7 +48,7 @@ const WalkMateDetailSide: React.FC = () => {
           </div>
         </SideTextDown>
       </SlideContainer>
-      <Map src="/src/assets/map.png" />
+      <MapContainer id="map" />
     </SlideBox>
   );
 };
@@ -86,10 +109,14 @@ const SideTextDown = styled.div`
     color: var(--black-900);
   }
 `;
-const Map = styled.img`
+
+const MapContainer = styled.div`
   margin-top: 50px;
   border-radius: 30px;
   width: 250px;
+  height: 500px;
 `;
 
-const SlideBox = styled.div``;
+const SlideBox = styled.div`
+  margin-left: 50px;
+`;
