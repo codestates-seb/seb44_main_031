@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import SignUp from './features/sign-up/SignUp';
 import SignIn from './features/sign-in/SignIn';
 import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
+import Main from './components/Main';
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
       <GlobalStyle />
       <Header />
       <Routes>
-        <Route path="/" element={<p>초기화면 구현 테스트</p>} />
+        <Route path="/" element={<Main />} />
         <Route path="walk-mate">
           <Route path="all" element={<WalkMateAll />} />
           <Route path="create" element={<WalkMateCreate />} />

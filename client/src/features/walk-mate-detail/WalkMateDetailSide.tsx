@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-const WalkMateDetailSide: React.FC = () => {
+const WalkMateDetailSide = () => {
   const [map, setMap] = useState<any>();
   const [marker, setMarker] = useState<any>();
   console.log(map, marker);

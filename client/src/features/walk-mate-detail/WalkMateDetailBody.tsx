@@ -8,7 +8,7 @@ interface Comment {
   content: string;
 }
 
-const WalkMateDetailBody: React.FC = () => {
+const WalkMateDetailBody = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
 

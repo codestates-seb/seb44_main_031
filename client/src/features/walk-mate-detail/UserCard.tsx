@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-const UserCard: React.FC = () => {
+const UserCard = () => {
   return (
     <UserCardContainer>
       <UserCardRow>
