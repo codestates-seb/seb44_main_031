@@ -3,7 +3,6 @@ package competnion.domain.user.service;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
-import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
@@ -15,16 +14,12 @@ import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static competnion.global.exception.ExceptionCode.INVALID_INPUT_VALUE;
-import static competnion.global.exception.ExceptionCode.valueOf;
 
 
 @Service
@@ -35,7 +30,7 @@ public class UserService {
     private final PetRepository petRepository;
     private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
@@ -89,7 +84,7 @@ public class UserService {
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.ACCESS_NOT_ALLOWED));
     }
 
     public Boolean checkExistsUserByUsername(final String username) {
@@ -108,15 +103,16 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public void saveUser(Point point, SignUpRequest signUpRequest) {
-        userRepository.save(User.SignUp()
-                .email(signUpRequest.getEmail())
-                .username(signUpRequest.getUsername())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .address(signUpRequest.getAddress())
-                .point(point)
-                .build());
-    }
+//    public void saveUser(Point point, SignUpRequest signUpRequest, List<String> roles) {
+//        userRepository.save(User.SignUp()
+//                .email(signUpRequest.getEmail())
+//                .username(signUpRequest.getUsername())
+//                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+//                .address(signUpRequest.getAddress())
+//                .point(point)
+//                .roles(roles)
+//                .build());
+//    }
 
 //    public User getAuthenticationUser() {
 //        String email = getContext().getAuthentication().getName();

@@ -80,7 +80,7 @@ public class PetService {
 
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE);
+        if (count >= 3) throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRED);
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {
