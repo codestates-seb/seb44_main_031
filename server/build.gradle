@@ -24,7 +24,6 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -38,6 +37,7 @@ dependencies {
 
 	// mail
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+	implementation group: 'com.sun.mail', name: 'javax.mail', version: '1.6.2'
 
 	// jasypt
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5'
@@ -45,13 +45,32 @@ dependencies {
 	// Spatial type
 	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '5.6.9.Final'
 
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// AWS S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	//
+	implementation 'commons-io:commons-io:2.11.0'
+
 //	// Websocket + STOMP
 //	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 //	implementation 'org.webjars:stomp-websocket:2.3.3-1'
 //	implementation 'org.webjars:sockjs-client:1.5.1'
 
 //	// Gson
-//	implementation 'com.google.code.gson:gson:2.8.8'
+	implementation 'com.google.code.gson:gson:2.8.8'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly	'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// Mapstruct
+	implementation 'org.mapstruct:mapstruct:1.5.1.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
 
 }
 
