@@ -4,15 +4,14 @@ import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
-import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
-import competnion.global.exception.BusinessException;
+import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
-import competnion.infra.redis.util.RedisUtil;
 import competnion.infra.s3.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -23,7 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static competnion.global.exception.ExceptionCode.INVALID_INPUT_VALUE;
+import static competnion.global.exception.ExceptionCode.valueOf;
+
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,7 @@ public class UserService {
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE));
     }
 
     public Boolean checkExistsUserByUsername(final String username) {

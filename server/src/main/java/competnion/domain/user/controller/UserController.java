@@ -2,7 +2,6 @@ package competnion.domain.user.controller;
 
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.AddressRequest;
-import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;

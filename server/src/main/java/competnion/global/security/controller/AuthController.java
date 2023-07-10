@@ -1,14 +1,18 @@
-package competnion.domain.user.controller;
+package competnion.global.security.controller;
 
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
-import competnion.domain.user.service.AuthService;
+import competnion.global.security.service.AuthService;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Positive;
@@ -17,14 +21,22 @@ import javax.validation.constraints.Positive;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController { // VerificationFilter 이후의 처리
 
     private final AuthService authService;
 
-    /**
-     * TODO : 커스텀 어노테이션으로 검증하기
-     */
-    // 회원가입 유저네임 중복체크
+
+//    @PostMapping("/social-login/google")
+//    public ResponseEntity doSocialLogin(@RequestBody LoginDto loginDto) {
+//
+//        // 로그인 자체는 필터에서 구현이 다 되었는데 추가적으로 던져줘야할 정보가 있을 경우에 작성
+//
+//
+//        return ResponseEntity.ok().build();
+//    }
+
+
+
     @GetMapping("/check-username")
     public Response<Boolean> checkUsername(@ValidUsername @RequestParam("username") final String username) {
         return Response.success(authService.checkDuplicatedUsername(username));
@@ -78,4 +90,25 @@ public class AuthController {
         authService.deleteUser(userId);
         return Response.success();
     }
+
+
+    @PostMapping("/reissue")
+    public ResponseEntity postReissue(HttpServletRequest request, HttpServletResponse response) {
+
+        authService.reissue(request,response);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity deleteLogout(HttpServletRequest request) {
+
+        authService.logout(request);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+
+
 }

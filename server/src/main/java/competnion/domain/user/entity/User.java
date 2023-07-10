@@ -56,6 +56,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
 
+    // 태영 추가 (유저 권한)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
+
     public void updateAddressAndCoordinates(final String address, final Point point) {
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
@@ -91,4 +95,14 @@ public class User extends BaseEntity {
         this.address = address;
         this.point = point;
     }
+
+    // 태영 추가
+    @Builder(builderMethodName = "UserDetails")
+    private User(final Long id, final String email, final String password, final List<String> roles) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
+
 }
