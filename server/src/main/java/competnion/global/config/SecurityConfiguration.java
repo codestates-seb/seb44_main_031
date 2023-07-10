@@ -84,37 +84,21 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
                                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll() // Preflight request
 
+
+                                .antMatchers(HttpMethod.DELETE,"/auth").hasRole("USER")
+                                .antMatchers(HttpMethod.POST,"/auth/sign-up").permitAll()
+                                .antMatchers(HttpMethod.GET,"/auth/sign-up/send-verification-email").permitAll()
+                                .antMatchers(HttpMethod.GET,"/auth/verify-email").permitAll()
+                                .antMatchers(HttpMethod.GET,"/auth/check-username").permitAll()
+                                .antMatchers(HttpMethod.POST,"/auth/delete/send-verification-email").hasRole("USER")
                                 .antMatchers(HttpMethod.POST,"/auth/reissue").permitAll()
                                 .antMatchers(HttpMethod.DELETE, "/auth/logout").hasRole("USER")
 
-                                .antMatchers(HttpMethod.POST,"/members").permitAll() // 회원가입
-                                .antMatchers(HttpMethod.PATCH, "/members/**").hasRole("USER") //회원 수정
-                                .antMatchers(HttpMethod.GET, "/members/**").permitAll()
-                                .antMatchers(HttpMethod.GET, "/members").hasRole("USER") // User tab
-                                .antMatchers(HttpMethod.GET,"/members/users/**").hasRole("USER") // MYPAGE
-                                .antMatchers(HttpMethod.DELETE, "/members/**").hasRole("USER")
+                                .antMatchers(HttpMethod.PATCH,"/user/{user-id}").hasRole("USER")
 
 
-                                .antMatchers(HttpMethod.POST, "/*/questions").hasRole("USER")
-                                .antMatchers(HttpMethod.PATCH, "/questions/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET, "/questions/**").permitAll()
-                                .antMatchers(HttpMethod.GET, "/questions/**").permitAll()
-                                .antMatchers(HttpMethod.DELETE, "/questions/**").hasRole("USER")
 
-                                .antMatchers(HttpMethod.POST, "/answers").hasRole("USER")
-                                .antMatchers(HttpMethod.PATCH, "/answers/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET, "/answers/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET, "/answers").permitAll()
-                                .antMatchers(HttpMethod.DELETE, "/answers/**").hasRole("USER")
 
-                                .antMatchers(HttpMethod.POST, "/comments").hasRole("USER")
-                                .antMatchers(HttpMethod.PATCH, "/comments/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET, "/comments/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET, "/comments").hasRole("USER")
-                                .antMatchers(HttpMethod.DELETE, "/comments/**").hasRole("USER")
-
-                                .antMatchers(HttpMethod.POST, "/votes/**").hasRole("USER")
-                                .antMatchers(HttpMethod.DELETE, "/votes/**").hasRole("USER")
 
 
                                 .anyRequest().permitAll()
