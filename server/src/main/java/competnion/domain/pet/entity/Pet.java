@@ -9,13 +9,13 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.Assert.hasText;
-import static org.springframework.util.Assert.notNull;
+import static org.springframework.util.Assert.*;
 
 @Getter
 @Entity
@@ -31,13 +31,13 @@ public class Pet extends BaseEntity {
     @NotBlank
     private String name;
     @Column(nullable = false)
-    @NotBlank
+//    @NotBlank
     private LocalDateTime birth;
     @Column(nullable = false)
-    @NotBlank
+    @NotNull
     private Boolean gender;
     @Column(nullable = false)
-    @NotBlank
+    @NotNull
     private Boolean isNeutered;
     @Column(nullable = false)
     @NotBlank
@@ -51,12 +51,17 @@ public class Pet extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    public void updateImgUrl(final String imgUrl) {
+        hasText(imgUrl, "imgUrl must not be null");
+        this.imgUrl = imgUrl;
+    }
+
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
     private Pet(final String name, final LocalDateTime birth, final Boolean gender, final Boolean isNeutered, final String imgUrl, final String inoculated, final User user) {
         hasText(name, "name must not be null");
-        notNull(birth, "birth must not be null");
-        notNull(gender, "gender must not be null");
-        notNull(isNeutered, "isNeutered must not be null");
+//        notNull(birth, "birth must not be null");
+        isInstanceOf(Boolean.class, gender, "Boolean expected");
+        isInstanceOf(Boolean.class, isNeutered, "Boolean expected");
         hasText(imgUrl, "imgUrl must not be null");
         hasText(inoculated, "inoculated must not be null");
         notNull(user, "user must not be null");
