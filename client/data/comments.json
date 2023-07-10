@@ -1,16 +1,38 @@
 {
-    "comments": [
-      {
-        "id": 1,
-        "content": "첫 번째 댓글"
-      },
-      {
-        "id": 2,
-        "content": "두 번째 댓글"
-      },
-      {
-        "id": 3,
-        "content": "세 번째 댓글"
-      }
-    ]
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode"
+    }
+  ],
+  "comments": [
+    {
+      "content": "ㄷㅈㅂㄷㅂㅈㄷ",
+      "id": 26
+    },
+    {
+      "content": "ㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴ",
+      "id": 27
+    },
+    {
+      "content": "영탁님",
+      "id": 28
+    },
+    {
+      "content": "ㅈㅂㄷㅂㅈㄷ",
+      "id": 29
+    },
+    {
+      "content": "ㄷㅂㅈㄷㅂㅈㄷ",
+      "id": 30
+    },
+    {
+      "content": "ㅂㅈㄷㅂㅈㄷㅂ",
+      "id": 31
+    }
+  ],
+  "profile": {
+    "name": "typicode"
   }
+}

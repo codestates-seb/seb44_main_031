@@ -25,6 +25,7 @@ export default Main;
 const MainContainer = styled.div``;
 
 const FirstSection = styled.section`
+  margin-top: 2px;
   height: 800px;
   background-color: #f0f0f0;
   display: flex;
