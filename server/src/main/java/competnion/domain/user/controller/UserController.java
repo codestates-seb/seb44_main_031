@@ -1,49 +1,58 @@
 package competnion.domain.user.controller;
 
-import competnion.domain.user.entity.User;
-import competnion.domain.user.repository.UserRepository;
+import competnion.domain.user.annotation.ValidUsername;
+import competnion.domain.user.dto.request.AddressRequest;
+import competnion.domain.user.dto.request.UpdateUsernameRequest;
+import competnion.domain.user.dto.response.UpdateAddressResponse;
+import competnion.domain.user.dto.response.UpdateUsernameResponse;
+import competnion.domain.user.dto.response.UserResponse;
+import competnion.domain.user.service.UserService;
+import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+
+@Validated
 @RestController
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
-    @PostMapping("/point")
-    public ResponseEntity<?> testPoint() throws ParseException {
-        userRepository.save(
-                User.builder()
-                        .username("test")
-                        .email("dlawjdals990218@naver.com")
-                        .password("testPassword")
-                        .point(createPoint(12.15, 10.18666))
-                        .build());
-        userRepository.save(
-                User.builder()
-                        .username("test2")
-                        .email("dlawjdals9902218@naver.com")
-                        .password("test2Password")
-                        .point(createPoint(13.50, 11.22666))
-                        .build());
-        return null;
+    /**
+     * TODO : 커스텀 어노테이션으로 검증하기
+     */
+    @GetMapping("/{user-id}")
+    public Response<UserResponse> getUser(@Positive @PathVariable("user-id") final Long userId) {
+        return Response.success(userService.getProfile(userId));
     }
 
-    @GetMapping("/getpoint")
-    public ResponseEntity<?> testGetPoint() throws ParseException {
-        User user = userRepository.findById(1L).orElseThrow();
-        System.out.println(user.getPoint());
-        return null;
+    @PatchMapping("/address/{user-id}")
+    public Response<UpdateAddressResponse> updateAddressAndCoordinates(
+            @Positive @PathVariable("user-id") final Long userId,
+            @Valid @RequestBody                final AddressRequest addressRequest
+    ) {
+        return Response.success(userService.updateAddress(userId, addressRequest));
     }
 
-    public Point createPoint(Double latitude, Double longitude) throws ParseException {
-        return (Point)new WKTReader().read(String.format("POINT(%s %s)", longitude, latitude));
+    @PatchMapping("/username/{user-id}")
+    public Response<UpdateUsernameResponse> updateUsername(
+            @Positive @PathVariable("user-id")        final Long userId,
+            @ValidUsername @RequestParam("username") final String username
+    ) {
+        return Response.success(userService.updateUsername(userId, username));
+    }
+
+    @PatchMapping("/image/{user-id}")
+    public Response<String> uploadProfileImage(
+            @PathVariable("user-id") final Long userId,
+            @RequestPart("image")    final MultipartFile image
+    ) {
+        return Response.success(userService.uploadProfileImage(userId, image));
     }
 }
