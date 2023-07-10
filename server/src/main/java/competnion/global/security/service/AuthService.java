@@ -129,15 +129,8 @@ public class AuthService {
         Point point = coordinateUtil.coordinateToPoint(signUpRequest.getLatitude(), signUpRequest.getLongitude());
         List<String> roles = authorityUtils.createRoles(signUpRequest.getEmail());
         String encode = passwordEncoder.encode(signUpRequest.getPassword());
-        userRepository.save(User.SignUp()
-                .email(signUpRequest.getEmail())
-                .username(signUpRequest.getUsername())
-                .password(encode)
-                .address(signUpRequest.getAddress())
-                .point(point)
-                .roles(roles)
-                .build());
-//        userService.saveUser(point, signUpRequest, roles);
+
+        userService.saveUser(point, signUpRequest, encode, roles);
         redisUtil.deleteData(signUpRequest.getEmail());
     }
 
@@ -182,5 +175,4 @@ public class AuthService {
     public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
 
     }
-
 }

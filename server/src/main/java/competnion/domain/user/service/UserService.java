@@ -3,6 +3,7 @@ package competnion.domain.user.service;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
+import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
+
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,6 @@ public class UserService {
     private final PetRepository petRepository;
     private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
-//    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
@@ -103,19 +105,14 @@ public class UserService {
         userRepository.delete(user);
     }
 
-//    public void saveUser(Point point, SignUpRequest signUpRequest, List<String> roles) {
-//        userRepository.save(User.SignUp()
-//                .email(signUpRequest.getEmail())
-//                .username(signUpRequest.getUsername())
-//                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-//                .address(signUpRequest.getAddress())
-//                .point(point)
-//                .roles(roles)
-//                .build());
-//    }
-
-//    public User getAuthenticationUser() {
-//        String email = getContext().getAuthentication().getName();
-//        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
-//    }
+    public void saveUser(Point point, SignUpRequest signUpRequest, String encode, List<String> roles) {
+        userRepository.save(User.SignUp()
+                .email(signUpRequest.getEmail())
+                .username(signUpRequest.getUsername())
+                .password(encode)
+                .address(signUpRequest.getAddress())
+                .point(point)
+                .roles(roles)
+                .build());
+    }
 }

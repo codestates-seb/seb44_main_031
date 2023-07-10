@@ -1,5 +1,6 @@
 package competnion.global.config;
 
+import competnion.global.resolver.LoginUserArgumentResolver;
 import competnion.global.security.filter.JwtAuthenticationFilter;
 import competnion.global.security.filter.JwtVerificationFilter;
 import competnion.global.security.handler.AuthFailureHandler;
@@ -20,16 +21,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,11 +40,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity(debug = false)
 public class SecurityConfiguration implements WebMvcConfigurer {
+    private final LoginUserArgumentResolver loginUserArgumentResolver;
     private final CustomAuthorityUtils authorityUtils;
     private final RedisUtil redisUtil;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public SecurityConfiguration(CustomAuthorityUtils authorityUtils, RedisUtil redisUtil, RefreshTokenRepository refreshTokenRepository) {
+    public SecurityConfiguration(LoginUserArgumentResolver loginUserArgumentResolver, CustomAuthorityUtils authorityUtils, RedisUtil redisUtil, RefreshTokenRepository refreshTokenRepository) {
+        this.loginUserArgumentResolver = loginUserArgumentResolver;
         this.authorityUtils = authorityUtils;
         this.redisUtil = redisUtil;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -128,6 +130,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtParseInterceptor(jwtUtils()))
                 .addPathPatterns(List.of("/*/questions","/questions/**","/answers/**","/auth/**","/votes/**"));
+    }
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(loginUserArgumentResolver);
     }
 
     public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer,HttpSecurity> {
