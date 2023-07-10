@@ -15,6 +15,7 @@ import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,7 @@ public class UserService {
     private final PetRepository petRepository;
     private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
-//    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
@@ -111,17 +112,14 @@ public class UserService {
         userRepository.save(User.SignUp()
                 .email(signUpRequest.getEmail())
                 .username(signUpRequest.getUsername())
-//                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .password((signUpRequest.getPassword()))
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .address(signUpRequest.getAddress())
                 .point(point)
                 .build());
     }
 
-//    private Long getAuthenticatedUserId() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        User user = userRepository.findByEmail(authentication.getName())
-//                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
-//        return user.getId();
+//    public User getAuthenticationUser() {
+//        String email = getContext().getAuthentication().getName();
+//        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
 //    }
 }

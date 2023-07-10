@@ -68,23 +68,23 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final class UserDetail extends User implements UserDetails {
 
-//        UserDetail(User user) {
-//            setUserId(user.getId());
-//            setEmail(user.getEmail());
-//            setPassword(user.getPassword());
-//            setRoles(user.getRoles());
-//        }
-
         UserDetail(User user) {
-
-            UserDetail userDetail = (UserDetail) User.UserDetails()
-                                                    .id(user.getId())
-                                                    .email(user.getEmail())
-                                                    .password(user.getPassword())
-                                                    .roles(user.getRoles())
-                                                    .build();
-
+            setId(user.getId());
+            setEmail(user.getEmail());
+            setPassword(user.getPassword());
+            setRoles(user.getRoles());
         }
+
+//        UserDetail(User user) {
+//
+//            UserDetail userDetail = (UserDetail) User.UserDetails()
+//                                                    .id(user.getId())
+//                                                    .email(user.getEmail())
+//                                                    .password(user.getPassword())
+//                                                    .roles(user.getRoles())
+//                                                    .build();
+//
+//        }
 
 
 

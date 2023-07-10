@@ -42,7 +42,7 @@ public class UserController {
     @PatchMapping("/username/{user-id}")
     public Response<UpdateUsernameResponse> updateUsername(
             @Positive @PathVariable("user-id")        final Long userId,
-            @ValidUsername @RequestParam("username") final String username
+            @ValidUsername @RequestParam("username")  final String username
     ) {
         return Response.success(userService.updateUsername(userId, username));
     }

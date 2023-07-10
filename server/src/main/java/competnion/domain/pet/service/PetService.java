@@ -1,9 +1,10 @@
 package competnion.domain.pet.service;
 
+import competnion.domain.pet.dto.request.RegisterPetRequest;
+import competnion.domain.pet.dto.request.UpdatePetInfoRequest;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
-import competnion.domain.user.dto.request.RegisterPetRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
 
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static java.util.Optional.ofNullable;
 
 
 @Service
@@ -52,6 +54,15 @@ public class PetService {
         return imgUrl;
     }
 
+    public Pet updatePetInfo(Long userId, Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
+        Pet pet = checkExistsPetOrThrow(userId, petId);
+        ofNullable(updatePetInfoRequest.getName()).ifPresent(pet::updateName);
+        ofNullable(updatePetInfoRequest.getBirth()).ifPresent(pet::updateBirth);
+        ofNullable(updatePetInfoRequest.getNeutralization()).ifPresent(pet::updateNeutralization);
+        ofNullable(updatePetInfoRequest.getVaccine()).ifPresent(pet::updateVaccine);
+        return pet;
+    }
+
     /**
      * TODO : 리팩토링 필요
      */
@@ -77,9 +88,9 @@ public class PetService {
                 .name(registerPetRequest.getName())
                 .birth(registerPetRequest.getBirth())
                 .gender(registerPetRequest.getGender())
-                .isNeutered(registerPetRequest.getIsNeutered())
+                .neutralization(registerPetRequest.getNeutralization())
                 .imgUrl(imgUrl)
-                .inoculated(registerPetRequest.getInoculated())
+                .vaccine(registerPetRequest.getVaccine())
                 .user(user)
                 .build());
     }

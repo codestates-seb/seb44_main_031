@@ -25,6 +25,7 @@ import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
 @Getter
+@Setter
 @Entity
 @DynamicUpdate
 @Table(name = "users")
@@ -45,6 +46,7 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String password;
+    @Lob
     @Setter
     private Point point;
     @Setter

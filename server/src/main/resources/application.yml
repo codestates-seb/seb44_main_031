@@ -7,8 +7,9 @@ cloud:
     stack:
       auto: false # CloudFormation 구성을 사용하지 않도록 설정
     credentials:
-      accesskey:
-      secretkey:
+      accessKey:
+      secretKey:
+
 
 
 Spring:
@@ -21,7 +22,7 @@ Spring:
   mail:
     host: smtp.gmail.com # gmail SMTP 서버
     port: 587 # gmail SMTP 서버
-    username: dlawjdals02182@gmail.com
+    username:
     password:
     properties: # 추가 속성
       mail:
@@ -37,46 +38,49 @@ Spring:
     host: 127.0.0.1
     port: 6379
 
+jwt:
+  key: fasdfdasfasdfdsfasdfasdfasdfasdfasdf
+  access-token-expiration-minutes: 60
+  refresh-token-expiration-minutes: 20160
 
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-  profiles:
-    active: local
-  datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
+#  h2:
+#    console:
+#      enabled: true
+#      path: /h2-console
+#  profiles:
+#    active: local
 #  datasource:
-#    url: jdbc:mysql://localhost:3307/competnion?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-#    username:
+#    url: jdbc:h2:mem:test
+#    username: sa
 #    password:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-
+#    driver-class-name: org.h2.Driver
 #  jpa:
+#    database-platform: org.hibernate.dialect.H2Dialect
 #    hibernate:
 #      ddl-auto: create-drop
-#      naming:
-#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-#      use-new-id-generator-mappings: false
-#    database: mysql
-#    database-platform: org.hibernate.spatial.dialect.mysql.MySQL56InnoDBSpatialDialect
+#    show-sql: true
 #    properties:
 #      hibernate:
-#        show_sql: true
 #        format_sql: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/competnion?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: 
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      use-new-id-generator-mappings: false
+    database: mysql
+    database-platform: org.hibernate.spatial.dialect.mysql.MySQL56InnoDBSpatialDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
 
 logging.level:
   org.hibernate.SQL: debug
