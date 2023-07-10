@@ -41,9 +41,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity(debug = false)
 public class SecurityConfiguration implements WebMvcConfigurer {
     private final CustomAuthorityUtils authorityUtils;
-
     private final RedisUtil redisUtil;
-
     private final RefreshTokenRepository refreshTokenRepository;
 
     public SecurityConfiguration(CustomAuthorityUtils authorityUtils, RedisUtil redisUtil, RefreshTokenRepository refreshTokenRepository) {
@@ -64,7 +62,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
                 .headers().frameOptions().sameOrigin()
                 .and()
@@ -100,11 +97,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
                                 .antMatchers(HttpMethod.POST,"/pets/register/{user-id}").hasRole("USER")
 
-
-
-
-
-
                                 .anyRequest().permitAll()
                 );
 
@@ -113,7 +105,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
@@ -122,7 +113,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
@@ -137,15 +128,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtParseInterceptor(jwtUtils()))
                 .addPathPatterns(List.of("/*/questions","/questions/**","/answers/**","/auth/**","/votes/**"));
-
     }
 
-
     public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer,HttpSecurity> {
-
         @Override
-        public void configure(HttpSecurity builder) throws Exception {
-
+        public void configure(HttpSecurity builder) {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
             JwtAuthenticationFilter jwtAuthenticationFilter =
@@ -160,7 +147,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
             builder
                     .addFilter(jwtAuthenticationFilter)
                     .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
-
         }
     }
 }

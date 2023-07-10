@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CoordinateUtil {
-
     public Point coordinateToPoint(
             final Double latitude,
             final Double longitude

@@ -11,9 +11,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.locationtech.jts.geom.Point;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +23,11 @@ import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.util.Assert.*;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
 @Getter
-@Setter
 @Entity
 @DynamicUpdate
 @Table(name = "users")
@@ -47,9 +49,9 @@ public class User extends BaseEntity {
     @NotBlank
     private String password;
     @Lob
-    @Setter
+    @NotNull
     private Point point;
-    @Setter
+    @NotBlank
     private String address;
     private String imgUrl;
     @Column(name = "deleted_at")
@@ -84,6 +86,26 @@ public class User extends BaseEntity {
         this.pets.add(pet);
     }
 
+    public void idToDetails(Long id) {
+        notNull(id, "id must not be null");
+        this.id = id;
+    }
+
+    public void emailToDetails(String email) {
+        hasText(email, "email must not be empty");
+        this.email = email;
+    }
+
+    public void passwordToDetails(String password) {
+        hasText(password, "password must not be empty");
+        this.password = password;
+    }
+
+    public void rolesToDetails(List<String> roles) {
+        notNull(roles, "roles must not be null");
+        this.roles = roles;
+    }
+
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
     private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles) {
         hasText(username, "username must not be empty");
@@ -91,6 +113,7 @@ public class User extends BaseEntity {
         hasText(password, "password must not be empty");
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
+        notNull(roles, "roles must not be null");
         this.username = username;
         this.email = email;
         this.password = password;
@@ -98,14 +121,4 @@ public class User extends BaseEntity {
         this.point = point;
         this.roles = roles;
     }
-
-    // 태영 추가
-    @Builder(builderMethodName = "UserDetails")
-    private User(final Long id, final String email, final String password, final List<String> roles) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.roles = roles;
-    }
-
 }
