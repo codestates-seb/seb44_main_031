@@ -127,7 +127,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         log.info("======================================================================");
 
         log.info("Request AccessToken Payload ->  userEmail value 값 추출 ");
-        String userEmail = (String) claims.get("userEmail");
+        String userEmail = (String) claims.get("username");
 
         log.info("Request AccessToken Payload ->  roles value List값 추출 + 가공 ");
         List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));

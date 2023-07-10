@@ -93,7 +93,9 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.POST,"/auth/reissue").permitAll()
                                 .antMatchers(HttpMethod.DELETE, "/auth/logout").hasRole("USER")
 
-                                .antMatchers(HttpMethod.PATCH,"/user/{user-id}").hasRole("USER")
+                                .antMatchers(HttpMethod.PATCH,"/users/address/{user-id}").hasRole("USER")
+                                .antMatchers(HttpMethod.PATCH,"/users/username/{user-id}").hasRole("USER")
+                                .antMatchers(HttpMethod.PATCH,"/users/image/{user-id}").hasRole("USER")
 
 
 

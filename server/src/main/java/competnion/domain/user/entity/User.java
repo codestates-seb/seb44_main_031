@@ -85,7 +85,7 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
-    private User(final String username, final String email, final String password, final String address, final Point point) {
+    private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles) {
         hasText(username, "username must not be empty");
         hasText(email, "email must not be empty");
         hasText(password, "password must not be empty");
@@ -96,6 +96,7 @@ public class User extends BaseEntity {
         this.password = password;
         this.address = address;
         this.point = point;
+        this.roles = roles;
     }
 
     // 태영 추가
