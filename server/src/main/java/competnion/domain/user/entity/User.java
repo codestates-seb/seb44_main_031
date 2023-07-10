@@ -26,7 +26,6 @@ import static org.springframework.util.Assert.notNull;
 
 @Getter
 @Entity
-@DynamicInsert
 @DynamicUpdate
 @Table(name = "users")
 @NoArgsConstructor(access = PROTECTED)
@@ -58,28 +57,34 @@ public class User extends BaseEntity {
     private List<Pet> pets = new ArrayList<>();
 
     public void updateAddressAndCoordinates(final String address, final Point point) {
-        hasText(address, "address must not be null");
+        hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
         this.address = address;
         this.point = point;
     }
 
     public void updateImgUrl(final String imgUrl) {
-        hasText(imgUrl, "imgUrl must not be null");
+        hasText(imgUrl, "imgUrl must not be empty");
         this.imgUrl = imgUrl;
     }
 
+    public void updateUsername(final String username) {
+        hasText(username, "username must not be empty");
+        this.username = username;
+    }
+
     public void addPet(Pet pet) {
+        notNull(pet, "pet must not be null");
         this.pets.add(pet);
     }
 
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
     private User(final String username, final String email, final String password, final String address, final Point point) {
-        hasText(username, "username must not be null");
-        hasText(email, "email must not be null");
-        hasText(password, "password must not be null");
-        hasText(address, "address must not be null");
-        notNull(point, "password must not be null");
+        hasText(username, "username must not be empty");
+        hasText(email, "email must not be empty");
+        hasText(password, "password must not be empty");
+        hasText(address, "address must not be empty");
+        notNull(point, "point must not be null");
         this.username = username;
         this.email = email;
         this.password = password;

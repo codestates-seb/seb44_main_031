@@ -8,19 +8,15 @@ import lombok.Getter;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Response {
-    private boolean success;
-    private Result result;
+public class Response<T> {
+    private String success;
+    private T result;
 
-    public static Response success() {
-        return new Response(true, null);
+    public static<T> Response<T> success() {
+        return new Response<>("요청 성공!!!!!", null);
     }
 
-    public static <T> Response success(T data) {
-        return new Response(true, new Success<>(data));
-    }
-
-    public static Response failure(String message) {
-        return new Response(false, new Failure(message));
+    public static<T> Response<T> success(T data) {
+        return new Response<>("요청 성공!!!!!", data);
     }
 }

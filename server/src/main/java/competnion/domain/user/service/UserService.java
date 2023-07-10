@@ -1,14 +1,126 @@
 package competnion.domain.user.service;
 
+import competnion.domain.pet.dto.response.PetResponse;
+import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
+import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
+import competnion.domain.user.entity.User;
+import competnion.domain.user.repository.UserRepository;
+import competnion.global.exception.BusinessException;
+import competnion.global.util.CoordinateUtil;
+import competnion.infra.redis.util.RedisUtil;
+import competnion.infra.s3.util.S3Util;
+import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-public interface UserService {
-    UserResponse getProfile(Long userId);
-    UpdateUsernameResponse updateUsername(Long userId, UpdateUsernameRequest updateUsernameRequest);
-    UpdateAddressResponse updateAddress(Long userId, AddressRequest addressRequest);
-//    String uploadProfileImage(Long userId, MultipartFile image);
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final PetRepository petRepository;
+    private final CoordinateUtil coordinateUtil;
+    private final S3Util s3Util;
+//    private final PasswordEncoder passwordEncoder;
+
+    @Transactional(readOnly = true)
+    public UserResponse getProfile(final Long userId) {
+        User existsUser = returnExistsUserByIdOrThrow(userId);
+        List<PetResponse> pets = petRepository.findAllByUserId(userId)
+                .stream()
+                .map(PetResponse::of)
+                .collect(Collectors.toList());
+        return UserResponse.of(existsUser, pets);
+    }
+
+    @Transactional
+    public UpdateUsernameResponse updateUsername(
+            final Long userId,
+            final String username
+    ) {
+        User user = returnExistsUserByIdOrThrow(userId);
+        user.updateUsername(username);
+        return UpdateUsernameResponse.of(user.getUsername());
+    }
+
+    @Transactional
+    public UpdateAddressResponse updateAddress(
+            final Long userId,
+            final AddressRequest addressRequest
+    ) {
+        User existsUser = returnExistsUserByIdOrThrow(userId);
+        Point point = coordinateUtil.coordinateToPoint(addressRequest.getLatitude(), addressRequest.getLongitude());
+        existsUser.updateAddressAndCoordinates(addressRequest.getAddress(), point);
+        return UpdateAddressResponse.of(
+                addressRequest.getLatitude(), addressRequest.getLongitude(), addressRequest.getAddress()
+        );
+    }
+
+    @Transactional
+    public String uploadProfileImage(
+            final Long userId,
+            final MultipartFile image
+    ) {
+        s3Util.isFileAnImageOrThrow(image);
+        User existsUser = returnExistsUserByIdOrThrow(userId);
+        String imgUrl = s3Util.uploadImage(image);
+
+        if (existsUser.getImgUrl() != null)
+            s3Util.deleteImage(existsUser.getImgUrl());
+
+        existsUser.updateImgUrl(imgUrl);
+
+        return imgUrl;
+    }
+
+    public User returnExistsUserByIdOrThrow(final Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
+    }
+
+    public Boolean checkExistsUserByUsername(final String username) {
+        return userRepository.findByUsername(username).isEmpty();
+    }
+
+    public Boolean checkExistsUserByEmail(final String email) {
+        return userRepository.findByEmail(email).isEmpty();
+    }
+
+    public Boolean checkEmailValidate(final String email, final User user) {
+        return user.getEmail().equals(email);
+    }
+
+    public void deleteUser(final User user) {
+        userRepository.delete(user);
+    }
+
+    public void saveUser(Point point, SignUpRequest signUpRequest) {
+        userRepository.save(User.SignUp()
+                .email(signUpRequest.getEmail())
+                .username(signUpRequest.getUsername())
+//                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .password((signUpRequest.getPassword()))
+                .address(signUpRequest.getAddress())
+                .point(point)
+                .build());
+    }
+
+//    private Long getAuthenticatedUserId() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        User user = userRepository.findByEmail(authentication.getName())
+//                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
+//        return user.getId();
+//    }
 }
