@@ -84,7 +84,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
                                 .antMatchers(HttpMethod.OPTIONS,"/**").permitAll() // Preflight request
 
-
                                 .antMatchers(HttpMethod.DELETE,"/auth").hasRole("USER")
                                 .antMatchers(HttpMethod.POST,"/auth/sign-up").permitAll()
                                 .antMatchers(HttpMethod.GET,"/auth/sign-up/send-verification-email").permitAll()
@@ -146,7 +145,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
             JwtAuthenticationFilter jwtAuthenticationFilter =
                     new JwtAuthenticationFilter(authenticationManager,jwtTokenizer(),refreshTokenRepository);
 
-            jwtAuthenticationFilter.setFilterProcessesUrl("/members/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/auth/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new AuthSuccessHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new AuthFailureHandler());
 
