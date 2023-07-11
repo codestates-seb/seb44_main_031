@@ -4,22 +4,19 @@ import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
-import competnion.global.security.service.AuthService;
+import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
+import competnion.global.security.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Positive;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @Validated
 @RestController
@@ -75,19 +72,17 @@ public class AuthController { // VerificationFilter 이후의 처리
     // 회원탈퇴 이메일 코드 전송
     @GetMapping("/delete/send-verification-email")
     public Response<Void> checkValidateEmailAndSendEmail(
-            @Email @RequestParam("email") final String email,
-            @UserContext                  final Long userId
+            @UserContext                  final User user,
+            @Email @RequestParam("email") final String email
     ) {
-        authService.checkValidateEmailAndSendEmail(email, userId);
+        authService.checkValidateEmailAndSendEmail(user, email);
         return Response.success();
     }
 
     // 이메일 인증 후 유저 탈퇴
     @DeleteMapping
-    public Response<Void> deleteUser(
-            @UserContext final Long userId
-    ) {
-        authService.deleteUser(userId);
+    public Response<Void> deleteUser(@UserContext final User user) {
+        authService.deleteUser(user);
         return Response.success();
     }
 

@@ -6,6 +6,7 @@ import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
+import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
@@ -31,25 +32,25 @@ public class UserController {
 
     @PatchMapping("/address")
     public Response<UpdateAddressResponse> updateAddressAndCoordinates(
-            @UserContext        final Long userId,
+            @UserContext        final User user,
             @Valid @RequestBody final AddressRequest addressRequest
     ) {
-        return Response.success(userService.updateAddress(userId, addressRequest));
+        return Response.success(userService.updateAddress(user, addressRequest));
     }
 
     @PatchMapping("/username")
     public Response<UpdateUsernameResponse> updateUsername(
-            @UserContext                              final Long userId,
+            @UserContext                              final User user,
             @ValidUsername @RequestParam("username")  final String username
     ) {
-        return Response.success(userService.updateUsername(userId, username));
+        return Response.success(userService.updateUsername(user, username));
     }
 
     @PatchMapping("/image")
     public Response<String> uploadProfileImage(
-            @UserContext             final Long userId,
+            @UserContext             final User user,
             @RequestPart("image")    final MultipartFile image
     ) {
-        return Response.success(userService.uploadProfileImage(userId, image));
+        return Response.success(userService.uploadProfileImage(user, image));
     }
 }

@@ -141,16 +141,14 @@ public class AuthService {
     }
 
     @Transactional
-    public void checkValidateEmailAndSendEmail(final String email, final Long userId) {
-        User user = userService.returnExistsUserByIdOrThrow(userId);
-        if (!userService.checkEmailValidate(email, user))
+    public void checkValidateEmailAndSendEmail(final User user, final String email) {
+        if (!userService.checkEmailValidate(user, email))
             throw new BusinessLogicException(INVALID_INPUT_VALUE);
         sendEmail(email);
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        User user = userService.returnExistsUserByIdOrThrow(userId);
+    public void deleteUser(final User user) {
         userService.deleteUser(user);
     }
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static competnion.global.exception.ExceptionCode.*;
 import static java.util.Optional.ofNullable;
 
 
@@ -25,16 +26,14 @@ import static java.util.Optional.ofNullable;
 public class PetService {
 
     private final PetRepository petRepository;
-    private final UserService userService;
     private final S3Util s3Util;
 
     public PetResponse registerPet(
-            final Long userId,
+            final User user,
             final RegisterPetRequest registerPetRequest,
             final MultipartFile image
     ) {
-        User user = userService.returnExistsUserByIdOrThrow(userId);
-        hasSpaceForRegisterPetOrThrow(userId);
+        hasSpaceForRegisterPetOrThrow(user.getId());
         s3Util.isFileAnImageOrThrow(image);
         String imgUrl = s3Util.uploadImage(image);
 
@@ -44,9 +43,9 @@ public class PetService {
         return PetResponse.of(pet);
     }
 
-    public String updatePetImage(final Long userId, final Long petId, final MultipartFile image) {
+    public String updatePetImage(final User user, final Long petId, final MultipartFile image) {
         s3Util.isFileAnImageOrThrow(image);
-        Pet pet = checkExistsPetOrThrow(userId, petId);
+        Pet pet = checkExistsPetOrThrow(user, petId);
 
         s3Util.deleteImage(pet.getImgUrl());
         String imgUrl = s3Util.uploadImage(image);
@@ -54,8 +53,8 @@ public class PetService {
         return imgUrl;
     }
 
-    public Pet updatePetInfo(Long userId, Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
-        Pet pet = checkExistsPetOrThrow(userId, petId);
+    public Pet updatePetInfo(final User user, final Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
+        Pet pet = checkExistsPetOrThrow(user, petId);
         ofNullable(updatePetInfoRequest.getName()).ifPresent(pet::updateName);
         ofNullable(updatePetInfoRequest.getBirth()).ifPresent(pet::updateBirth);
         ofNullable(updatePetInfoRequest.getNeutralization()).ifPresent(pet::updateNeutralization);
@@ -63,24 +62,20 @@ public class PetService {
         return pet;
     }
 
-    /**
-     * TODO : 리팩토링 필요
-     */
-    public Pet checkExistsPetOrThrow(final Long userId, final Long petId) {
+    public Pet checkExistsPetOrThrow(final User user, final Long petId) {
         Pet findPet = petRepository.findById(petId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE));
-        User user = userService.returnExistsUserByIdOrThrow(userId);
+                .orElseThrow(() -> new BusinessLogicException(INVALID_INPUT_VALUE));
 
         boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
-        if (!petMatch) throw new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE);
 
+        if (!petMatch) throw new BusinessLogicException(INVALID_INPUT_VALUE);
         return findPet;
     }
 
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRED);
+        if (count >= 3) throw new BusinessLogicException(ACCESS_TOKEN_EXPIRED);
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {

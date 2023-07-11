@@ -46,22 +46,20 @@ public class UserService {
 
     @Transactional
     public UpdateUsernameResponse updateUsername(
-            final Long userId,
+            final User user,
             final String username
     ) {
-        User user = returnExistsUserByIdOrThrow(userId);
         user.updateUsername(username);
         return UpdateUsernameResponse.of(user.getUsername());
     }
 
     @Transactional
     public UpdateAddressResponse updateAddress(
-            final Long userId,
+            final User user,
             final AddressRequest addressRequest
     ) {
-        User existsUser = returnExistsUserByIdOrThrow(userId);
         Point point = coordinateUtil.coordinateToPoint(addressRequest.getLatitude(), addressRequest.getLongitude());
-        existsUser.updateAddressAndCoordinates(addressRequest.getAddress(), point);
+        user.updateAddressAndCoordinates(addressRequest.getAddress(), point);
         return UpdateAddressResponse.of(
                 addressRequest.getLatitude(), addressRequest.getLongitude(), addressRequest.getAddress()
         );
@@ -69,17 +67,16 @@ public class UserService {
 
     @Transactional
     public String uploadProfileImage(
-            final Long userId,
+            final User user,
             final MultipartFile image
     ) {
         s3Util.isFileAnImageOrThrow(image);
-        User existsUser = returnExistsUserByIdOrThrow(userId);
         String imgUrl = s3Util.uploadImage(image);
 
-        if (existsUser.getImgUrl() != null)
-            s3Util.deleteImage(existsUser.getImgUrl());
+        if (user.getImgUrl() != null)
+            s3Util.deleteImage(user.getImgUrl());
 
-        existsUser.updateImgUrl(imgUrl);
+        user.updateImgUrl(imgUrl);
 
         return imgUrl;
     }
@@ -97,7 +94,7 @@ public class UserService {
         return userRepository.findByEmail(email).isEmpty();
     }
 
-    public Boolean checkEmailValidate(final String email, final User user) {
+    public Boolean checkEmailValidate(final User user, final String email) {
         return user.getEmail().equals(email);
     }
 
