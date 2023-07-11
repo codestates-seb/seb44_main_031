@@ -1,9 +1,11 @@
 package competnion.domain.community.dto.response;
 
+import competnion.domain.comment.dto.CommentDto;
 import competnion.domain.community.entity.Article;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class ArticleResponseDto {
@@ -14,6 +16,7 @@ public class ArticleResponseDto {
         private String body;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        private List<CommentDto.Response> comments;
 
         public ArticleResponseDto(Article entity) {
                 this.articleId = entity.getArticleId();

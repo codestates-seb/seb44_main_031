@@ -4,6 +4,7 @@ import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.user.entity.User;
+import competnion.domain.user.repository.UserRepository;
 import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.exception.ExceptionCode;
@@ -23,6 +24,7 @@ import java.util.Optional;
 public class CommunityService {
     private final ArticleRepository articleRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Transactional
     /**게시글 생성 메서드 **/
@@ -59,10 +61,12 @@ public class CommunityService {
 
     @Transactional(readOnly = true)
     /**게시글 전제 조회 메서드 **/
-    public Page<Article> findNearbyArticles(int page, int size, String sort) {
-        Pageable pageable = PageRequest.of(page, size);
-        //추후 로그인한 유저의 point값으로 거리계산해야함. 임시로 findall
-        return articleRepository.findAll(pageable);
+    public Page<Article> findNearbyArticles(final Long userId, Pageable pageable) {
+
+        User findUser = userService.returnExistsUserByIdOrThrow(userId);
+        Point userLocation = findUser.getPoint();
+
+        return articleRepository.findNearbyArticles(userLocation, pageable);
     }
 
     /** 질문 삭제 메서드 **/

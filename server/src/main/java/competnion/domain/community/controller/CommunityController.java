@@ -9,6 +9,7 @@ import competnion.domain.community.response.SingleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
+import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.exception.ExceptionCode;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import competnion.global.security.interceptor.JwtParseInterceptor;
@@ -30,6 +32,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Validated
@@ -40,7 +43,6 @@ import java.util.List;
 public class CommunityController {
     private final CommunityService communityService;
     private final PetRepository petRepository;
-    private final ArticleRepository articleRepository;
 
     /** 게시글 작성 **/
     @PostMapping
@@ -50,8 +52,7 @@ public class CommunityController {
          */
         Long userId = JwtParseInterceptor.getAuthenticatedUserId();
         List<Pet> pets = petRepository.findAllByUserId(userId);
-       if(pets == null) throw new BusinessLogicException(ExceptionCode.ACCESS_NOT_ALLOWED);
-
+        if(pets == null) throw new BusinessLogicException(ExceptionCode.ACCESS_NOT_ALLOWED);
         Article createdArticle = communityService.createArticle(userId, articlePostDto.toEntity());
         return new ResponseEntity<>(
                 new SingleResponseDto<>(new ArticleResponseDto(createdArticle)), HttpStatus.CREATED);
@@ -75,17 +76,19 @@ public class CommunityController {
 
     /** 전체 조회 **/
     @GetMapping
-    public List<Article> getAllArticlesWithin3Km(@RequestParam("point") Point point) {
+    public ResponseEntity getAllArticlesWithin3Km(@UserContext final Long userId,
+                                                  @PageableDefault(size = 30) Pageable pageable) {
         /**로그인한 사용자의 위치정보를 알기 위해서는 security정보 필요, 당장은 임의로 넣음 */
-        // 사용자의 위치로부터 위도와 경도 추출
-        double latitude = point.getY();
-        double longitude = point.getX();
+        Page<Article> articlePage = communityService.findNearbyArticles(userId, pageable);
+        List<Article> articles = articlePage.getContent();
 
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<ArticleResponseDto> articleResponseDtos = articles.stream()
+                .map(ArticleResponseDto::new)
+                .collect(Collectors.toList());
 
-        Page<Article> page = articleRepository.findNearbyArticles(point, pageable);
+        MultiResponseDto<ArticleResponseDto> multiResponseDto = new MultiResponseDto<>(articleResponseDtos, articlePage);
 
-        return page.getContent();
+        return new ResponseEntity<>(multiResponseDto, HttpStatus.OK);
     }
 
     /** 질문 삭제 **/
