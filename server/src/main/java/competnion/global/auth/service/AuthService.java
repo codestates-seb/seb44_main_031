@@ -1,15 +1,14 @@
-package competnion.global.security.service;
+package competnion.global.auth.service;
 
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.domain.user.service.UserService;
+import competnion.global.auth.repository.RefreshTokenRepository;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.security.interceptor.JwtParseInterceptor;
 import competnion.global.security.jwt.JwtTokenizer;
-import competnion.global.security.repository.RefreshTokenRepository;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.CustomAuthorityUtils;
 import competnion.global.util.JwtUtils;

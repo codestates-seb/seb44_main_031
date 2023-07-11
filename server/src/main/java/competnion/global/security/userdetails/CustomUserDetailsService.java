@@ -1,4 +1,4 @@
-package competnion.global.security.service;
+package competnion.global.security.userdetails;
 
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;

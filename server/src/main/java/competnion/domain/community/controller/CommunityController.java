@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/articles")
 @Slf4j
 @RequiredArgsConstructor
-
 public class CommunityController {
     private final CommunityService communityService;
     private final PetRepository petRepository;
@@ -68,6 +67,7 @@ public class CommunityController {
         return new ResponseEntity<>(
                 new SingleResponseDto<>(new ArticleResponseDto(updatedArticle)), HttpStatus.OK);
     }
+
     /** 게시글 상세 조회 **/
     @GetMapping("/{article-id}")
     public ArticleResponseDto getArticle(@PathVariable("article-id") @Positive Long articleId){

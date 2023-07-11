@@ -1,4 +1,4 @@
-package competnion.global.security.dto;
+package competnion.global.auth.dto;
 
 import lombok.Getter;
 

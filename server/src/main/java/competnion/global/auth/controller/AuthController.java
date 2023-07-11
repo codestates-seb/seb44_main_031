@@ -1,4 +1,4 @@
-package competnion.global.security.controller;
+package competnion.global.auth.controller;
 
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
@@ -6,7 +6,7 @@ import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
-import competnion.global.security.service.AuthService;
+import competnion.global.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

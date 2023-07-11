@@ -9,7 +9,7 @@ import competnion.global.security.handler.UserAccessDeniedHandler;
 import competnion.global.security.handler.UserAuthenticationEntryPoint;
 import competnion.global.security.interceptor.JwtParseInterceptor;
 import competnion.global.security.jwt.JwtTokenizer;
-import competnion.global.security.repository.RefreshTokenRepository;
+import competnion.global.auth.repository.RefreshTokenRepository;
 import competnion.global.util.CustomAuthorityUtils;
 import competnion.global.util.JwtUtils;
 import competnion.infra.redis.util.RedisUtil;

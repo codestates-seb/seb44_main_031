@@ -1,4 +1,4 @@
-package competnion.global.security.entity;
+package competnion.global.auth.entity;
 
 import lombok.*;
 
