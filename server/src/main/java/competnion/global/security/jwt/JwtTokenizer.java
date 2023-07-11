@@ -1,5 +1,6 @@
 package competnion.global.security.jwt;
 
+import competnion.domain.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -13,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -112,6 +114,35 @@ public class JwtTokenizer {
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(jws);
+    }
+
+    public String delegateAccessToken(User user) {
+
+        log.info("JwtAuthenticationFilter - delegateAccessToken");
+
+        // AccessToken 생성 로직
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("userId",user.getId());
+        claims.put("username",user.getUsername());
+        claims.put("roles",user.getRoles());
+        String subject = user.getEmail();
+        Date expiration = getTokenExpiration(getAccessTokenExpirationMinutes());
+        String encodedSecretKey = encodeBase64SecretKey(getSecretKey());
+
+        String accessToken = generateAccessToken(claims,subject,expiration,encodedSecretKey);
+
+        return accessToken;
+
+    }
+
+    public String delegateRefreshToken(User user) {
+        String subject = user.getEmail();
+        Date expiration = getTokenExpiration(getRefreshTokenExpirationMinutes());
+        String base64EncodedSecretKey = encodeBase64SecretKey(getSecretKey());
+
+        String refreshToken = generateRefreshToken(subject, expiration, base64EncodedSecretKey);
+
+        return refreshToken;
     }
 
 

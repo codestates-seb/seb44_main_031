@@ -13,14 +13,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
     UsernamePasswordAuthenticationToken :
@@ -100,8 +98,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         User user = (User) authResult.getPrincipal();
 
-        String accessToken = delegateAccessToken(user);
-        String refreshToken = delegateRefreshToken(user);
+        String accessToken = jwtTokenizer.delegateAccessToken(user);
+        String refreshToken = jwtTokenizer.delegateRefreshToken(user);
 
 
         log.info("refreshToken DB에 저장");
@@ -121,40 +119,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         this.getSuccessHandler().onAuthenticationSuccess(request,response,authResult);
 
     }
-
-    private String delegateAccessToken(User user) {
-
-        log.info("JwtAuthenticationFilter - delegateAccessToken");
-
-        // AccessToken 생성 로직
-        Map<String,Object> claims = new HashMap<>();
-        claims.put("userId",user.getId());
-        claims.put("username",user.getUsername());
-        claims.put("roles",user.getRoles());
-        String subject = user.getEmail();
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-        String encodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-        String accessToken = jwtTokenizer.generateAccessToken(claims,subject,expiration,encodedSecretKey);
-
-        return accessToken;
-
-    }
-
-    private String delegateRefreshToken(User user) {
-        String subject = user.getEmail();
-        Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getRefreshTokenExpirationMinutes());
-        String base64EncodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-        String refreshToken = jwtTokenizer.generateRefreshToken(subject, expiration, base64EncodedSecretKey);
-
-        return refreshToken;
-    }
-
-
-
-
-
-
 
 }

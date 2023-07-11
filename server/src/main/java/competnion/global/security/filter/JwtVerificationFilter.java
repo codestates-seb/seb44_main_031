@@ -78,12 +78,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
             request.setAttribute("exception",se);
 
         }
-        catch (ExpiredJwtException ee) {
-            log.info("만료된 AccessToken 입니다!");
-
-            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_EXPIRED);
-        }
-
         catch (BusinessLogicException be) {
             log.info("Business Exception 발생 !");
             request.setAttribute("exception",be);
