@@ -6,8 +6,6 @@ import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.entity.User;
-import competnion.domain.user.service.UserService;
-
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.exception.ExceptionCode;
 import competnion.infra.s3.util.S3Util;
@@ -15,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 import static competnion.global.exception.ExceptionCode.*;
 import static java.util.Optional.ofNullable;

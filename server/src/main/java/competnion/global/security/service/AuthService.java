@@ -28,7 +28,6 @@ import java.util.*;
 
 import static competnion.global.exception.ExceptionCode.*;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
