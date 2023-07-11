@@ -15,23 +15,49 @@ const Main = () => {
           <AnimatedText>PetMily</AnimatedText>
         </AnimatedTextContainer>
       </FirstSection>
-      {/* 나머지 섹션들 추가 */}
+      <SecondSection>
+        <TitleContainer>
+          <Title>당신 근처의 소중한 이웃들과 함께</Title>
+          <Subtitle>소중한 반려견들과 함께하는 즐거운 산책 시스템</Subtitle>
+        </TitleContainer>
+        <AnimatedTextContainer>
+          <MainDog src={mainDogImage} alt="강아지사진" />
+          <AnimatedText>PetMily</AnimatedText>
+        </AnimatedTextContainer>
+      </SecondSection>
     </MainContainer>
   );
 };
 
 export default Main;
 
-const MainContainer = styled.div``;
+const MainContainer = styled.div`
+  scroll-snap-type: y mandatory;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+`;
 
 const FirstSection = styled.section`
-  margin-top: 2px;
-  height: 800px;
-  background-color: #f0f0f0;
+  scroll-snap-align: start;
+  height: 100vh;
+  background-color: var(--beige-100);
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
+  overflow-x: hidden;
+`;
+const SecondSection = styled.section`
+  scroll-snap-align: start;
+  height: 100vh;
+  background-color: #c47070;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
 `;
 
 const slideIn = keyframes`
@@ -85,7 +111,7 @@ const AnimatedTextContainer = styled.div`
 const MainDog = styled.img`
   width: 700px;
   height: auto;
-  margin-right: 10px; /* 제목과 사진 사이의 간격을 조정 */
+  margin-right: 10px;
 `;
 
 const AnimatedText = styled.h3`

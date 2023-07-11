@@ -1,9 +1,22 @@
 import { styled } from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate('/');
+    window.location.reload();
+  };
+  const handleSignUpClick = () => {
+    navigate('/users/sign-up');
+  };
+  const handleLogin = () => {
+    navigate('/users/sign-in');
+  };
   return (
     <HeaderContainer>
-      <LogoContainer>
+      <LogoContainer onClick={handleLogoClick}>
         <LogoImage src="/src/assets/petmily-logo-pink.png" alt="PetMily Logo" />
         <LogoText>PetMily</LogoText>
       </LogoContainer>
@@ -14,8 +27,8 @@ const Header = () => {
         <NavLink>마이페이지</NavLink>
       </NavigationContainer>
       <AuthContainer>
-        <LoginButton>Login</LoginButton>
-        <LogoutButton>회원가입</LogoutButton>
+        <LoginButton onClick={handleLogin}>Login</LoginButton>
+        <SignUp onClick={handleSignUpClick}>회원가입</SignUp>
       </AuthContainer>
     </HeaderContainer>
   );
@@ -25,17 +38,23 @@ const HeaderContainer = styled.header`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100vw;
+
   height: 80px;
   background-color: white;
   padding: 0 80px;
-
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 999;
 `;
 
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
+  :hover {
+    cursor: pointer;
+  }
 `;
 
 const LogoImage = styled.img`
@@ -101,7 +120,7 @@ const LoginButton = styled.button`
   }
 `;
 
-const LogoutButton = styled.button`
+const SignUp = styled.button`
   font-size: 16px;
   font-weight: bold;
   color: white;
