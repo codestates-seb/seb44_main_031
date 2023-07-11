@@ -64,6 +64,6 @@ public class S3Util {
     public void isFileAnImageOrThrow(final MultipartFile image) {
         String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
         if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
-            throw new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE);
+            throw new BusinessLogicException(ExceptionCode.ACCESS_TOKEN_REGISTERED_LOGOUT);
     }
 }

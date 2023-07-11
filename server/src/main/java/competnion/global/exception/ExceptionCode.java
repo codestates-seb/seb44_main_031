@@ -16,12 +16,10 @@ public enum ExceptionCode {
 
     USER_NOT_FOUND(404, "USER NOT FOUND");
 
-
-
     @Getter
-    private int status;
+    private final int status;
     @Getter
-    private String message;
+    private final String message;
 
     ExceptionCode(int status, String message) {
         this.status = status;

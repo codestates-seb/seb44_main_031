@@ -18,63 +18,50 @@ import javax.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionAdvice {
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getBindingResult());
-
-        return response;
+            MethodArgumentNotValidException e
+    ) {
+        return ErrorResponse.of(e.getBindingResult());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleConstraintViolationException(
-            ConstraintViolationException e) {
-        final ErrorResponse response = ErrorResponse.of(e.getConstraintViolations());
-
-        return response;
+            ConstraintViolationException e
+    ) {
+        return ErrorResponse.of(e.getConstraintViolations());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public ErrorResponse handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException e) {
-
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED);
-
-        return response;
+            HttpRequestMethodNotSupportedException e
+    ) {
+        return ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler
     public ResponseEntity handleBusinessLogicException(BusinessLogicException e) {
-
         final ErrorResponse response = ErrorResponse.of(e.getExceptionCode());
-
         return new ResponseEntity<>(response, HttpStatus.valueOf(e.getExceptionCode().getStatus()));
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleHttpMessageNotReadableException(
-            HttpMessageNotReadableException e) {
-
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST,
-                "Required request body is missing");
-
-        return response;
+            HttpMessageNotReadableException e
+    ) {
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, "Required request body is missing");
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMissingServletRequestParameterException(
-            MissingServletRequestParameterException e) {
-
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST,
-                e.getMessage());
-
-        return response;
+            MissingServletRequestParameterException e
+    ) {
+        return ErrorResponse.of(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @ExceptionHandler
@@ -82,14 +69,6 @@ public class GlobalExceptionAdvice {
     public ErrorResponse handleException(Exception e) {
         System.out.println(HttpStatus.INTERNAL_SERVER_ERROR.value());
         System.out.println(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-
-        final ErrorResponse response = ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
-
-        return response;
+        return ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
-
-
-
 }

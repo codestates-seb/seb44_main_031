@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-@Target({FIELD})
-@Retention(RUNTIME)
+@Target(value = {FIELD})
+@Retention(value = RUNTIME)
 @Constraint(validatedBy = PasswordValidator.class)
 @Documented
 public @interface ValidPassword {
