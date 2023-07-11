@@ -20,7 +20,7 @@ public class RedisUtil {
 //  private final RedisTemplate<String, Object> redisTemplate;
 
     public void set(String key, Object o, int minutes) {
-        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer(o.getClass()));
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
         redisTemplate.opsForValue().set(key, (String) o, minutes, TimeUnit.MINUTES);
     }
 
@@ -37,7 +37,7 @@ public class RedisUtil {
     }
 
     public void setBlackList(String key, Object o, long minutes) {
-        redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer(o.getClass()));
+        redisBlackListTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
         redisBlackListTemplate.opsForValue().set(key, o, minutes, TimeUnit.MINUTES);
     }
 
@@ -54,7 +54,6 @@ public class RedisUtil {
     }
 
     // 정민님 코드
-
     public String getData(String key) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return valueOperations.get(key);
@@ -70,6 +69,4 @@ public class RedisUtil {
     public void deleteData(String key) {
         redisTemplate.delete(key);
     }
-
-
 }

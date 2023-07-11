@@ -31,10 +31,8 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final CustomAuthorityUtils authorityUtils;
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -57,22 +55,16 @@ public class CustomUserDetailsService implements UserDetailsService {
         User findUser = optionalUser.orElseThrow(() ->
                 new BusinessLogicException(ExceptionCode.USER_NOT_FOUND));
 
-
-
-
         log.info("DB에 유저 정보가 있으면 User -> 인증 주체인 PrincipalDetail 객체로 변환");
         return new UserDetail(findUser);
     }
 
-
-
     private final class UserDetail extends User implements UserDetails {
-
         UserDetail(User user) {
-            setId(user.getId());
-            setEmail(user.getEmail());
-            setPassword(user.getPassword());
-            setRoles(user.getRoles());
+            idToDetails(user.getId());
+            emailToDetails(user.getEmail());
+            passwordToDetails(user.getPassword());
+            rolesToDetails(user.getRoles());
         }
 
 //        UserDetail(User user) {

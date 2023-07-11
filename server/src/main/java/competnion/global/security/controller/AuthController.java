@@ -1,11 +1,13 @@
 package competnion.global.security.controller;
 
+import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.global.security.service.AuthService;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,14 +19,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Positive;
 
+import static org.springframework.http.HttpStatus.*;
+
 @Validated
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController { // VerificationFilter 이후의 처리
-
     private final AuthService authService;
-
 
 //    @PostMapping("/social-login/google")
 //    public ResponseEntity doSocialLogin(@RequestBody LoginDto loginDto) {
@@ -34,8 +36,6 @@ public class AuthController { // VerificationFilter 이후의 처리
 //
 //        return ResponseEntity.ok().build();
 //    }
-
-
 
     @GetMapping("/check-username")
     public Response<Boolean> checkUsername(@ValidUsername @RequestParam("username") final String username) {
@@ -73,42 +73,34 @@ public class AuthController { // VerificationFilter 이후의 처리
     }
 
     // 회원탈퇴 이메일 코드 전송
-    @GetMapping("/delete/send-verification-email/{user-id}")
+    @GetMapping("/delete/send-verification-email")
     public Response<Void> checkValidateEmailAndSendEmail(
-            @Email @RequestParam("email")     final String email,
-            @Positive @PathVariable("user-id") final Long userId
+            @Email @RequestParam("email") final String email,
+            @UserContext                  final Long userId
     ) {
         authService.checkValidateEmailAndSendEmail(email, userId);
         return Response.success();
     }
 
     // 이메일 인증 후 유저 탈퇴
-    @DeleteMapping("/{user-id}")
+    @DeleteMapping
     public Response<Void> deleteUser(
-            @Positive @PathVariable("user-id") final Long userId
+            @UserContext final Long userId
     ) {
         authService.deleteUser(userId);
         return Response.success();
     }
 
-
     @PostMapping("/reissue")
-    public ResponseEntity postReissue(HttpServletRequest request, HttpServletResponse response) {
-
+    public Response<Void> postReissue(HttpServletRequest request, HttpServletResponse response) {
         authService.reissue(request,response);
-
-        return ResponseEntity.ok().build();
+        return Response.success();
     }
 
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/logout")
-    public ResponseEntity deleteLogout(HttpServletRequest request) {
-
+    public Response<Void> deleteLogout(HttpServletRequest request) {
         authService.logout(request);
-        return ResponseEntity.noContent().build();
+        return Response.success();
     }
-
-
-
-
-
 }

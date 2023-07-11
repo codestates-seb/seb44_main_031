@@ -1,5 +1,6 @@
 package competnion.global.config;
 
+import competnion.global.resolver.LoginUserArgumentResolver;
 import competnion.global.security.filter.JwtAuthenticationFilter;
 import competnion.global.security.filter.JwtVerificationFilter;
 import competnion.global.security.handler.AuthFailureHandler;
@@ -26,9 +27,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 
 import java.util.Arrays;
 import java.util.List;
@@ -39,13 +40,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity(debug = false)
 public class SecurityConfiguration implements WebMvcConfigurer {
+    private final LoginUserArgumentResolver loginUserArgumentResolver;
     private final CustomAuthorityUtils authorityUtils;
-
     private final RedisUtil redisUtil;
-
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public SecurityConfiguration(CustomAuthorityUtils authorityUtils, RedisUtil redisUtil, RefreshTokenRepository refreshTokenRepository) {
+    public SecurityConfiguration(LoginUserArgumentResolver loginUserArgumentResolver, CustomAuthorityUtils authorityUtils, RedisUtil redisUtil, RefreshTokenRepository refreshTokenRepository) {
+        this.loginUserArgumentResolver = loginUserArgumentResolver;
         this.authorityUtils = authorityUtils;
         this.redisUtil = redisUtil;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -63,7 +64,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
                 .headers().frameOptions().sameOrigin()
                 .and()
@@ -97,10 +97,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.PATCH,"/users/username/{user-id}").hasRole("USER")
                                 .antMatchers(HttpMethod.PATCH,"/users/image/{user-id}").hasRole("USER")
 
-
-
-
-
+                                .antMatchers(HttpMethod.POST,"/pets/register/{user-id}").hasRole("USER")
 
                                 .anyRequest().permitAll()
                 );
@@ -118,7 +115,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PATCH","DELETE","OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
@@ -133,15 +130,16 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtParseInterceptor(jwtUtils()))
                 .addPathPatterns(List.of("/*/questions","/questions/**","/answers/**","/auth/**","/votes/**"));
-
     }
 
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(loginUserArgumentResolver);
+    }
 
     public class CustomFilterConfigurer extends AbstractHttpConfigurer<CustomFilterConfigurer,HttpSecurity> {
-
         @Override
-        public void configure(HttpSecurity builder) throws Exception {
-
+        public void configure(HttpSecurity builder) {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
             JwtAuthenticationFilter jwtAuthenticationFilter =
@@ -156,7 +154,6 @@ public class SecurityConfiguration implements WebMvcConfigurer {
             builder
                     .addFilter(jwtAuthenticationFilter)
                     .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
-
         }
     }
 }

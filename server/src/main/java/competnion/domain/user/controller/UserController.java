@@ -1,5 +1,6 @@
 package competnion.domain.user.controller;
 
+import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
@@ -23,33 +24,30 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * TODO : 커스텀 어노테이션으로 검증하기
-     */
     @GetMapping("/{user-id}")
     public Response<UserResponse> getUser(@Positive @PathVariable("user-id") final Long userId) {
         return Response.success(userService.getProfile(userId));
     }
 
-    @PatchMapping("/address/{user-id}")
+    @PatchMapping("/address")
     public Response<UpdateAddressResponse> updateAddressAndCoordinates(
-            @Positive @PathVariable("user-id") final Long userId,
-            @Valid @RequestBody                final AddressRequest addressRequest
+            @UserContext        final Long userId,
+            @Valid @RequestBody final AddressRequest addressRequest
     ) {
         return Response.success(userService.updateAddress(userId, addressRequest));
     }
 
-    @PatchMapping("/username/{user-id}")
+    @PatchMapping("/username")
     public Response<UpdateUsernameResponse> updateUsername(
-            @Positive @PathVariable("user-id")        final Long userId,
+            @UserContext                              final Long userId,
             @ValidUsername @RequestParam("username")  final String username
     ) {
         return Response.success(userService.updateUsername(userId, username));
     }
 
-    @PatchMapping("/image/{user-id}")
+    @PatchMapping("/image")
     public Response<String> uploadProfileImage(
-            @PathVariable("user-id") final Long userId,
+            @UserContext             final Long userId,
             @RequestPart("image")    final MultipartFile image
     ) {
         return Response.success(userService.uploadProfileImage(userId, image));
