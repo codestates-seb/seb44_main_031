@@ -1,16 +1,37 @@
 {
+  "owner": {
+    "articleId": 1,
+    "username": "JohnDoe",
+    "userimUrl": "imageURL"
+  },
+  "post": {
+    "postId": 1,
+    "title": "산책 장소 수정합니다",
+    "body": "호수 공원에 1시간 정도 같이 산책 다녀오실 분 계신가요?",
+    "location": "일산 호수 공원",
+    "attendants": 3,
+    "createdAt": "2023-07-11 15:00:00",
+    "modifiedAt": "2023-07-11 15:00:00",
     "comments": [
       {
-        "id": 1,
-        "content": "첫 번째 댓글"
-      },
-      {
-        "id": 2,
-        "content": "두 번째 댓글"
-      },
-      {
-        "id": 3,
-        "content": "세 번째 댓글"
+        "commentId": 1,
+        "userId": 2,
+        "username": "Kevin",
+        "commentContent": "참여 눌렀습니다, 이따봐요!",
+        "createdAt": "2023-07-11 15:00:00"
       }
     ]
-  }
+  },
+  "attendees": [
+    {
+      "userId": 1,
+      "username": "JohnDoe",
+      "userimUrl": "default"
+    },
+    {
+      "userId": 2,
+      "username": "Kevin",
+      "userimUrl": "imageURL"
+    }
+  ]
+}

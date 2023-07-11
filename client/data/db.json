@@ -17,15 +17,14 @@
       "userId" : 2,
       "username": "Kevin",
       "commentContent": "참여 눌렀습니다, 이따봐요!",
-      "createdAt": "YYYY-MM-DD HH:MM:SS",
-      "modifiedAt": "YYYY-MM-DD HH:MM:SS"
+      "createdAt": "YYYY-MM-DD HH:MM:SS"
     }
   ],
   "attendees": [ 
     {
       "userId": 1,
       "username": "JohnDoe",
-      "userimUrl" : "imageURL"
+      "userimUrl" : "default"
     },
     {
       "userId": 2,
