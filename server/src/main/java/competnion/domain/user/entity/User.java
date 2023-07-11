@@ -11,9 +11,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.locationtech.jts.geom.Point;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.util.Assert.*;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
@@ -45,9 +48,10 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String password;
-    @Setter
+    @Lob
+    @NotNull
     private Point point;
-    @Setter
+    @NotBlank
     private String address;
     private String imgUrl;
     @Column(name = "deleted_at")
@@ -55,6 +59,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
+
+    // 태영 추가 (유저 권한)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
 
     public void updateAddressAndCoordinates(final String address, final Point point) {
         hasText(address, "address must not be empty");
@@ -78,17 +86,39 @@ public class User extends BaseEntity {
         this.pets.add(pet);
     }
 
+    public void idToDetails(Long id) {
+        notNull(id, "id must not be null");
+        this.id = id;
+    }
+
+    public void emailToDetails(String email) {
+        hasText(email, "email must not be empty");
+        this.email = email;
+    }
+
+    public void passwordToDetails(String password) {
+        hasText(password, "password must not be empty");
+        this.password = password;
+    }
+
+    public void rolesToDetails(List<String> roles) {
+        notNull(roles, "roles must not be null");
+        this.roles = roles;
+    }
+
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
-    private User(final String username, final String email, final String password, final String address, final Point point) {
+    private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles) {
         hasText(username, "username must not be empty");
         hasText(email, "email must not be empty");
         hasText(password, "password must not be empty");
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
+        notNull(roles, "roles must not be null");
         this.username = username;
         this.email = email;
         this.password = password;
         this.address = address;
         this.point = point;
+        this.roles = roles;
     }
 }

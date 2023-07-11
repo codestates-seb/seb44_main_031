@@ -1,22 +1,26 @@
 package competnion.domain.pet.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import competnion.domain.pet.entity.Pet;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 import static lombok.AccessLevel.PRIVATE;
 
 @Getter
 @AllArgsConstructor(access = PRIVATE)
 public class PetResponse {
     private String name;
-    private LocalDateTime birth;
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
+    private LocalDate birth;
     private Boolean gender;
-    private Boolean isNeutered;
+    private Boolean neutralization;
     private String imgUrl;
-    private String inoculated;
+    private String vaccine;
     private Boolean isMain;
 
     public static PetResponse of(Pet pet) {
@@ -24,10 +28,10 @@ public class PetResponse {
                 pet.getName(),
                 pet.getBirth(),
                 pet.getGender(),
-                pet.getIsNeutered(),
+                pet.getNeutralization(),
                 pet.getImgUrl(),
-                pet.getInoculated(),
-                pet.getIsMain()
+                pet.getVaccine(),
+                pet.getIsSelected()
         );
     }
 }

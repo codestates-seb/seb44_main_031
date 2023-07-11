@@ -1,6 +1,5 @@
 package competnion.domain.user.dto.response;
 
-import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -24,8 +24,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-//	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	compileOnly 'org.projectlombok:lombok'
@@ -62,6 +61,16 @@ dependencies {
 
 //	// Gson
 	implementation 'com.google.code.gson:gson:2.8.8'
+	implementation 'com.google.code.findbugs:jsr305:3.0.2'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly	'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	// Mapstruct
+	implementation 'org.mapstruct:mapstruct:1.5.1.Final'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
 
 }
 

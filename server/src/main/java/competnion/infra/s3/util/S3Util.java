@@ -1,10 +1,9 @@
 package competnion.infra.s3.util;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import competnion.global.exception.BusinessException;
+import competnion.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +15,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.UUID;
 
-import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+import static competnion.global.exception.ExceptionCode.*;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -28,7 +27,7 @@ public class S3Util {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public String uploadImage(MultipartFile multipartFile) {
+    public String uploadImage(MultipartFile multipartFile) throws BusinessLogicException {
         String imageName = String.format("%s-%s", UUID.randomUUID(), multipartFile.getOriginalFilename());
 
         // 업로드되는 객체의 속성을 설정
@@ -42,7 +41,7 @@ public class S3Util {
 //                            .withCannedAcl(CannedAccessControlList.PublicRead)	// PublicRead 권한으로 업로드 됨
             );
         } catch (IOException e) {
-            throw new BusinessException(INVALID_INPUT_VALUE);
+            throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED);
         }
 
         URL imageUrl = amazonS3Client.getUrl(bucket, imageName);
@@ -63,6 +62,6 @@ public class S3Util {
     public void isFileAnImageOrThrow(final MultipartFile image) {
         String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
         if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
-            throw new BusinessException(INVALID_INPUT_VALUE);
+            throw new BusinessLogicException(INVALID_IMAGE_EXTENSION);
     }
 }

@@ -1,20 +1,23 @@
 package competnion.domain.pet.service;
 
+import competnion.domain.pet.dto.request.RegisterPetRequest;
+import competnion.domain.pet.dto.request.UpdatePetInfoRequest;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
-import competnion.domain.user.dto.request.RegisterPetRequest;
 import competnion.domain.user.entity.User;
-import competnion.domain.user.service.UserService;
-import competnion.global.exception.BusinessException;
+import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.infra.s3.util.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import static competnion.global.exception.ErrorCode.COUNTDOG;
-import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
+import java.util.Optional;
+
+import static competnion.global.exception.ExceptionCode.*;
+import static java.util.Optional.ofNullable;
 
 @Service
 @Transactional
@@ -22,16 +25,14 @@ import static competnion.global.exception.ErrorCode.INVALID_INPUT_VALUE;
 public class PetService {
 
     private final PetRepository petRepository;
-    private final UserService userService;
     private final S3Util s3Util;
 
     public PetResponse registerPet(
-            final Long userId,
+            final User user,
             final RegisterPetRequest registerPetRequest,
             final MultipartFile image
     ) {
-        User user = userService.returnExistsUserByIdOrThrow(userId);
-        hasSpaceForRegisterPetOrThrow(userId);
+        hasSpaceForRegisterPetOrThrow(user.getId());
         s3Util.isFileAnImageOrThrow(image);
         String imgUrl = s3Util.uploadImage(image);
 
@@ -41,9 +42,9 @@ public class PetService {
         return PetResponse.of(pet);
     }
 
-    public String updatePetImage(final Long userId, final Long petId, final MultipartFile image) {
+    public String updatePetImage(final User user, final Long petId, final MultipartFile image) {
         s3Util.isFileAnImageOrThrow(image);
-        Pet pet = checkExistsPetOrThrow(userId, petId);
+        Pet pet = checkExistsPetOrThrow(user, petId);
 
         s3Util.deleteImage(pet.getImgUrl());
         String imgUrl = s3Util.uploadImage(image);
@@ -51,24 +52,32 @@ public class PetService {
         return imgUrl;
     }
 
-    /**
-     * TODO : 리팩토링 필요
-     */
-    public Pet checkExistsPetOrThrow(final Long userId, final Long petId) {
-        Pet findPet = petRepository.findById(petId)
-                .orElseThrow(() -> new BusinessException(INVALID_INPUT_VALUE));
-        User user = userService.returnExistsUserByIdOrThrow(userId);
+    public Pet updatePetInfo(final User user, final Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
+        Pet pet = checkExistsPetOrThrow(user, petId);
+        ofNullable(updatePetInfoRequest.getName()).ifPresent(pet::updateName);
+        ofNullable(updatePetInfoRequest.getBirth()).ifPresent(pet::updateBirth);
+        ofNullable(updatePetInfoRequest.getNeutralization()).ifPresent(pet::updateNeutralization);
+        ofNullable(updatePetInfoRequest.getVaccine()).ifPresent(pet::updateVaccine);
+        return pet;
+    }
 
+    public Pet checkExistsPetOrThrow(final User user, final Long petId) {
+        Pet findPet = findPetById(petId);
         boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
-        if (!petMatch) throw new BusinessException(INVALID_INPUT_VALUE);
 
+        if (!petMatch) throw new BusinessLogicException(PET_NOT_MATCH);
         return findPet;
     }
 
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessException(INVALID_INPUT_VALUE);
+        if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
+    }
+
+    public Pet findPetById(final Long petId) {
+        return petRepository.findById(petId)
+                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {
@@ -76,9 +85,9 @@ public class PetService {
                 .name(registerPetRequest.getName())
                 .birth(registerPetRequest.getBirth())
                 .gender(registerPetRequest.getGender())
-                .isNeutered(registerPetRequest.getIsNeutered())
+                .neutralization(registerPetRequest.getNeutralization())
                 .imgUrl(imgUrl)
-                .inoculated(registerPetRequest.getInoculated())
+                .vaccine(registerPetRequest.getVaccine())
                 .user(user)
                 .build());
     }

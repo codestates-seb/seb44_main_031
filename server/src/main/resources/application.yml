@@ -7,7 +7,7 @@ cloud:
     stack:
       auto: false # CloudFormation 구성을 사용하지 않도록 설정
     credentials:
-      accessKey:
+      accessKey: 
       secretKey:
 
 Spring:
@@ -36,8 +36,6 @@ Spring:
     host: 127.0.0.1
     port: 6379
 
-
-
 #  h2:
 #    console:
 #      enabled: true
@@ -49,7 +47,6 @@ Spring:
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
-#
 #  jpa:
 #    database-platform: org.hibernate.dialect.H2Dialect
 #    hibernate:
@@ -60,14 +57,14 @@ Spring:
 #        format_sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3307/competnion?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username:
+    url: jdbc:mysql://localhost:3307/petmilyy?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
       use-new-id-generator-mappings: false
@@ -77,6 +74,11 @@ Spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+jwt:
+  key: fasdfdasfasdfdsfasdfasdfasdfasdfasdf
+  access-token-expiration-minutes: 60
+  refresh-token-expiration-minutes: 20160
 
 logging.level:
   org.hibernate.SQL: debug
