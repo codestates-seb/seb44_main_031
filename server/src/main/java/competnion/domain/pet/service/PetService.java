@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.util.Optional.ofNullable;
 
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -63,19 +62,22 @@ public class PetService {
     }
 
     public Pet checkExistsPetOrThrow(final User user, final Long petId) {
-        Pet findPet = petRepository.findById(petId)
-                .orElseThrow(() -> new BusinessLogicException(INVALID_INPUT_VALUE));
-
+        Pet findPet = findPetById(petId);
         boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
 
-        if (!petMatch) throw new BusinessLogicException(INVALID_INPUT_VALUE);
+        if (!petMatch) throw new BusinessLogicException(PET_NOT_MATCH);
         return findPet;
     }
 
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessLogicException(ACCESS_TOKEN_EXPIRED);
+        if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
+    }
+
+    public Pet findPetById(final Long petId) {
+        return petRepository.findById(petId)
+                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {

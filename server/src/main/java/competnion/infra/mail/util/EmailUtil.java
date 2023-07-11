@@ -1,5 +1,6 @@
 package competnion.infra.mail.util;
 
+import competnion.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -10,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Random;
+
+import static competnion.global.exception.ExceptionCode.PARSE_TO_COORDINATES_FAILED;
+import static competnion.global.exception.ExceptionCode.SEND_EMAIL_FAILED;
 
 @Component
 @Transactional
@@ -37,7 +41,7 @@ public class EmailUtil {
                     "인증 코드: " + code
             );
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            throw new BusinessLogicException(SEND_EMAIL_FAILED);
         }
     }
 

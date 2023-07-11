@@ -120,11 +120,8 @@ public class AuthService {
 
     @Transactional
     public void signUp(final SignUpRequest signUpRequest) {
-        if (!checkDuplicatedUsername(signUpRequest.getUsername()))
-            throw new BusinessLogicException(INVALID_INPUT_VALUE);
-
-        if (!checkDuplicatedEmail(signUpRequest.getEmail()))
-            throw new BusinessLogicException(INVALID_INPUT_VALUE);
+        checkDuplicatedUsername(signUpRequest.getUsername());
+        checkDuplicatedEmail(signUpRequest.getEmail());
 
         Point point = coordinateUtil.coordinateToPoint(signUpRequest.getLatitude(), signUpRequest.getLongitude());
         List<String> roles = authorityUtils.createRoles(signUpRequest.getEmail());
@@ -136,14 +133,13 @@ public class AuthService {
 
     @Transactional
     public void checkDuplicateEmailAndSendVerificationEmail(final String email) {
-        if (!checkDuplicatedEmail(email)) throw new BusinessLogicException(INVALID_INPUT_VALUE);
+        checkDuplicatedEmail(email);
         sendEmail(email);
     }
 
     @Transactional
     public void checkValidateEmailAndSendEmail(final User user, final String email) {
-        if (!userService.checkEmailValidate(user, email))
-            throw new BusinessLogicException(INVALID_INPUT_VALUE);
+        checkEmailValidate(user, email);
         sendEmail(email);
     }
 
@@ -152,16 +148,24 @@ public class AuthService {
         userService.deleteUser(user);
     }
 
-    public Boolean verifyEmailCode(final String code, final String email) {
-        return code.equals(redisUtil.getData(email));
+    public void verifyEmailCode(final String code, final String email) {
+        if (!code.equals(redisUtil.getData(email)))
+            throw new BusinessLogicException(INVALID_EMAIL_CODE);
     }
 
-    public Boolean checkDuplicatedUsername(final String username) {
-        return userService.checkExistsUserByUsername(username);
+    public void checkEmailValidate(final User user, final String email) {
+        if (!userService.checkEmailValidate(user, email))
+            throw new BusinessLogicException(INVALID_EMAIL);
     }
 
-    public Boolean checkDuplicatedEmail(final String email) {
-        return userService.checkExistsUserByEmail(email);
+    public void checkDuplicatedUsername(final String username) {
+        if (!userService.checkExistsUserByUsername(username))
+            throw new BusinessLogicException(DUPLICATE_USERNAME);
+    }
+
+    public void checkDuplicatedEmail(final String email) {
+        if (!userService.checkExistsUserByEmail(email))
+            throw new BusinessLogicException(DUPLICATE_EMAIL);
     }
 
     public void sendEmail(String email) {

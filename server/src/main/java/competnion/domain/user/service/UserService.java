@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static competnion.global.exception.ExceptionCode.*;
 import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
 
 
@@ -83,7 +84,7 @@ public class UserService {
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.ACCESS_NOT_ALLOWED));
+                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
     }
 
     public Boolean checkExistsUserByUsername(final String username) {

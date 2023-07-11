@@ -35,8 +35,9 @@ public class AuthController { // VerificationFilter 이후의 처리
 //    }
 
     @GetMapping("/check-username")
-    public Response<Boolean> checkUsername(@ValidUsername @RequestParam("username") final String username) {
-        return Response.success(authService.checkDuplicatedUsername(username));
+    public Response<Void> checkUsername(@ValidUsername @RequestParam("username") final String username) {
+        authService.checkDuplicatedUsername(username);
+        return Response.success();
     }
 
     // 회원가입 이메일 중복체크 & 인증 코드 전송
@@ -55,11 +56,12 @@ public class AuthController { // VerificationFilter 이후의 처리
 
     // 회원가입 이메일 인증
     @GetMapping("/verify-email")
-    public Response<Boolean> verifyEmail(
+    public Response<Void> verifyEmail(
             @RequestParam("code")         final String code,
             @Email @RequestParam("email") final String email
     ) {
-        return Response.success(authService.verifyEmailCode(code, email));
+        authService.verifyEmailCode(code, email);
+        return Response.success();
     }
 
     // 비밃번호 재설정
