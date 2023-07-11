@@ -8,28 +8,17 @@
   ],
   "comments": [
     {
-      "content": "ㄷㅈㅂㄷㅂㅈㄷ",
-      "id": 26
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
     },
     {
-      "content": "ㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴ",
-      "id": 27
+      "content": "dsadas",
+      "id": 2
     },
     {
-      "content": "영탁님",
-      "id": 28
-    },
-    {
-      "content": "ㅈㅂㄷㅂㅈㄷ",
-      "id": 29
-    },
-    {
-      "content": "ㄷㅂㅈㄷㅂㅈㄷ",
-      "id": 30
-    },
-    {
-      "content": "ㅂㅈㄷㅂㅈㄷㅂ",
-      "id": 31
+      "content": "dasdasd",
+      "id": 3
     }
   ],
   "profile": {
