@@ -76,9 +76,16 @@ public class AuthService {
         log.info("AuthService - reissue");
         log.info("=========================================================");
 
+        if (request.getHeader("Authorization")==null) {
+            throw new BusinessLogicException(ACCESS_TOKEN_NULL);
+        }
+
+
         if(request.getHeader("Refresh")==null) {
             throw new BusinessLogicException(REFRESH_TOKEN_NULL);
         }
+
+
 
         log.info("request AccessToken에서 memberId 추출 ");
         long userIdInToken = JwtParseInterceptor.getAuthenticatedUserId();
@@ -100,15 +107,7 @@ public class AuthService {
 
 
             log.info("추출한 member정보로 AccessToken 생성");
-            Map<String,Object> claims = new HashMap<>();
-            claims.put("memberId",findUser.getId());
-            claims.put("nickname",findUser.getUsername());
-            claims.put("roles",findUser.getRoles());
-            String subject = findUser.getEmail();
-            Date expiration = jwtTokenizer.getTokenExpiration(jwtTokenizer.getAccessTokenExpirationMinutes());
-            String encodedSecretKey = jwtTokenizer.encodeBase64SecretKey(jwtTokenizer.getSecretKey());
-
-            String newAccessToken = jwtTokenizer.generateAccessToken(claims,subject,expiration,encodedSecretKey);
+            String newAccessToken = jwtTokenizer.delegateAccessToken(findUser);
 
             response.setHeader("Authorization","Bearer " + newAccessToken);
         }
