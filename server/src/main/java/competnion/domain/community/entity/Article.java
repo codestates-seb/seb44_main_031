@@ -26,18 +26,10 @@ public class Article {
     @Column(name = "article_id")
     private Long articleId;
     @Column(nullable = false)
-
     private String title;
 
     @Column(nullable = false)
     private String body;
-
-    @Column(nullable = false) // 시간이 지났는지 여부
-    private boolean isPassed;
-
-    @Column(nullable = false) // 참석자가 있는지 여부
-    private boolean isAttended;
-
     @Column(nullable = false)
     private String location;
 
@@ -63,9 +55,9 @@ public class Article {
     @JoinColumn(name = "user_id")
     private User user;
 
-//    @OnDelete(action= OnDeleteAction.CASCADE)
-//    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
-//    private List<Comment> comments = new ArrayList<>();
+    @OnDelete(action= OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
+    private List<Comment> comments = new ArrayList<>();
 //    private Duration timeDifference;
 //
 //    public Article(LocalDateTime date) {
@@ -79,37 +71,33 @@ public class Article {
 //        return Duration.between(date, now);
 //    }
 
-    @Builder
+    @Builder(builderClassName = "CreateArticle", builderMethodName = "CreateArticle")
     private Article(User user, String title, String body, String location, int attendant, LocalDateTime date) {
         this.user = user;
         this.title = title;
         this.body = body;
-        this.isPassed = false;
-        this.isAttended = false;
         this.attendant = attendant;
         this.location = location;
         this.date = date;
     }
 
-    public static Article of(User user, Article article) {
-        return Article.builder()
-                .user(user)
-                .title(article.getTitle())
-                .body(article.getBody())
-                .attendant(article.getAttendant())
-                .date(article.getDate())
-                .location(article.getLocation())
-                .build();
-    }
-
-
     /** 게시글 수정 */
-    public void update(Article article) {
-        this.title = article.title;
-        this.body = article.body;
-        this.location = article.location;
-        this.date = article.date;
-        this.attendant = article.attendant;
+    public void update(Article updatedArticle) {
+        if (updatedArticle.getTitle() != null) {
+            this.title = updatedArticle.getTitle();
+        }
+        if (updatedArticle.getBody() != null) {
+            this.body = updatedArticle.getBody();
+        }
+        if (updatedArticle.getLocation() != null) {
+            this.location = updatedArticle.getLocation();
+        }
+        if (updatedArticle.getDate() != null) {
+            this.date = updatedArticle.getDate();
+        }
+        if (updatedArticle.getAttendant() != 0) {
+            this.attendant = updatedArticle.getAttendant();
+        }
     }
 
     public void attend() {

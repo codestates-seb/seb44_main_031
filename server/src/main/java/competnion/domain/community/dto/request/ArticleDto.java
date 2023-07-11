@@ -31,7 +31,7 @@ public class ArticleDto {
         }
 
         public Article toEntity() {
-            return Article.builder()
+            return Article.CreateArticle()
                     .title(title)
                     .body(body)
                     .location(location)
@@ -60,7 +60,7 @@ public class ArticleDto {
             this.attendant = attendant;
         }
         public Article toEntity() {
-            return Article.builder()
+            return Article.CreateArticle()
                     .title(title)
                     .body(body)
                     .location(location)

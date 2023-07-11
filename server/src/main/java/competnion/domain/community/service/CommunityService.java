@@ -4,8 +4,9 @@ import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.user.entity.User;
-import competnion.global.exception.BusinessException;
-import competnion.global.exception.ErrorCode;
+import competnion.domain.user.service.UserService;
+import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,26 +22,38 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CommunityService {
     private final ArticleRepository articleRepository;
+    private final UserService userService;
 
     @Transactional
     /**게시글 생성 메서드 **/
-    public Article createArticle(Article article) {
-        /**작성한 회원이 존재하는지에 대한 여부 필요 **/
-        return articleRepository.save(article);
+    public Article createArticle(Long userId, Article article) {
+
+        User findUser = userService.returnExistsUserByIdOrThrow(userId);
+
+        Article findArticle = Article.CreateArticle()
+                .user(findUser)
+                .title(article.getTitle())
+                .body(article.getBody())
+                .location(article.getLocation())
+                .attendant(article.getAttendant())
+                .date(article.getDate())
+                .build();
+
+        return articleRepository.save(findArticle);
     }
 
     @Transactional
     /**게시글 수정 메서드 **/
-    public void updateArticle(Long articleId,Article article) {
+    public void updateArticle(Long articleId, Long userId, Article article) {
         Article findArticle = findArticleById(articleId);
-        /**추후 게시글을 작성자만 수정할 수 있는 로직 필요 **/
+        /**추후 게시글을 작성자만 수정할 수 있는 로직 필요(해결) **/
+        validateAuthorEqualUser(findArticle.getUser().getId(), userId);
         findArticle.update(article);
     }
 
     /**게시글 조회 메서드 **/
     public ArticleResponseDto findById(Long articleId) {
-        Article article = articleRepository.findById(articleId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+        Article article = findVerifiedArticle(articleId);
         return new ArticleResponseDto(article);
     }
 
@@ -53,14 +66,15 @@ public class CommunityService {
     }
 
     /** 질문 삭제 메서드 **/
-    public void deleteArticle(long articleId){
+    public void deleteArticle(Long articleId, Long userId){
 
         Article findArticle = findVerifiedArticle(articleId);
-        //TODO : 작성자 여부 확인 필요
+        /** 작성자 여부 확인 필요(해결) */
+        validateAuthorEqualUser(findArticle.getUser().getId(), userId);
         articleRepository.delete(findArticle);
     }
 
-    public  Article findArticle(long articleId){
+    public  Article findArticle(Long articleId){
         Article findArticle = findVerifiedArticle(articleId);
 
         articleRepository.save(findArticle);
@@ -68,18 +82,25 @@ public class CommunityService {
         return findArticle;
     }
     /** 게시글이 등록된 게시글인지 확인하는 메서드 **/
-    public Article findVerifiedArticle(long articleId){
+    public Article findVerifiedArticle(Long articleId){
 
         Optional<Article> findArticle = articleRepository.findById(articleId);
 
         Article article = findArticle.orElseThrow(() ->
-                new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+                new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE));
 
         return article;
     }
     /** 게시글 찾는 메서드 **/
     public Article findArticleById(Long articleId) {
         return articleRepository.findById(articleId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_INPUT_VALUE));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionCode.INVALID_INPUT_VALUE));
+    }
+
+    /** 게시글을 수정할 때 작성자인지 확인하는 메서드 */
+    private void validateAuthorEqualUser(Long authorId, Long userId) {
+        if (!authorId.equals(userId)) {
+            throw new BusinessLogicException(ExceptionCode.ACCESS_NOT_ALLOWED);
+        }
     }
 }
