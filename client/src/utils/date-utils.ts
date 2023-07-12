@@ -36,3 +36,11 @@ export const dateToStringTime = (dateFormatTime: Date) => {
   const stringFormatTime = `${hourString}:${minString}`;
   return stringFormatTime;
 };
+
+// 'YYYY-MM-DD' 와  '00:00' 을 이용해서 new Date() 을 생성하는 함수
+export const stringToDate = (dateString: string, timeString: string) => {
+  const timestamp = Date.parse(`${dateString}T${timeString}:00`);
+  const date = new Date(timestamp);
+  return date;
+  // console.log(date);
+};

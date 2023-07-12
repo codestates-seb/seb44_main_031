@@ -4,6 +4,44 @@ import {
   dateToStringTime,
   nowDateAfterSomeMinutes,
 } from '../utils/date-utils';
+import { axiosInstance } from '../api/walkMateAxios';
+import { useNavigate } from 'react-router-dom';
+
+export interface inputValueType {
+  image: string;
+  title: string;
+  body: string;
+  date: string;
+  initDate: string;
+  time: string;
+  attendant: number;
+  location: { lat: number; lng: number };
+  walkLocation: { lat: number; lng: number };
+  walkAddress: string;
+  pets: { id: number; name: string; imgUrl: string }[];
+  selectedPets: number[];
+}
+
+export interface isValidType {
+  image: boolean;
+  title: boolean;
+  body: boolean;
+  date: boolean;
+  time: boolean;
+  attendant: boolean;
+  location: boolean;
+}
+
+export interface isTouchedType {
+  image: boolean;
+  title: boolean;
+  body: boolean;
+  date: boolean;
+  time: boolean;
+  attendant: boolean;
+  location: boolean;
+  pets: boolean;
+}
 
 const useWalkMateForm = () => {
   // input 값
@@ -12,26 +50,33 @@ const useWalkMateForm = () => {
   // onSubmit Handler: submit 될때 validatoin check, 해당 input으로 focus 스크롤이동, 통과되면 POST 요청보내
   // error 메세지, isTouched 가 ture && !isValid 일때 에러 메세지 띄워주면되
   // 성공적으로 submit 하면 초기 state 값으로 reset 해야되 (어차피 페이지 navigate 되니까 상관없을듯)
+  const navigate = useNavigate();
 
-  const [inputValue, setInputValue] = useState({
+  const [inputValue, setInputValue] = useState<inputValueType>({
     image: '',
     title: '',
     body: '',
     date: '',
+    initDate: '',
     time: '',
     attendant: 4,
-    location: { lat: '', long: '' },
+    // location: { lat: 37.5796, lng: 126.977 },
+    // walkLocation: { lat: 37.5796, lng: 126.977 },
+    location: { lat: 33.450701, lng: 126.570667 },
+    walkLocation: { lat: 33.450701, lng: 126.570667 },
+    walkAddress: '',
+    pets: [{ id: 1, name: '', imgUrl: '' }],
+    selectedPets: [],
   });
-  // console.log(inputValue);
 
-  const [isValid, setIsValid] = useState({
+  const [isValid, setIsValid] = useState<isValidType>({
     image: false,
     title: false,
     body: false,
-    date: false,
-    time: false,
+    date: true,
+    time: true,
     attendant: true,
-    location: false,
+    location: true,
   });
 
   const [isTouched, setIsTouched] = useState({
@@ -42,19 +87,55 @@ const useWalkMateForm = () => {
     time: false,
     attendant: false,
     location: false,
+    pets: false,
   });
 
+  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
+    // Date initial value
     const thirtyMinLater = nowDateAfterSomeMinutes(30);
     const stringFormatDate = dateToStringDate(thirtyMinLater);
     const stringFormatTime = dateToStringTime(thirtyMinLater);
 
     setInputValue((prev) => {
-      return { ...prev, date: stringFormatDate };
+      return { ...prev, initDate: stringFormatDate, date: stringFormatDate };
     });
     setInputValue((prev) => {
       return { ...prev, time: stringFormatTime };
     });
+
+    // GET 요청보내서 사용자 위치 정보, 강아지정보, 로그인여부 받아와야함.
+    const fetchUserData = async () => {
+      try {
+        setIsPageLoading(true);
+        const response = await axiosInstance.get('articles-info');
+        const data = response.data;
+        setInputValue((prev) => {
+          return {
+            ...prev,
+            pets: data.result.pets,
+            location: { lat: data.result.latitude, lng: data.result.longitude },
+            walkLocation: {
+              lat: data.result.latitude,
+              lng: data.result.longitude,
+            },
+          };
+        });
+      } catch (err: any) {
+        // 토큰 인증이 안됐을 경우 로그인 페이지로 이동
+        if (err.status === 401) {
+          navigate('/users/sign-in', { state: { path: '/walk-mate/create' } });
+        }
+        setError(err.message);
+        console.log(err.message);
+      } finally {
+        setIsPageLoading(false);
+      }
+    };
+    fetchUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
@@ -76,8 +157,8 @@ const useWalkMateForm = () => {
     setIsTouched({ ...isTouched, title: true });
 
     const isTitleValid =
-      e.currentTarget.value.trim().length >= 10 &&
-      e.currentTarget.value.trim().length <= 30;
+      e.currentTarget.value.trim().length >= 15 &&
+      e.currentTarget.value.trim().length <= 100;
     if (!isTitleValid) {
       setIsValid({ ...isValid, title: false });
     }
@@ -93,8 +174,8 @@ const useWalkMateForm = () => {
     setIsTouched({ ...isTouched, body: true });
 
     const isBodyValid =
-      e.currentTarget.value.trim().length >= 40 &&
-      e.currentTarget.value.trim().length <= 500;
+      e.currentTarget.value.trim().length >= 30 &&
+      e.currentTarget.value.trim().length <= 250;
     if (!isBodyValid) {
       setIsValid({ ...isValid, body: false });
     }
@@ -115,12 +196,30 @@ const useWalkMateForm = () => {
     const inputDate = e.currentTarget.value;
     const dateAfterThirtyMin = dateToStringDate(nowDateAfterSomeMinutes(30));
 
-    const isDateValid = inputDate === dateAfterThirtyMin;
+    // 시간을 수정하지 않고 날짜만 수정한 경우라도 날짜와 시간 두개 동시에 검사해줘야함.
+    // 왜냐면 초기값에 시간을 수정하지 않고 날짜만 바꿨을경우, 유효한 Date 이지만 통과되지 않는 엣지케이스 발생
+
+    // 날짜 유효성 검사
+    const isDateValid = inputDate >= dateAfterThirtyMin;
     if (!isDateValid) {
       setIsValid({ ...isValid, date: false });
     }
     if (isDateValid) {
       setIsValid({ ...isValid, date: true });
+    }
+
+    // 시간 유효성 검사
+    const userInputDate = new Date(
+      `${e.currentTarget.value}T${inputValue.time}:00`
+    );
+    const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
+    const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
+
+    if (!isDateAndTimeValid) {
+      setIsValid({ ...isValid, time: false });
+    }
+    if (isDateAndTimeValid) {
+      setIsValid({ ...isValid, time: true });
     }
   };
 
@@ -157,47 +256,21 @@ const useWalkMateForm = () => {
     //valid: 어떤걸 선택해도 되서 인원은 무조건 ture 임.
   };
 
-  const handleLocationChange = (e: any) => {
-    // location 은 input 이 아닌데 onChange event에 value 랑 touched, valid 여부를 어떻게 확인하지?
-
-    setInputValue({ ...inputValue, location: e.currentTarget.value });
-    setIsTouched({ ...isTouched, location: true });
-    // valid: 산책모임을 지정한 장소가 본인 주소로부터 3km 이내여야되.
-  };
-
-  // const handleSubmit = (e: React.SyntheticEvent, ref: HTMLDivElement) => {
-  //   e.preventDefault();
-  //   const isAllValid =
-  //     isValid.image &&
-  //     isValid.title &&
-  //     isValid.body &&
-  //     isValid.date &&
-  //     isValid.time &&
-  //     isValid.attendant &&
-  //     isValid.location;
-
-  //   if (!isAllValid) {
-  //     console.log('not valid');
-  //     ref.scrollIntoView({ behavior: 'smooth' });
-  //   }
-
-  //   if (isAllValid) {
-  //     console.log('POST http request is sent');
-  //     return;
-  //   }
-  // };
-
   return {
     inputValue,
+    setInputValue,
     isValid,
+    setIsValid,
     isTouched,
+    setIsTouched,
+    isPageLoading,
+    error,
     handleImageChange,
     handleTitleChange,
     handleBodyChange,
     handleDateChange,
     handleTimeChange,
     handleAttendantChange,
-    handleLocationChange,
   };
 };
 

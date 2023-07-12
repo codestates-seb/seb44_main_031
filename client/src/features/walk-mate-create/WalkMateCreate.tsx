@@ -1,7 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
+// import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import { styled } from 'styled-components';
 import useWalkMateForm from '../../hooks/useWalkMateForm';
+import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
+import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
+import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
+import WalkMateSelectPetsList from './WalkMateSelectPetsList';
+import { axiosInstance } from '../../api/walkMateAxios';
 
 declare global {
   interface Window {
@@ -12,59 +18,121 @@ declare global {
 const WalkMateCreate = () => {
   const {
     inputValue,
+    setInputValue,
     isValid,
+    setIsValid,
     isTouched,
+    setIsTouched,
+    isPageLoading,
+    error,
     handleImageChange,
     handleTitleChange,
     handleBodyChange,
     handleDateChange,
     handleTimeChange,
     handleAttendantChange,
-    handleLocationChange,
   } = useWalkMateForm();
-  const [map, setMap] = useState<any>();
-  const [marker, setMarker] = useState<any>();
-  // console.log(map, marker);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [isSubmitBtnTouched, setIsSubmitBtnTouched] = useState<boolean>(false);
 
-  useEffect(() => {
-    window.kakao.maps.load(() => {
-      const container = document.getElementById('map');
-      const options = {
-        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-        level: 3,
-      };
+  const isAllValid =
+    isValid.image &&
+    isValid.title &&
+    isValid.body &&
+    isValid.date &&
+    isValid.time &&
+    isValid.attendant &&
+    isValid.location &&
+    inputValue.selectedPets.length !== 0;
 
-      setMap(new window.kakao.maps.Map(container, options));
-      setMarker(new window.kakao.maps.Marker());
-    });
-  }, []);
+  // fetching 할때
+  // const isLoading = useRef(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const isAllValid =
-      isValid.image &&
-      isValid.title &&
-      isValid.body &&
-      isValid.date &&
-      isValid.time &&
-      isValid.attendant &&
-      isValid.location;
+    setIsSubmitBtnTouched(true);
 
-    if (!isAllValid) {
-      console.log('not valid');
-      // invalid 한 태그를 찾아서 스크롤을 이동시켜야함 (현재는 임시로 title input에 지정해놨음)
-      // for in 쓰면 될듯, 그러려면 ref 를 input 마다 다걸어놔야되나?
-      // 헤딩 태그에 focus 를 해줘야함
-      inputRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      inputRef.current?.focus();
-    }
+    // 날짜 & 시간 유효성검사
+    const userInputDate = new Date(`${inputValue.date}T${inputValue.time}:00`);
+    const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
+    const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
 
-    if (isAllValid) {
-      console.log('POST http request is sent');
+    // 반려견 유효성 검사
+    if (inputValue.selectedPets.length === 0) {
       return;
     }
+
+    if (!isDateAndTimeValid) {
+      console.log('not valid');
+      inputRef?.current?.scrollIntoView({ behavior: 'smooth' });
+      inputRef?.current?.focus();
+      setIsValid({ ...isValid, time: false });
+
+      return;
+    }
+
+    if (isAllValid && isDateAndTimeValid && !isLoading) {
+      // post
+      console.log('POST http request is sent');
+
+      const formData = new FormData();
+      formData.append('image', inputValue.image);
+
+      const requestData = {
+        title: inputValue.title,
+        body: inputValue.body,
+        location: inputValue.walkAddress,
+        latitude: inputValue.walkLocation.lat,
+        longitude: inputValue.walkLocation.lng,
+        // date : "2023-07-13T16:23",
+        date: stringToDate(inputValue.date, inputValue.time),
+        attendant: inputValue.attendant,
+        petIds: inputValue.selectedPets,
+      };
+      console.log(requestData);
+      const blob = new Blob([JSON.stringify(requestData)], {
+        type: 'application/json',
+      });
+      formData.append('request', blob);
+
+      try {
+        setIsLoading(true);
+        const response = await axiosInstance.post('articles', {
+          data: formData,
+        });
+        console.log(response.data);
+      } catch (err: any) {
+        console.log(err.message);
+      } finally {
+        // setTimeout으로 버튼 disabled 되는지 가상 환경 테스트,
+        await setTimeout(() => {
+          console.log('setTimeout 3secs');
+          // isLoading.current = false;
+          setIsLoading(false);
+        }, 3000);
+        // submitButtonRef?.current?.removeAttribute('disabled');
+        // console.log(submitButtonRef.current);
+      }
+    }
   };
+
+  if (isPageLoading) {
+    return (
+      <FormDivContainer>
+        <img src="/src/assets/loading-spinner-dog-1.gif" alt="" />
+      </FormDivContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <FormDivContainer>
+        <p>{error}</p>
+      </FormDivContainer>
+    );
+  }
 
   return (
     <FormDivContainer>
@@ -98,10 +166,10 @@ const WalkMateCreate = () => {
             value={inputValue.title}
             onChange={handleTitleChange}
             size={50}
-            minLength={10}
-            maxLength={30}
+            minLength={15}
+            maxLength={100}
             required
-            ref={inputRef}
+            // ref={inputRef}
             // autoFocus
           />
           {!isValid.title && isTouched.title && (
@@ -117,8 +185,8 @@ const WalkMateCreate = () => {
             placeholder="내용을 입력해 주세요."
             value={inputValue.body}
             onChange={handleBodyChange}
-            minLength={40}
-            maxLength={500}
+            minLength={30}
+            maxLength={250}
             // cols={5}
             required
           />
@@ -134,7 +202,7 @@ const WalkMateCreate = () => {
               type="date"
               id="date"
               name="date"
-              min={inputValue.date}
+              min={inputValue.initDate}
               value={inputValue.date}
               onChange={handleDateChange}
               required
@@ -152,14 +220,14 @@ const WalkMateCreate = () => {
               type="time"
               id="time"
               name="time"
-              // value="13:30"
               value={inputValue.time}
               onChange={handleTimeChange}
               required
+              ref={inputRef}
             />
             {!isValid.time && isTouched.time && (
               <p className="error-message">
-                현재 시각의 최소 30분 이후 부터 선택 가능합니다.
+                현재 시각으로부터 30분 후 부터 선택 가능합니다.
               </p>
             )}
           </div>
@@ -182,28 +250,63 @@ const WalkMateCreate = () => {
           </div>
         </div>
         <div className="input-field">
-          <label htmlFor="map">산책 모임 장소</label>
-          <p className="notice-p">
-            ( 본인 등록 위치의 3km 이내에서만 선택 가능 )
-          </p>
-          <div id="map" style={{ width: '500px', height: '400px' }}></div>
-          {!isValid.location && isTouched.location && (
-            <p className="error-message">error message</p>
-          )}{' '}
+          <div className="input-field-label-p-error">
+            <div className="input-field-label-p">
+              <label htmlFor="map">산책 모임 장소</label>
+              <p className="notice-p">
+                ( 본인 등록 위치의 3km 이내에서만 선택 가능 )
+              </p>
+            </div>
+            {!isValid.location && isTouched.location && (
+              <p className="error-message">원 안의 위치만 선택할 수 있습니다</p>
+            )}
+          </div>
+          <WalkMateCreateKakaoMap
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+            setIsTouched={setIsTouched}
+            setIsValid={setIsValid}
+          />
+          {/* {!isValid.location && isTouched.location && (
+            <p className="error-message">원 안의 지역을 선택해주세요</p>
+          )} */}
+        </div>
+        <div className="input-field select-pets">
+          <div className="input-field-label-p-error">
+            <div className="input-field-label-p">
+              <label htmlFor="map">산책할 반려견 선택</label>
+              <p className="notice-p">( 최소 1마리, 최대 4마리 선택 가능 )</p>
+            </div>
+            {inputValue.selectedPets.length === 0 && (
+              <p className="error-message">최소 1마리 이상 선택해주세요</p>
+            )}
+          </div>
+          <WalkMateSelectPetsList
+            inputValue={inputValue}
+            setInputValue={setInputValue}
+          />
         </div>
         <div className="btn-submit-container">
-          <StyledButtonPink3D type="submit">
+          <StyledButtonPink3D type="submit" disabled={isLoading}>
             <span className="span-img-container">
-              <span>산책 모임 개설하기</span>
-              <img
-                src="/src/assets/petmily-logo-white.png"
-                alt=""
-                width={25}
-                height={25}
-              />
+              {isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <span>산책 모임 개설하기</span>
+                  <img
+                    src="/src/assets/petmily-logo-white.png"
+                    alt=""
+                    width={25}
+                    height={25}
+                  />
+                </>
+              )}
             </span>
           </StyledButtonPink3D>
-          {<p>위의 입력 사항을 다시 한번 확인해주세요</p>}
+          {!isAllValid && isSubmitBtnTouched && (
+            <p>입력 사항들을 다시 한번 확인해주세요</p>
+          )}
         </div>
       </StyledForm>
     </FormDivContainer>
@@ -243,6 +346,7 @@ const StyledForm = styled.form`
     gap: 5px;
     label {
       align-self: flex-start;
+      font-size: 16px;
     }
 
     input,
@@ -265,7 +369,7 @@ const StyledForm = styled.form`
 
   .error-message {
     font-weight: 500;
-    font-size: 15px;
+    font-size: 16px;
     align-self: flex-end;
     color: var(--pink-400);
   }
@@ -306,7 +410,7 @@ const StyledForm = styled.form`
 
   .notice-p {
     color: var(--black-800);
-    font-size: 12px;
+    font-size: 13px;
   }
 
   .span-img-container {
@@ -330,5 +434,20 @@ const StyledForm = styled.form`
       outline: 0;
       border: 2px solid var(--pink-400);
     }
+  }
+
+  .input-field-label-p-error {
+    display: flex;
+    justify-content: space-between;
+
+    .input-field-label-p {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+
+  .select-pets {
+    margin-top: 20px;
   }
 `;
