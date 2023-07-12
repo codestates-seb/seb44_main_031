@@ -59,7 +59,8 @@ public class PetService {
     }
 
     public Pet checkExistsPetOrThrow(final User user, final Long petId) {
-        Pet findPet = findPetById(petId);
+        Pet findPet = petRepository.findById(petId)
+                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
         boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
 
@@ -67,14 +68,13 @@ public class PetService {
         return findPet;
     }
 
+    public void checkUserHasPet(User user) {
+        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
+    }
+
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
         if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
-    }
-
-    public Pet findPetById(final Long petId) {
-        return petRepository.findById(petId)
-                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {

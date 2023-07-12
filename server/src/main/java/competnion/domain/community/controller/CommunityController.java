@@ -34,7 +34,7 @@ public class CommunityController {
 
     /** 게시글 작성 **/
     @PostMapping
-    public Response<ArticleResponseDto> createArticle(
+    public Response<Long> createArticle(
             @UserContext                                    final User user,
             @Valid @RequestPart("request")                  final ArticlePostDto articlePostDto,
             @RequestPart(value = "image", required = false) final List<MultipartFile> images
@@ -42,14 +42,15 @@ public class CommunityController {
         return Response.success(communityService.createArticle(user, articlePostDto, images));
     }
 
-//    // 게시글 참여
-//    @PostMapping("/attend")
-//    public Response<?> attend(
-//            @UserContext final User user,
-//
-//    ) {
-//        return null;
-//    }
+    // 게시글 참여
+    @PostMapping("/attend/{article-id}")
+    public Response<?> attend(
+            @UserContext                          final User user,
+            @Positive @PathVariable("article-id") final Long articleId
+    ) {
+        communityService.attend(user, articleId);
+        return Response.success();
+    }
 
     /** 게시글 수정 **/
 //    @PatchMapping("/{article-id}")

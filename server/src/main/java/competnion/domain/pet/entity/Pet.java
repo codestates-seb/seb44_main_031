@@ -54,8 +54,6 @@ public class Pet extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @OneToMany(mappedBy = "pet")
-    private List<Article> articles = new ArrayList<>();
 
     public void updateImgUrl(final String imgUrl) {
         hasText(imgUrl, "imgUrl must not be null");

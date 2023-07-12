@@ -1,6 +1,5 @@
 package competnion.domain.community.entity;
 
-import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

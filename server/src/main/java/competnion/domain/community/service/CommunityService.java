@@ -50,9 +50,15 @@ public class CommunityService {
         return WriterResponse.of(user, petResponseList);
     }
 
+    public List<PetResponse> getPetInfo(final User user) {
+        return user.getPets().stream()
+                .map(PetResponse::simple)
+                .collect(Collectors.toList());
+    }
+
     /**게시글 생성 메서드 **/
     @Transactional
-    public ArticleResponseDto createArticle(
+    public Long createArticle(
             final User user,
             final ArticlePostDto articlePostDto,
             final List<MultipartFile> images
@@ -61,23 +67,23 @@ public class CommunityService {
          * TODO : 1. 개설하기 버튼을 누를때부터 기준 30분 이상인지
                   2. 작성자의 주소 위치의 3km 반경
          */
-        checkWriterHasPet(user);
+        petService.checkUserHasPet(user);
+        for (Long petId : articlePostDto.getPetIds()) {
+            petService.checkExistsPetOrThrow(user, petId);
+        }
 
-        Article article = saveArticle(user, articlePostDto);
         List<String> imageUrlList = s3Util.uploadImageList(images);
 
+        Article article = saveArticle(user, articlePostDto);
         saveAttends(articlePostDto.getPetIds(), user, article);
         saveImages(imageUrlList, article);
-
-        List<String> imgUrlsFromArticle = getImgUrlsFromArticle(article);
-
-        return ArticleResponseDto.of(article, imgUrlsFromArticle);
+        return article.getId();
     }
 
     // 산책 갈래요 참여
     @Transactional
-    public void attend() {
-
+    public void attend(final User user, final Long articleId) {
+        petService.checkUserHasPet(user);
     }
 
     @Transactional
@@ -176,10 +182,6 @@ public class CommunityService {
                     .build());
         }
         attendRepository.saveAll(attends);
-    }
-
-    public void checkWriterHasPet(User user) {
-        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
     }
 
     /** 게시글을 수정할 때 작성자인지 확인하는 메서드 */
