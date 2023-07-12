@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.*;
+import java.util.List;
 
 public class ArticleDto {
 
@@ -30,28 +31,10 @@ public class ArticleDto {
         private Double longitude;
         @NotBlank
         private String location;
-        @DateTimeFormat(pattern = "yyyy-MM-dd")
-        private LocalDate date;
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+        private LocalDateTime date;
         private Integer attendant;
-
-//        @Builder
-//        public ArticlePostDto(String title, String body, String location, LocalDate date, int attendant) {
-//            this.title = title;
-//            this.body = body;
-//            this.location = location;
-//            this.date = date;
-//            this.attendant = attendant;
-//        }
-
-//        public Article toEntity() {
-//            return Article.CreateArticle()
-//                    .title(title)
-//                    .body(body)
-//                    .location(location)
-//                    .date(date)
-//                    .attendant(attendant)
-//                    .build();
-//        }
+        private List<Long> petIds;
     }
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)

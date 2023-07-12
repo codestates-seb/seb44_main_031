@@ -27,7 +27,7 @@ import java.util.List;
 public class CommunityController {
     private final CommunityService communityService;
 
-    @GetMapping("/information")
+    @GetMapping("/info")
     public Response<WriterResponse> getWriterInfo(@UserContext final User user) {
         return Response.success(communityService.getWriterInfo(user));
     }
@@ -36,11 +36,10 @@ public class CommunityController {
     @PostMapping
     public Response<ArticleResponseDto> createArticle(
             @UserContext                                    final User user,
-            @RequestParam("pet-id")                         final List<Long> petIds,
             @Valid @RequestPart("request")                  final ArticlePostDto articlePostDto,
             @RequestPart(value = "image", required = false) final List<MultipartFile> images
     ) {
-        return Response.success(communityService.createArticle(user, articlePostDto, images, petIds));
+        return Response.success(communityService.createArticle(user, articlePostDto, images));
     }
 
 //    // 게시글 참여

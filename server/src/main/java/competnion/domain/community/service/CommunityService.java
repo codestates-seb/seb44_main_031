@@ -10,7 +10,6 @@ import competnion.domain.community.repository.ArticleImageRepository;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
 import competnion.domain.pet.dto.response.PetResponse;
-import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
@@ -56,30 +55,20 @@ public class CommunityService {
     public ArticleResponseDto createArticle(
             final User user,
             final ArticlePostDto articlePostDto,
-            final List<MultipartFile> images,
-            final List<Long> petIds
+            final List<MultipartFile> images
     ) {
         /**
          * TODO : 1. 개설하기 버튼을 누를때부터 기준 30분 이상인지
                   2. 작성자의 주소 위치의 3km 반경
-                  3. 작성자는 게시글 생성할때 데려갈 강아지 선택
          */
         checkWriterHasPet(user);
 
         Article article = saveArticle(user, articlePostDto);
-
-        List<Attend> attends = new ArrayList<>();
-        for (Long petId : petIds) {
-            attends.add(Attend.saveAttend()
-                    .article(article)
-                    .user(user)
-                    .pet(petService.checkExistsPetOrThrow(user, petId))
-                    .build());
-        }
-        attendRepository.saveAll(attends);
-
         List<String> imageUrlList = s3Util.uploadImageList(images);
+
+        saveAttends(articlePostDto.getPetIds(), user, article);
         saveImages(imageUrlList, article);
+
         List<String> imgUrlsFromArticle = getImgUrlsFromArticle(article);
 
         return ArticleResponseDto.of(article, imgUrlsFromArticle);
@@ -175,6 +164,18 @@ public class CommunityService {
             imageUrls.add(articleImage.getImgUrl());
         }
         return imageUrls;
+    }
+
+    public void saveAttends(final List<Long> petIds, final User user, final Article article) {
+        List<Attend> attends = new ArrayList<>();
+        for (Long petId : petIds) {
+            attends.add(Attend.saveAttend()
+                    .article(article)
+                    .user(user)
+                    .pet(petService.checkExistsPetOrThrow(user, petId))
+                    .build());
+        }
+        attendRepository.saveAll(attends);
     }
 
     public void checkWriterHasPet(User user) {

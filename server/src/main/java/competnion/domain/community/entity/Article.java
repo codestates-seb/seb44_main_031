@@ -10,6 +10,7 @@ import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,15 +35,12 @@ public class Article extends BaseEntity {
     private String location;
     private Point point;
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
     @Column(nullable = false)
     private int attendant;
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "pet_id")
-    private Pet pet;
     @OneToMany(mappedBy = "article")
     private List<ArticleImage> images = new ArrayList<>();
 
@@ -63,7 +61,7 @@ public class Article extends BaseEntity {
 //    }
 
     @Builder(builderClassName = "CreateArticle", builderMethodName = "CreateArticle")
-    private Article(User user, String title, String body, String location, int attendant, LocalDate date, Point point) {
+    private Article(User user, String title, String body, String location, int attendant, LocalDateTime date, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
