@@ -51,7 +51,7 @@ const WalkMateDetailBody: React.FC = () => {
   const fetchComments = async () => {
     try {
       const response = await axios.get<Comment[]>(
-        'http://localhost:3001/comments'
+        'http://localhost:3001/walk-mate'
       );
       setComments(response.data);
     } catch (error) {
@@ -67,7 +67,7 @@ const WalkMateDetailBody: React.FC = () => {
     if (newComment.trim() !== '') {
       try {
         const response = await axios.post<Comment>(
-          'http://localhost:3001/comments',
+          'http://localhost:3001/walk-mate',
           {
             content: newComment,
           }
@@ -82,7 +82,7 @@ const WalkMateDetailBody: React.FC = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3001/comments/${id}`);
+      await axios.delete(`http://localhost:3001/walk-mate/${id}`);
       const updatedComments = comments.filter(
         (comment) => comment.commentId !== id
       );
