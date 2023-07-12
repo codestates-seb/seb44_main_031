@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 import static lombok.AccessLevel.PRIVATE;
@@ -23,6 +22,11 @@ public class PetResponse {
     private String vaccine;
     private Boolean isMain;
 
+    private PetResponse(String name, String imgUrl) {
+        this.name = name;
+        this.imgUrl = imgUrl;
+    }
+
     public static PetResponse of(Pet pet) {
         return new PetResponse(
                 pet.getName(),
@@ -32,6 +36,13 @@ public class PetResponse {
                 pet.getImgUrl(),
                 pet.getVaccine(),
                 pet.getIsSelected()
+        );
+    }
+
+    public static PetResponse simple(Pet pet) {
+        return new PetResponse(
+                pet.getName(),
+                pet.getImgUrl()
         );
     }
 }

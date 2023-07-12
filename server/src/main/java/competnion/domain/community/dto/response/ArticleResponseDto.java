@@ -1,30 +1,33 @@
 package competnion.domain.community.dto.response;
 
-import competnion.domain.comment.dto.CommentDto;
 import competnion.domain.community.entity.Article;
-import lombok.*;
+import competnion.domain.user.dto.response.UserResponse;
+import competnion.domain.user.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static lombok.AccessLevel.PRIVATE;
+
 @Getter
+@AllArgsConstructor(access = PRIVATE)
 public class ArticleResponseDto {
         private Long articleId;
-        private Long userId;
         private String username;
         private String title;
         private String body;
-        private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
-        private List<CommentDto.Response> comments;
+        private List<String> imageUrls;
+//        private List<CommentDto.Response> comments;
 
-        public ArticleResponseDto(Article entity) {
-                this.articleId = entity.getArticleId();
-                this.userId = entity.getUser().getId();
-                this.username = entity.getUser().getUsername();
-                this.title = entity.getTitle();
-                this.body = entity.getBody();
-                this.createdAt = entity.getCreatedAt();
-                this.modifiedAt = entity.getModifiedAt();
+        public static ArticleResponseDto of(Article article, List<String> imageUrls) {
+                return new ArticleResponseDto(
+                        article.getId(),
+                        article.getUser().getUsername(),
+                        article.getTitle(),
+                        article.getBody(),
+                        imageUrls
+                );
         }
 }

@@ -1,5 +1,6 @@
 package competnion.domain.user.entity;
 
+import competnion.domain.community.entity.Article;
 import competnion.domain.pet.entity.Pet;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
@@ -51,6 +52,8 @@ public class User extends BaseEntity {
     @Lob
     @NotNull
     private Point point;
+    private Double latitude;
+    private Double longitude;
     @NotBlank
     private String address;
     private String imgUrl;
@@ -59,6 +62,8 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Article> articles = new ArrayList<>();
 
     // 태영 추가 (유저 권한)
     @ElementCollection(fetch = FetchType.EAGER)
@@ -107,7 +112,7 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
-    private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles) {
+    private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude) {
         hasText(username, "username must not be empty");
         hasText(email, "email must not be empty");
         hasText(password, "password must not be empty");
@@ -119,6 +124,8 @@ public class User extends BaseEntity {
         this.password = password;
         this.address = address;
         this.point = point;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.roles = roles;
     }
 }

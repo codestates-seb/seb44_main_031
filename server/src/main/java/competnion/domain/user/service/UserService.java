@@ -10,9 +10,8 @@ import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
-import competnion.infra.s3.util.S3Util;
+import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static competnion.global.exception.ExceptionCode.*;
 import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
 
 
@@ -110,6 +108,8 @@ public class UserService {
                 .password(encode)
                 .address(signUpRequest.getAddress())
                 .point(point)
+                .latitude(signUpRequest.getLatitude())
+                .longitude(signUpRequest.getLongitude())
                 .roles(roles)
                 .build());
     }
