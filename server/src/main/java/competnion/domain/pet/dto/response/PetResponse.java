@@ -13,6 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @AllArgsConstructor(access = PRIVATE)
 public class PetResponse {
+    private Long id;
     private String name;
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth;
@@ -20,11 +21,20 @@ public class PetResponse {
     private Boolean neutralization;
     private String imgUrl;
     private String vaccine;
-    private Boolean isMain;
 
-    private PetResponse(String name, String imgUrl) {
+    private PetResponse(Long id, String name, String imgUrl) {
+        this.id = id;
         this.name = name;
         this.imgUrl = imgUrl;
+    }
+
+    private PetResponse(String name, LocalDate birth, Boolean gender, Boolean neutralization, String imgUrl, String vaccine) {
+        this.name = name;
+        this.birth = birth;
+        this.gender = gender;
+        this.neutralization = neutralization;
+        this.imgUrl = imgUrl;
+        this.vaccine = vaccine;
     }
 
     public static PetResponse of(Pet pet) {
@@ -34,13 +44,13 @@ public class PetResponse {
                 pet.getGender(),
                 pet.getNeutralization(),
                 pet.getImgUrl(),
-                pet.getVaccine(),
-                pet.getIsSelected()
+                pet.getVaccine()
         );
     }
 
     public static PetResponse simple(Pet pet) {
         return new PetResponse(
+                pet.getId(),
                 pet.getName(),
                 pet.getImgUrl()
         );

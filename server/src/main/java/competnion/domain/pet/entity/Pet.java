@@ -50,7 +50,6 @@ public class Pet extends BaseEntity {
     @Column(nullable = false)
     @NotBlank
     private String vaccine;
-    private Boolean isSelected;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")

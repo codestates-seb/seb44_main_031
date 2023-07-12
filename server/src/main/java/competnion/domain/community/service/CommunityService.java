@@ -16,6 +16,7 @@ import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.exception.ExceptionCode;
+import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -40,6 +41,7 @@ public class CommunityService {
     private final AttendRepository attendRepository;
     private final UserService userService;
     private final PetService petService;
+    private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
 
     public WriterResponse getWriterInfo(final User user) {
@@ -62,7 +64,6 @@ public class CommunityService {
                   2. 작성자의 주소 위치의 3km 반경
                   3. 작성자는 게시글 생성할때 데려갈 강아지 선택
          */
-
         checkWriterHasPet(user);
 
         Article article = saveArticle(user, articlePostDto);
@@ -153,6 +154,7 @@ public class CommunityService {
                 .title(articlePostDto.getTitle())
                 .body(articlePostDto.getBody())
                 .location(articlePostDto.getLocation())
+                .point(coordinateUtil.coordinateToPoint(articlePostDto.getLatitude(), articlePostDto.getLongitude()))
                 .attendant(articlePostDto.getAttendant())
                 .date(articlePostDto.getDate())
                 .build());

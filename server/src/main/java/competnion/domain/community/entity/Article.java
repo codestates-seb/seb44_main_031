@@ -63,12 +63,13 @@ public class Article extends BaseEntity {
 //    }
 
     @Builder(builderClassName = "CreateArticle", builderMethodName = "CreateArticle")
-    private Article(User user, String title, String body, String location, int attendant, LocalDate date) {
+    private Article(User user, String title, String body, String location, int attendant, LocalDate date, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
         this.attendant = attendant;
         this.location = location;
+        this.point = point;
         this.date = date;
     }
 
