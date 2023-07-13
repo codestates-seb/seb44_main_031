@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { styled } from 'styled-components';
-import { inputValueType } from '../../hooks/useWalkMateForm';
+import { inputValueType } from './useWalkMateForm';
 
 interface propType {
   inputValue: inputValueType;

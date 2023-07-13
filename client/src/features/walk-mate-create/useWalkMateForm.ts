@@ -3,8 +3,8 @@ import {
   dateToStringDate,
   dateToStringTime,
   nowDateAfterSomeMinutes,
-} from '../utils/date-utils';
-import { axiosInstance } from '../api/walkMateAxios';
+} from '../../utils/date-utils';
+import { axiosInstance } from '../../api/walkMateAxios';
 import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 

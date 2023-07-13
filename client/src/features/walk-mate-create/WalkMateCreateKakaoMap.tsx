@@ -1,10 +1,6 @@
 import { useEffect, useRef, Dispatch, SetStateAction } from 'react';
 import { distance } from '../../utils/distance';
-import {
-  inputValueType,
-  isTouchedType,
-  isValidType,
-} from '../../hooks/useWalkMateForm';
+import { inputValueType, isTouchedType, isValidType } from './useWalkMateForm';
 
 declare global {
   interface Window {
@@ -82,8 +78,6 @@ const WalkMateCreateKakaoMap = ({
     kakao.maps.event.addListener(map, 'click', function (mouseEvent: any) {
       // 클릭한 위도, 경도 정보를 가져옵니다
       const latlng = mouseEvent.latLng;
-      const message = `위도: ${latlng.getLat()}, 경도: ${latlng.getLng()}`;
-      console.log(message);
 
       // 유저가 지정한 마커의 위도,경도를 state 값으로 업데이트
       setInputValue((prev) => {

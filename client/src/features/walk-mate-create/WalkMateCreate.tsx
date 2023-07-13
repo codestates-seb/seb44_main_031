@@ -2,7 +2,7 @@
 import { useState, useRef } from 'react';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import { styled } from 'styled-components';
-import useWalkMateForm from '../../hooks/useWalkMateForm';
+import useWalkMateForm from './useWalkMateForm';
 import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
 import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
@@ -65,7 +65,6 @@ const WalkMateCreate = () => {
 
     // 시간 유효성 검사 후 통과 안되면 input scroll 로 보내기
     if (!isDateAndTimeValid) {
-      console.log('not valid');
       inputRef?.current?.scrollIntoView({ behavior: 'smooth' });
       inputRef?.current?.focus();
       setIsValid({ ...isValid, time: false });
@@ -92,7 +91,6 @@ const WalkMateCreate = () => {
         attendant: inputValue.attendant,
         petIds: inputValue.selectedPets,
       };
-      console.log(requestData);
       const blob = new Blob([JSON.stringify(requestData)], {
         type: 'application/json',
       });
@@ -112,7 +110,6 @@ const WalkMateCreate = () => {
       } finally {
         // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
         await setTimeout(() => {
-          console.log('setTimeout 3secs');
           setIsLoading(false);
         }, 3000);
       }
