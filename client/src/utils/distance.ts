@@ -1,3 +1,5 @@
+// 두 좌표(위도, 경도) 사이의 거리를 km 단위로 계산해주는 알고리즘 함수 (영탁)
+
 export function distance(
   lat1: number,
   lon1: number,
@@ -15,7 +17,6 @@ export function distance(
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c; // 두 지점 간의 거리 (단위: km)
-  console.log(distance);
   return distance;
 }
 

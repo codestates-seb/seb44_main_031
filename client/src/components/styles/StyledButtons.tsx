@@ -36,6 +36,7 @@ export const StyledButtonPink3D = styled.button`
   }
 `;
 
+// flat 한 버젼의 버튼 컴포넌트, 추후 추가 구현 예정 (영탁)
 // const StyeldButtonFlat = styled.button`
 //   font-weight: bold;
 //   padding: 5px;

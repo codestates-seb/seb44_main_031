@@ -6,6 +6,7 @@ import {
 } from '../utils/date-utils';
 import { axiosInstance } from '../api/walkMateAxios';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
 
 export interface inputValueType {
   image: string;
@@ -46,10 +47,8 @@ export interface isTouchedType {
 const useWalkMateForm = () => {
   // input 값
   // onChange Handler: input 값 binding, validation check
-  // onBlur Handler: blur 될때 validation 일어나야되 (필요없는거 같은데)
-  // onSubmit Handler: submit 될때 validatoin check, 해당 input으로 focus 스크롤이동, 통과되면 POST 요청보내
-  // error 메세지, isTouched 가 ture && !isValid 일때 에러 메세지 띄워주면되
-  // 성공적으로 submit 하면 초기 state 값으로 reset 해야되 (어차피 페이지 navigate 되니까 상관없을듯)
+  // error 메세지, isTouched 가 ture && !isValid 일때만 에러 메세지 띄워줌
+  // 성공적으로 submit 하면 초기 state 값으로 reset 해야함 (근데 어차피 페이지 navigate 되니까 상관없을듯)
   const navigate = useNavigate();
 
   const [inputValue, setInputValue] = useState<inputValueType>({
@@ -60,8 +59,6 @@ const useWalkMateForm = () => {
     initDate: '',
     time: '',
     attendant: 4,
-    // location: { lat: 37.5796, lng: 126.977 },
-    // walkLocation: { lat: 37.5796, lng: 126.977 },
     location: { lat: 33.450701, lng: 126.570667 },
     walkLocation: { lat: 33.450701, lng: 126.570667 },
     walkAddress: '',
@@ -91,10 +88,10 @@ const useWalkMateForm = () => {
   });
 
   const [isPageLoading, setIsPageLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<null | string>(null);
 
   useEffect(() => {
-    // Date initial value
+    // 유저가 페이지에 접속한 시점의 Date initial value
     const thirtyMinLater = nowDateAfterSomeMinutes(30);
     const stringFormatDate = dateToStringDate(thirtyMinLater);
     const stringFormatTime = dateToStringTime(thirtyMinLater);
@@ -123,13 +120,16 @@ const useWalkMateForm = () => {
             },
           };
         });
-      } catch (err: any) {
-        // 토큰 인증이 안됐을 경우 로그인 페이지로 이동
-        if (err.status === 401) {
-          navigate('/users/sign-in', { state: { path: '/walk-mate/create' } });
+      } catch (err: unknown) {
+        // 토큰 인증이 안됐을 경우 현재 페이지 주소를 state 으로 담아서 로그인 페이지로 이동.
+        if (err instanceof AxiosError) {
+          if (err.status === 401) {
+            navigate('/users/sign-in', {
+              state: { path: '/walk-mate/create' },
+            });
+          }
+          setError(err.message);
         }
-        setError(err.message);
-        console.log(err.message);
       } finally {
         setIsPageLoading(false);
       }
@@ -188,16 +188,18 @@ const useWalkMateForm = () => {
     setInputValue({ ...inputValue, date: e.currentTarget.value });
     setIsTouched({ ...isTouched, date: true });
 
-    // valid: 작성하는 시점에 지정한 날짜가 꼭 작성하는 시점으로부터 now+ 30min 의 날짜어야되.
-    // input 에 min 속성으로 이미 지정되있음. 근데 엣지케이스 있음.
-    // 엣지케이스 ex) 11시 20분에 화면에 들어왔어, 7월7일 23시50분으로 설정했어.
-    // 근데 작성하다 보니 11시 40분이 되서 최소 날짜가 7월8일 00시10분 이후어야되.
-    // 그렇기 때문에 여기(HandleChnage)나,onSubmit 할때 한번 더 유효성 검사해줘야되.
+    // valid: 작성하는 시점에 지정한 날짜가 작성하는 시점 + 30min 의 날짜여야됨.
+    // input 에 min 속성으로 선택 가능 날짜가 이미 지정되있음. 하지만 엣지케이스 대비해야함.
+
+    // 엣지케이스 ex) 7월7일 11시 29분에 화면에 들어왔을때, 기본값이 7월7일 23시59분으로 설정돼있는데,
+    // 작성하다 보니 11시 31분이 되어서 최소 가능 날짜&시간이 7월8일 00시01분 이후어야되.
+    // 그렇기 때문에 여기(HandleChnage)나,onSubmit 할때 한번 더 유효성 검사해줘야함.
+
+    // 또 시간을 수정하지 않고 날짜만 수정한 경우라도 날짜와 시간 두개 동시에 검사해줘야함.
+    // 날짜만 수정했다고 날짜만 검사하게 되면, 시간을 초기값으로 두고 수정하지 않고 날짜만 바꿨을 경우, 유효한 Date 이지만 통과되지 않는 엣지케이스가 발생
+
     const inputDate = e.currentTarget.value;
     const dateAfterThirtyMin = dateToStringDate(nowDateAfterSomeMinutes(30));
-
-    // 시간을 수정하지 않고 날짜만 수정한 경우라도 날짜와 시간 두개 동시에 검사해줘야함.
-    // 왜냐면 초기값에 시간을 수정하지 않고 날짜만 바꿨을경우, 유효한 Date 이지만 통과되지 않는 엣지케이스 발생
 
     // 날짜 유효성 검사
     const isDateValid = inputDate >= dateAfterThirtyMin;
@@ -227,14 +229,14 @@ const useWalkMateForm = () => {
     setInputValue({ ...inputValue, time: e.currentTarget.value });
     setIsTouched({ ...isTouched, time: true });
 
-    // valid: 작성하는 시점에 지정한 시간이 꼭 작성하는 시점으로부터 최소 30분 이후여야되.
-    // 그렇기 때문에 여기(HandleChnage)나,onSubmit 할때 한번 더 유효성 검사해줘야되.
+    // valid: 작성하는 시점에 지정한 시간이 꼭 작성하는 시점으로부터 최소 30분 이후여야함.
+    // 그래서 handleTimeChange(여기), onSubmit 할때 한번 더 유효성 검사해줘야함.
 
-    // 근데 시간 유효성은 어떻게 판단하지? 12시가 넘어가면 단순히 시간크기 비교할수없는데 시간분만 비교할 수가 없는데.
-    // 엣지케이스 ex) 11시 20분에 화면에 들어왔어, 7월7일 23시50분으로 설정했어.
-    // 근데 작성하다 보니 11시 40분이 되서 최소 날짜가 7월8일 00시10분 이후어야되.
-    // 전체 시간 + 30으로 비교해야겠다.
-    // 유저가 입력한 Date 과 현재 시각 + 30분의 Date 을 비교하면 됨
+    // 시간 유효성 판단 기준
+    // 엣지케이스 ex) 7월7일 11시 29분에 화면에 들어왔을때, 기본값이 7월7일 23시59분으로 설정돼있는데,
+    // 작성하다 보니 11시 31분이 되어서 최소 가능 날짜&시간이 7월8일 00시01분 이후어야되.
+    // 그러므로 시간만 보면 안되고 날짜와 시간을 합친 Date 전체 시간기준 + 30으로 계산해야함.
+    // 유저가 입력한 Date 과 현재 시각 30분 후의 Date 을 비교하면 됨
     const userInputDate = new Date(
       `${inputValue.date}T${e.currentTarget.value}:00`
     );

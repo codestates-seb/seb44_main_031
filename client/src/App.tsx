@@ -7,6 +7,8 @@ import Footer from './components/Footer';
 import SignUp from './features/sign-up/SignUp';
 import SignIn from './features/sign-in/SignIn';
 import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -26,6 +28,7 @@ function App() {
         </Route>
       </Routes>
       <Footer />
+      <ToastContainer autoClose={2000} />
     </div>
   );
 }

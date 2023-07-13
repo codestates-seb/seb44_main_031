@@ -16,6 +16,7 @@ interface PetCardPropType {
   setInputValue: Dispatch<SetStateAction<inputValueType>>;
 }
 
+// 개별 펫카드 컴포넌트
 const PetCard = ({
   id,
   imgUrl,
@@ -24,13 +25,18 @@ const PetCard = ({
   inputValue,
   setInputValue,
 }: PetCardPropType) => {
+  // 현재 Card 의 펫이 선택이 돼있는지 아닌지 판단하기 위한 불리안 값.
+  // isSelected 값에 따라서 UI와 state 을 업데이트하는 용도.
   const isSelected = selectedPets.some((pet) => pet === id);
 
   const handlePetCardClick = () => {
+    // 본인의 펫 리스트중에 선택되지 않은 펫들의 id[]
     const unselectPetResult = inputValue.selectedPets.filter(
       (pet) => pet !== id
     );
 
+    // 클릭된 펫이 이미 선택되있는 경우는 선택 취소되게 하고,
+    // 선택되있지 않은 경우는 선택되게 해야함.
     if (isSelected) {
       setInputValue((prev) => {
         return { ...prev, selectedPets: unselectPetResult };
@@ -47,7 +53,7 @@ const PetCard = ({
     <PetCardContainer
       className="pet-card-container"
       onClick={handlePetCardClick}
-      isSelected={isSelected}
+      $isSelected={isSelected}
     >
       <img src={imgUrl} alt="img" className="pet-image" />
       <p>{name}</p>
@@ -55,6 +61,7 @@ const PetCard = ({
   );
 };
 
+// 페이지 컴포넌트 단에서 렌더될 PetCard의 컨테이너 컴포넌트
 const WalkMateSelectPetsList = ({ inputValue, setInputValue }: propType) => {
   return (
     <PetsListContainer>
@@ -73,6 +80,7 @@ const WalkMateSelectPetsList = ({ inputValue, setInputValue }: propType) => {
   );
 };
 
+// 스타일드 컴포넌츠
 const PetsListContainer = styled.ul`
   display: flex;
   gap: 20px;
@@ -80,7 +88,7 @@ const PetsListContainer = styled.ul`
 `;
 
 interface PetCardContainerProps {
-  readonly isSelected: boolean;
+  readonly $isSelected: boolean;
 }
 
 const PetCardContainer = styled.li<PetCardContainerProps>`
@@ -95,7 +103,7 @@ const PetCardContainer = styled.li<PetCardContainerProps>`
   border-radius: 20px;
   width: 120px;
   height: 120px;
-  background-color: ${({ isSelected }) => (isSelected ? 'pink' : 'white')};
+  background-color: ${({ $isSelected }) => ($isSelected ? 'pink' : 'white')};
 
   .pet-image {
     height: 60px;
@@ -103,14 +111,14 @@ const PetCardContainer = styled.li<PetCardContainerProps>`
 
   &:hover {
     /* background-color: var(--pink-200); */
-    background-color: ${({ isSelected }) => (isSelected ? 'pink' : 'white')};
+    background-color: ${({ $isSelected }) => ($isSelected ? 'pink' : 'white')};
     transform: translateY(-5px);
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1),
       0px 5px 10px rgba(0, 0, 0, 0.1);
   }
 
   &:active {
-    background-color: ${({ isSelected }) => (isSelected ? 'pink' : 'white')};
+    background-color: ${({ $isSelected }) => ($isSelected ? 'pink' : 'white')};
     transform: translateY(0px);
   }
 `;

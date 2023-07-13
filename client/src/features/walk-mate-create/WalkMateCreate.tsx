@@ -8,14 +8,13 @@ import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
 import { axiosInstance } from '../../api/walkMateAxios';
-
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const WalkMateCreate = () => {
+  const navigate = useNavigate();
+
   const {
     inputValue,
     setInputValue,
@@ -46,24 +45,25 @@ const WalkMateCreate = () => {
     isValid.location &&
     inputValue.selectedPets.length !== 0;
 
-  // fetching 할때
-  // const isLoading = useRef(false);
+  // POST 요청할 때 로딩용 상태값
   const [isLoading, setIsLoading] = useState(false);
 
+  // onSubmit Handler: submit 될때 validatoin check, 유효성 검사 통과 안될경우 에러 메세지 띄우고 해당 input으로 focus 스크롤이동, 통과했을대만 POST 요청 보냄
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setIsSubmitBtnTouched(true);
-
-    // 날짜 & 시간 유효성검사
-    const userInputDate = new Date(`${inputValue.date}T${inputValue.time}:00`);
-    const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
-    const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
 
     // 반려견 유효성 검사
     if (inputValue.selectedPets.length === 0) {
       return;
     }
 
+    // 날짜 & 시간 유효성 검사
+    const userInputDate = new Date(`${inputValue.date}T${inputValue.time}:00`);
+    const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
+    const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
+
+    // 시간 유효성 검사 후 통과 안되면 input scroll 로 보내기
     if (!isDateAndTimeValid) {
       console.log('not valid');
       inputRef?.current?.scrollIntoView({ behavior: 'smooth' });
@@ -73,20 +73,21 @@ const WalkMateCreate = () => {
       return;
     }
 
+    // 모든 유효성 검사 통과됐고, 다른 POST 요청이 없는 경우만 POST 요청을 보냄,
     if (isAllValid && isDateAndTimeValid && !isLoading) {
-      // post
-      console.log('POST http request is sent');
-
+      // 이미지가 포함되야하기 때문에 form data 형식으로 보냄
       const formData = new FormData();
+
+      // 이미지 데이터
       formData.append('image', inputValue.image);
 
+      // json 으로 보낼 blob 데이터
       const requestData = {
         title: inputValue.title,
         body: inputValue.body,
         location: inputValue.walkAddress,
         latitude: inputValue.walkLocation.lat,
         longitude: inputValue.walkLocation.lng,
-        // date : "2023-07-13T16:23",
         date: stringToDate(inputValue.date, inputValue.time),
         attendant: inputValue.attendant,
         petIds: inputValue.selectedPets,
@@ -102,18 +103,18 @@ const WalkMateCreate = () => {
         const response = await axiosInstance.post('articles', {
           data: formData,
         });
-        console.log(response.data);
-      } catch (err: any) {
-        console.log(err.message);
+        toast.success('산책 모집 글 등록 성공!');
+        navigate(`/walk-mate/${response.data.result}`);
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          toast.error(err.message);
+        }
       } finally {
-        // setTimeout으로 버튼 disabled 되는지 가상 환경 테스트,
+        // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
         await setTimeout(() => {
           console.log('setTimeout 3secs');
-          // isLoading.current = false;
           setIsLoading(false);
         }, 3000);
-        // submitButtonRef?.current?.removeAttribute('disabled');
-        // console.log(submitButtonRef.current);
       }
     }
   };
@@ -121,7 +122,10 @@ const WalkMateCreate = () => {
   if (isPageLoading) {
     return (
       <FormDivContainer>
-        <img src="/src/assets/loading-spinner-dog-1.gif" alt="" />
+        <img
+          src="/src/assets/loading-spinner-dog-1.gif"
+          alt="dog-loading-spinner"
+        />
       </FormDivContainer>
     );
   }
@@ -169,11 +173,9 @@ const WalkMateCreate = () => {
             minLength={15}
             maxLength={100}
             required
-            // ref={inputRef}
-            // autoFocus
           />
           {!isValid.title && isTouched.title && (
-            <p className="error-message">error message</p>
+            <p className="error-message">{`최소 15자 최대 100자 (현재 입력된 글자수: ${inputValue.title.length})`}</p>
           )}
         </div>
         <div className="input-field">
@@ -187,11 +189,10 @@ const WalkMateCreate = () => {
             onChange={handleBodyChange}
             minLength={30}
             maxLength={250}
-            // cols={5}
             required
           />
           {!isValid.body && isTouched.body && (
-            <p className="error-message">error message</p>
+            <p className="error-message">{`최소 30자 최대 250자 (현재 입력된 글자수: ${inputValue.body.length})`}</p>
           )}
         </div>
         <div className="date-time-container">
@@ -207,6 +208,7 @@ const WalkMateCreate = () => {
               onChange={handleDateChange}
               required
             />
+
             {!isValid.date && isTouched.date && (
               <p className="error-message">
                 이미 지난 날짜는 선택할 수 없습니다.
@@ -227,12 +229,15 @@ const WalkMateCreate = () => {
             />
             {!isValid.time && isTouched.time && (
               <p className="error-message">
-                현재 시각으로부터 30분 후 부터 선택 가능합니다.
+                현재 시각의 30분 후 부터 선택 가능합니다.
               </p>
             )}
           </div>
         </div>
-        <div className="input-field">
+        <p className="notice-p notice-p-date">
+          ( 현재 시각의 30분 후 부터 선택 가능합니다. )
+        </p>
+        <div className="input-field input-attendant-container">
           <label htmlFor="attendant">산책 모임 인원</label>
           <p className="notice-p">( 본인 포함 )</p>
           <div>
@@ -254,11 +259,13 @@ const WalkMateCreate = () => {
             <div className="input-field-label-p">
               <label htmlFor="map">산책 모임 장소</label>
               <p className="notice-p">
-                ( 본인 등록 위치의 3km 이내에서만 선택 가능 )
+                ( 나의 위치의 3km 이내에서만 선택 가능 )
               </p>
             </div>
             {!isValid.location && isTouched.location && (
-              <p className="error-message">원 안의 위치만 선택할 수 있습니다</p>
+              <p className="error-message">
+                원 안의 위치만 선택하실 수 있습니다
+              </p>
             )}
           </div>
           <WalkMateCreateKakaoMap
@@ -267,14 +274,11 @@ const WalkMateCreate = () => {
             setIsTouched={setIsTouched}
             setIsValid={setIsValid}
           />
-          {/* {!isValid.location && isTouched.location && (
-            <p className="error-message">원 안의 지역을 선택해주세요</p>
-          )} */}
         </div>
         <div className="input-field select-pets">
           <div className="input-field-label-p-error">
             <div className="input-field-label-p">
-              <label htmlFor="map">산책할 반려견 선택</label>
+              <label htmlFor="map">산책 갈 반려견 선택</label>
               <p className="notice-p">( 최소 1마리, 최대 4마리 선택 가능 )</p>
             </div>
             {inputValue.selectedPets.length === 0 && (
@@ -316,15 +320,12 @@ const WalkMateCreate = () => {
 export default WalkMateCreate;
 
 // Styled Components
-
 const FormDivContainer = styled.div`
   width: 100vw;
-  /* height: 100vh; */
 `;
 
 const StyledForm = styled.form`
   width: 600px;
-  /* height: 900px; */
   margin: 60px auto;
   display: flex;
   flex-direction: column;
@@ -427,7 +428,6 @@ const StyledForm = styled.form`
     border: 1.5px solid var(--black-400);
     border-radius: 15px;
     width: 130px;
-    /* height: 0px; */
     margin-right: 10px;
 
     &:focus {
@@ -449,5 +449,9 @@ const StyledForm = styled.form`
 
   .select-pets {
     margin-top: 20px;
+  }
+
+  .input-attendant-container {
+    margin-top: 10px;
   }
 `;

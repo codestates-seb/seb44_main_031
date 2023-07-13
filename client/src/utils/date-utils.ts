@@ -1,3 +1,5 @@
+// 날짜, 시간을 상황에 맞는 format 으로 변환해주기 위한 유틸 함수들 (영탁)
+
 // 현재로부터 + a분의 Date 을 생성하는 함수
 export const nowDateAfterSomeMinutes = (min: number) => {
   const nowDate = new Date();
@@ -42,5 +44,4 @@ export const stringToDate = (dateString: string, timeString: string) => {
   const timestamp = Date.parse(`${dateString}T${timeString}:00`);
   const date = new Date(timestamp);
   return date;
-  // console.log(date);
 };
