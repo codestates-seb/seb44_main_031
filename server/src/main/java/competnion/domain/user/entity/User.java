@@ -1,6 +1,7 @@
 package competnion.domain.user.entity;
 
 import competnion.domain.community.entity.Article;
+import competnion.domain.community.entity.Attend;
 import competnion.domain.pet.entity.Pet;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
@@ -60,14 +61,20 @@ public class User extends BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    // 태영 추가 (유저 권한)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
     @OneToMany(mappedBy = "user")
     private List<Article> articles = new ArrayList<>();
+    @OneToMany(mappedBy = "user")
+    private List<Attend> attends = new ArrayList<>();
 
-    // 태영 추가 (유저 권한)
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+
+
+
 
     public void updateAddressAndCoordinates(final String address, final Point point) {
         hasText(address, "address must not be empty");

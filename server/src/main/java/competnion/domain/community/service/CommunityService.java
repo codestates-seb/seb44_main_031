@@ -6,9 +6,11 @@ import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.entity.ArticleImage;
 import competnion.domain.community.entity.Attend;
+import competnion.domain.community.mapper.ArticleMapper;
 import competnion.domain.community.repository.ArticleImageRepository;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
+import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
@@ -21,6 +23,7 @@ import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.mapstruct.control.MappingControl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,6 +46,7 @@ public class CommunityService {
     private final ArticleImageRepository articleImageRepository;
     private final AttendRepository attendRepository;
     private final PetService petService;
+    private final ArticleMapper mapper;
     private final PetRepository petRepository;
     private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
@@ -104,11 +108,20 @@ public class CommunityService {
 //        findArticle.update(article);
 //    }
 
-    /**게시글 조회 메서드 **/
-//    public ArticleResponseDto findById(Long articleId) {
-//        Article article = findVerifiedArticle(articleId);
-//        return new ArticleResponseDto(article);
-//    }
+    /**게시글 상세 조회 **/
+    public SingleArticleResponseDto findArticle(Long articleId) {
+
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND));
+
+        List<String> images = getImgUrlsFromArticle(article);
+
+        List<User> attendees = extractUserFromAttend(articleId);
+
+        return mapper.articleToSingleArticleResponse(images,article,attendees);
+
+
+    }
 
 //    @Transactional(readOnly = true)
 //    /**게시글 전제 조회 메서드 **/
@@ -205,6 +218,10 @@ public class CommunityService {
         long count = attendRepository.countByArticleId(attendRequest.getArticleId());
         if (count >= attendRequest.getAttendant())
             throw new BusinessLogicException(NO_SPACE_FOR_ATTEND);
+    }
+
+    public List<User> extractUserFromAttend (long articleId) {
+        return attendRepository.findUsersFromAttendByArticleId(articleId);
     }
 
 //    /** 게시글을 수정할 때 작성자인지 확인하는 메서드 */

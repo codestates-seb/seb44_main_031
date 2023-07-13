@@ -3,14 +3,15 @@ package competnion.domain.community.controller;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.response.WriterResponse;
+import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
-import competnion.global.security.interceptor.JwtParseInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -67,11 +68,11 @@ public class CommunityController {
 //                new SingleResponseDto<>(new ArticleResponseDto(updatedArticle)), HttpStatus.OK);
 //    }
 
-    /** 게시글 상세 조회 **/
-//    @GetMapping("/{article-id}")
-//    public ArticleResponseDto getArticle(@PathVariable("article-id") @Positive Long articleId){
-//        return communityService.findById(articleId);
-//    }
+
+    @GetMapping("/{article-id}")
+    public ResponseEntity<SingleArticleResponseDto> getArticle(@PathVariable("article-id") @Positive Long articleId){
+        return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
+    }
 
     /** 전체 조회 **/
 //    @GetMapping

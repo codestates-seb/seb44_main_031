@@ -1,5 +1,6 @@
 package competnion.domain.community.entity;
 
+import competnion.domain.comment.entity.Comment;
 import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
@@ -49,8 +50,8 @@ public class Article extends BaseEntity {
     private List<Pet> pets = new ArrayList<>();
 
 //    @OnDelete(action= OnDeleteAction.CASCADE)
-//    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
-//    private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
+    private List<Comment> comments = new ArrayList<>();
 //    private Duration timeDifference;
 //
 //    public Article(LocalDateTime date) {

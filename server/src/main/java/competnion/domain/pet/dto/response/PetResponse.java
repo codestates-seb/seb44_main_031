@@ -37,6 +37,10 @@ public class PetResponse {
         this.vaccine = vaccine;
     }
 
+    public PetResponse(String name) {
+        this.name = name;
+    }
+
     public static PetResponse of(Pet pet) {
         return new PetResponse(
                 pet.getName(),
@@ -55,4 +59,12 @@ public class PetResponse {
                 pet.getImgUrl()
         );
     }
+
+    public static PetResponse petName(Pet pet) {
+        return new PetResponse(
+                pet.getName()
+        );
+    }
+
+
 }
