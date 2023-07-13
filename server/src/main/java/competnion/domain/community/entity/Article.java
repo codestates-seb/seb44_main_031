@@ -1,5 +1,6 @@
 package competnion.domain.community.entity;
 
+import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ public class Article extends BaseEntity {
     private String body;
     @Column(nullable = false)
     private String location;
+    @Lob
+    @NotNull
     private Point point;
     @Column(nullable = false)
     private LocalDateTime date;
@@ -41,6 +45,8 @@ public class Article extends BaseEntity {
     private User user;
     @OneToMany(mappedBy = "article")
     private List<ArticleImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    private List<Pet> pets = new ArrayList<>();
 
 //    @OnDelete(action= OnDeleteAction.CASCADE)
 //    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
@@ -70,7 +76,7 @@ public class Article extends BaseEntity {
     }
 
     /** 게시글 수정 */
-    public void update(Article updatedArticle) {
+    public void updateInfo(Article updatedArticle) {
         if (updatedArticle.getTitle() != null) {
             this.title = updatedArticle.getTitle();
         }

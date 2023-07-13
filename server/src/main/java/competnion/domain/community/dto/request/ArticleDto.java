@@ -1,24 +1,22 @@
 package competnion.domain.community.dto.request;
 
-import competnion.domain.community.entity.Article;
-import competnion.domain.user.entity.User;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.format.annotation.DateTimeFormat;
 
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
-import java.time.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ArticleDto {
 
     @Getter
     @Builder
-    public static class ArticlePostDto {
+    public static class ArticlePostRequest {
         @Length(min = 15, max = 100)
         @NotBlank
         private String title;

@@ -70,10 +70,9 @@ public class UserService {
             final MultipartFile image
     ) {
         s3Util.isFileAnImageOrThrow(image);
-        String imgUrl = s3Util.uploadImage(image);
-
         if (user.getImgUrl() != null)
             s3Util.deleteImage(user.getImgUrl());
+        String imgUrl = s3Util.uploadImage(image);
 
         user.updateImgUrl(imgUrl);
 

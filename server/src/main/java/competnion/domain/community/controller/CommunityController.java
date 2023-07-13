@@ -1,9 +1,10 @@
 package competnion.domain.community.controller;
 
-import competnion.domain.community.dto.request.ArticleDto.ArticlePostDto;
-import competnion.domain.community.dto.response.ArticleResponseDto;
+import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
+import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.service.CommunityService;
+import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
@@ -27,28 +28,31 @@ import java.util.List;
 public class CommunityController {
     private final CommunityService communityService;
 
-    @GetMapping("/info")
+    @GetMapping("/writer-info")
     public Response<WriterResponse> getWriterInfo(@UserContext final User user) {
         return Response.success(communityService.getWriterInfo(user));
+    }
+
+    @GetMapping("attendee-info")
+    public Response<List<PetResponse>> getAttendeeInfo(@UserContext final User user) {
+        return Response.success(communityService.getAttendeePetInfo(user));
     }
 
     /** 게시글 작성 **/
     @PostMapping
     public Response<Long> createArticle(
             @UserContext                                    final User user,
-            @Valid @RequestPart("request")                  final ArticlePostDto articlePostDto,
+            @Valid @RequestPart("request")                  final ArticlePostRequest articlePostDto,
             @RequestPart(value = "image", required = false) final List<MultipartFile> images
     ) {
         return Response.success(communityService.createArticle(user, articlePostDto, images));
     }
 
     // 게시글 참여
-    @PostMapping("/attend/{article-id}")
-    public Response<?> attend(
-            @UserContext                          final User user,
-            @Positive @PathVariable("article-id") final Long articleId
+    @PostMapping("/attend")
+    public Response<?> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest attendRequest
     ) {
-        communityService.attend(user, articleId);
+        communityService.attend(user, attendRequest);
         return Response.success();
     }
 
@@ -86,13 +90,13 @@ public class CommunityController {
 //        return new ResponseEntity<>(multiResponseDto, HttpStatus.OK);
 //    }
 
-    /** 질문 삭제 **/
-    @DeleteMapping("/{article-id}")
-    public ResponseEntity deleteArticle(@PathVariable("article-id") @Positive long articleId){
-        /** 삭제하려는 게시글이 작성자인지 확인하는 로직 필요(해결) */
-        Long userId = JwtParseInterceptor.getAuthenticatedUserId();
-        communityService.deleteArticle(articleId, userId);
-        return ResponseEntity.noContent().build();
-    }
+//    /** 질문 삭제 **/
+//    @DeleteMapping("/{article-id}")
+//    public ResponseEntity deleteArticle(@PathVariable("article-id") @Positive long articleId){
+//        /** 삭제하려는 게시글이 작성자인지 확인하는 로직 필요(해결) */
+//        Long userId = JwtParseInterceptor.getAuthenticatedUserId();
+//        communityService.deleteArticle(articleId, userId);
+//        return ResponseEntity.noContent().build();
+//    }
 }
 

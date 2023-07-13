@@ -1,6 +1,7 @@
 package competnion.domain.pet.entity;
 
 import competnion.domain.community.entity.Article;
+import competnion.domain.community.entity.Attend;
 import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
@@ -54,6 +55,9 @@ public class Pet extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "article_id")
+    private Article article;
 
     public void updateImgUrl(final String imgUrl) {
         hasText(imgUrl, "imgUrl must not be null");
@@ -79,6 +83,13 @@ public class Pet extends BaseEntity {
         hasText(vaccine, "vaccine must not be empty");
         this.vaccine = vaccine;
     }
+
+    public void updateArticle(final Article article) {
+        notNull(article, "article must not be null");
+        this.article = article;
+    }
+
+                             // end::[])
 
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
     private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final String vaccine, final User user) {
