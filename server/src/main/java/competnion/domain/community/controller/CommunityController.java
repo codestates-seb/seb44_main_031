@@ -64,16 +64,16 @@ public class CommunityController {
         return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
     }
 
-    // TODO : request param 으로 리팩토링
     @GetMapping("/all")
     public Response<List<ArticleResponse>> getAllArticles(
             @UserContext final User user,
             @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
+            @RequestParam(value = "days",    required = false, defaultValue = "1")   final int days,
             @RequestParam(value = "pageNumber", required = false, defaultValue = "1")  final int pageNumber,
             @RequestParam(value = "pageSize",   required = false, defaultValue = "10") final int pageSize
     ) {
         PageRequest pageable = PageRequest.of(pageNumber - 1, pageSize);
-        List<ArticleResponse> articles = communityService.getAll(user, keyword, pageable);
+        List<ArticleResponse> articles = communityService.getAll(user, keyword, days, pageable);
         return Response.success(articles);
     }
 

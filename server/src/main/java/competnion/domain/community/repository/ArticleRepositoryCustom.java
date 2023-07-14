@@ -1,10 +1,16 @@
 package competnion.domain.community.repository;
 
-import competnion.domain.community.entity.Article;
+import competnion.domain.community.dto.ArticleQueryDto;
 import org.locationtech.jts.geom.Point;
 
 import java.util.List;
 
 public interface ArticleRepositoryCustom {
-    List<Article> findAllByKeywordAndDistance(Point userPoint, String keyword, Double distance, long offset, int limit);
+    List<ArticleQueryDto> findAllByKeywordAndDistance(
+            Point userPoint,
+            String keyword,
+            int days,
+            Double distance,
+            long offset,
+            int limit);
 }

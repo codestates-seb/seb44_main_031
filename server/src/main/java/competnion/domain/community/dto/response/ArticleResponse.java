@@ -1,8 +1,10 @@
 package competnion.domain.community.dto.response;
 
-import competnion.domain.community.entity.Article;
+import competnion.domain.community.dto.ArticleQueryDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -10,8 +12,9 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class ArticleResponse {
     private String title;
+    private LocalDateTime date;
 
-    public static ArticleResponse of(Article article) {
-        return new ArticleResponse(article.getTitle());
+    public static ArticleResponse of(ArticleQueryDto articleQueryDto) {
+        return new ArticleResponse(articleQueryDto.getTitle(), articleQueryDto.getDate());
     }
 }
