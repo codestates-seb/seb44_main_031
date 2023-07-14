@@ -11,5 +11,11 @@
         <module name="competnion.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="competnion" target="11" />
+      <module name="competnion.querydsl" target="11" />
+      <module name="competnion.test" target="11" />
+      <module name="server.competnion.main" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

@@ -2,8 +2,6 @@ package competnion.domain.community.dto.response;
 
 import competnion.domain.comment.dto.CommentDto;
 import competnion.domain.community.entity.Article;
-import competnion.domain.user.dto.response.UserResponse;
-import competnion.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

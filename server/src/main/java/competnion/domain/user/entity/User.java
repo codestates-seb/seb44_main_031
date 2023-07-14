@@ -50,7 +50,6 @@ public class User extends BaseEntity {
     @Column(unique = true, nullable = false)
     @NotBlank
     private String password;
-    @Lob
     @NotNull
     private Point point;
     private Double latitude;

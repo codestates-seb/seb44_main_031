@@ -2,6 +2,7 @@ package competnion.domain.community.controller;
 
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
+import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
@@ -11,6 +12,7 @@ import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +36,7 @@ public class CommunityController {
         return Response.success(communityService.getWriterInfo(user));
     }
 
-    @GetMapping("attendee-info")
+    @GetMapping("/attendee-info")
     public Response<List<PetResponse>> getAttendeeInfo(@UserContext final User user) {
         return Response.success(communityService.getAttendeePetInfo(user));
     }
@@ -57,21 +59,22 @@ public class CommunityController {
         return Response.success();
     }
 
-    /** 게시글 수정 **/
-//    @PatchMapping("/{article-id}")
-//    public ResponseEntity updateArticle(@PathVariable("article-id") Long articleId,
-//                                        @Valid@RequestBody ArticlePatchDto articlePatchDto) {
-//        Long userId = JwtParseInterceptor.getAuthenticatedUserId();
-//        communityService.updateArticle(articleId, userId, articlePatchDto.toEntity());
-//        Article updatedArticle = communityService.findArticleById(articleId);
-//        return new ResponseEntity<>(
-//                new SingleResponseDto<>(new ArticleResponseDto(updatedArticle)), HttpStatus.OK);
-//    }
-
-
     @GetMapping("/{article-id}")
     public ResponseEntity<SingleArticleResponseDto> getArticle(@PathVariable("article-id") @Positive Long articleId){
         return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
+    }
+
+    // TODO : request param 으로 리팩토링
+    @GetMapping("/all")
+    public Response<List<ArticleResponse>> getAllArticles(
+            @UserContext final User user,
+            @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
+            @RequestParam(value = "pageNumber", required = false, defaultValue = "1")  final int pageNumber,
+            @RequestParam(value = "pageSize",   required = false, defaultValue = "10") final int pageSize
+    ) {
+        PageRequest pageable = PageRequest.of(pageNumber - 1, pageSize);
+        List<ArticleResponse> articles = communityService.getAll(user, keyword, pageable);
+        return Response.success(articles);
     }
 
     /** 전체 조회 **/

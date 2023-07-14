@@ -37,7 +37,7 @@ public interface ArticleMapper {
 
     default List<PetResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
         return pets.stream()
-                    .map(pet -> PetResponse.petName(pet))
+                    .map(PetResponse::petName)
                     .collect(Collectors.toList());
     }
 

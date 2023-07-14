@@ -34,7 +34,6 @@ public class Article extends BaseEntity {
     private String body;
     @Column(nullable = false)
     private String location;
-    @Lob
     @NotNull
     private Point point;
     @Column(nullable = false)

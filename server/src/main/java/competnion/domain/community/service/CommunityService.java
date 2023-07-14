@@ -1,7 +1,9 @@
 package competnion.domain.community.service;
 
+import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
+import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.entity.ArticleImage;
@@ -16,15 +18,10 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
-import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.mapstruct.control.MappingControl;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +31,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static competnion.global.exception.ExceptionCode.*;
@@ -67,6 +63,7 @@ public class CommunityService {
     /**
      * TODO : 1. 개설하기 버튼을 누를때부터 기준 30분 이상인지
               2. 작성자의 주소 위치의 3km 반경
+              3. 데려갈 수 있는 강아지가 더이상 없는 경우
      */
     /**게시글 생성 메서드 **/
     @Transactional
@@ -94,7 +91,8 @@ public class CommunityService {
         checkSpaceForAttend(attendRequest);
         checkMeetingTime(attendRequest);
 
-        Article article = articleRepository.findById(attendRequest.getArticleId()).orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND));
+        Article article = articleRepository.findById(attendRequest.getArticleId())
+                .orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND));
 
         saveAttends(user, article, attendRequest.getPetIds());
     }
@@ -119,9 +117,28 @@ public class CommunityService {
         List<User> attendees = extractUserFromAttend(articleId);
 
         return mapper.articleToSingleArticleResponse(images,article,attendees);
-
-
     }
+
+    public List<ArticleResponse> getAll(User user, String keyword, Pageable pageable) {
+        List<Article> articles = articleRepository.findAllByKeywordAndDistance(
+                user.getPoint(),
+                keyword,
+                30000.0,
+                pageable.getPageNumber(),
+                pageable.getPageSize());
+
+        return articles.stream()
+                .map(ArticleResponse::of)
+                .collect(Collectors.toList());
+    }
+
+//    public List<ArticleResponse> getAll(User user, GetAllArticlesRequest req) {
+//        List<Article> articles = articleRepository.findAllByKeywordAndDistance(
+//                user.getPoint(), req.getKeyword(), 30000.0, req.getOffset() - 1, req.getLimit());
+//        return articles.stream()
+//                .map(ArticleResponse::of)
+//                .collect(Collectors.toList());
+//    }
 
 //    @Transactional(readOnly = true)
 //    /**게시글 전제 조회 메서드 **/
