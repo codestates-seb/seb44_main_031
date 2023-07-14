@@ -97,7 +97,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.PATCH,"/users/username/{user-id}").hasRole("USER")
                                 .antMatchers(HttpMethod.PATCH,"/users/image/{user-id}").hasRole("USER")
 
-                                .antMatchers(HttpMethod.POST,"/pets/register/{user-id}").hasRole("USER")
+                                .antMatchers(HttpMethod.POST,"/pets/register/").hasRole("USER")
+
+
+                                .antMatchers(HttpMethod.POST,"/articles/**").hasRole("USER")
+                                .antMatchers(HttpMethod.DELETE,"/articles/**").hasRole("USER")
 
                                 .anyRequest().permitAll()
                 );
@@ -129,7 +133,7 @@ public class SecurityConfiguration implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new JwtParseInterceptor(jwtUtils()))
-                .addPathPatterns(List.of("/*/questions","/questions/**","/answers/**","/auth/**","/votes/**"));
+                .addPathPatterns(List.of("/articles/**"));
     }
 
     @Override
