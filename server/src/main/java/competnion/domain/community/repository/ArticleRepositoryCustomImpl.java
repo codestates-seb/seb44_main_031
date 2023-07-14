@@ -26,7 +26,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
             String keyword,
             int days,
             Double distance,
-            String orderBy,
+//            String orderBy,
             long offset,
             int limit
     ) {
@@ -39,7 +39,8 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point).loe(distance),
                         article.date.after(LocalDateTime.now())
                 )
-                .orderBy(order(orderBy))
+//                .orderBy(order(orderBy))
+                .orderBy(article.date.desc())
                 .offset(offset)
                 .limit(limit)
                 .fetch();
@@ -64,15 +65,15 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 : null;
     }
 
-    private OrderSpecifier<?> order(String order) {
-        if (order.equals("meetingDateDesc")) {
-            return article.date.desc();
-        }
-
-        if (order.equals("createdDateDesc")) {
-            return article.createdAt.desc();
-        }
-
-        return article.date.desc();
-    }
+//    private OrderSpecifier<?> order(String order) {
+//        if (order.equals("meetingDateDesc")) {
+//            return article.date.desc();
+//        }
+//
+//        if (order.equals("createdDateDesc")) {
+//            return article.createdAt.desc();
+//        }
+//
+//        return article.date.desc();
+//    }
 }
