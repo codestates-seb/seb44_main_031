@@ -1,6 +1,6 @@
 package competnion.domain.community.repository;
 
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import competnion.domain.community.dto.ArticleQueryDto;
@@ -28,22 +28,11 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
             long offset,
             int limit
     ) {
-        BooleanBuilder keywordPredicate = new BooleanBuilder();
-        BooleanBuilder daysPredicate = new BooleanBuilder();
-
-        if (keyword != null && !keyword.isEmpty())
-            keywordPredicate.and(article.title.containsIgnoreCase(keyword));
-
-        if (days == 7)
-            daysPredicate.and(article.date.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days)));
-
-
         return jpaQueryFactory
                 .select(new QArticleQueryDto(article.title, article.date))
                 .from(article)
                 .where(
-                        keywordPredicate,
-                        daysPredicate,
+                        all(keyword, days),
                         Expressions.numberTemplate(Double.class,
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point).loe(distance),
                         article.date.after(LocalDateTime.now())
@@ -52,5 +41,24 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 .offset(offset)
                 .limit(limit)
                 .fetch();
+    }
+
+    private BooleanExpression all(
+            String keyword,
+            int days
+    ) {
+        return days(days).and(keyword(keyword));
+    }
+
+    private BooleanExpression keyword(String keyword) {
+        return keyword != null && !keyword.isEmpty()
+                ? article.title.containsIgnoreCase(keyword)
+                : null;
+    }
+
+    private BooleanExpression days(int days) {
+        return days == 7
+                ? article.date.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days))
+                : null;
     }
 }

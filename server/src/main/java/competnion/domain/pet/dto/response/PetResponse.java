@@ -28,21 +28,13 @@ public class PetResponse {
         this.imgUrl = imgUrl;
     }
 
-    private PetResponse(String name, LocalDate birth, Boolean gender, Boolean neutralization, String imgUrl, String vaccine) {
-        this.name = name;
-        this.birth = birth;
-        this.gender = gender;
-        this.neutralization = neutralization;
-        this.imgUrl = imgUrl;
-        this.vaccine = vaccine;
-    }
-
     public PetResponse(String name) {
         this.name = name;
     }
 
     public static PetResponse of(Pet pet) {
         return new PetResponse(
+                pet.getId(),
                 pet.getName(),
                 pet.getBirth(),
                 pet.getGender(),

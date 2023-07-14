@@ -89,8 +89,6 @@ public class Pet extends BaseEntity {
         this.article = article;
     }
 
-                             // end::[])
-
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
     private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final String vaccine, final User user) {
         hasText(name, "name must not be null");
