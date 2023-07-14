@@ -1,5 +1,6 @@
 package competnion.domain.community.repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,6 +26,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
             String keyword,
             int days,
             Double distance,
+            String orderBy,
             long offset,
             int limit
     ) {
@@ -37,7 +39,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point).loe(distance),
                         article.date.after(LocalDateTime.now())
                 )
-                .orderBy(article.date.desc())
+                .orderBy(order(orderBy))
                 .offset(offset)
                 .limit(limit)
                 .fetch();
@@ -60,5 +62,17 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
         return days == 7
                 ? article.date.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days))
                 : null;
+    }
+
+    private OrderSpecifier<?> order(String order) {
+        if (order.equals("meetingDateDesc")) {
+            return article.date.desc();
+        }
+
+        if (order.equals("createdDateDesc")) {
+            return article.createdAt.desc();
+        }
+
+        return article.date.desc();
     }
 }

@@ -11,6 +11,7 @@ public interface ArticleRepositoryCustom {
             String keyword,
             int days,
             Double distance,
+            String orderBy,
             long offset,
             int limit);
 }
