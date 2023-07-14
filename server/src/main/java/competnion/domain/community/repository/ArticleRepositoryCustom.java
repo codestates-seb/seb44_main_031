@@ -9,7 +9,7 @@ public interface ArticleRepositoryCustom {
     List<ArticleQueryDto> findAllByKeywordAndDistance(
             Point userPoint,
             String keyword,
-            int days,
+//            int days,
             Double distance,
 //            String orderBy,
             long offset,

@@ -68,12 +68,12 @@ public class CommunityController {
     public Response<List<ArticleResponse>> getAllArticles(
             @UserContext final User user,
             @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
-            @RequestParam(value = "days",    required = false, defaultValue = "1")   final int days,
+//            @RequestParam(value = "days",    required = false, defaultValue = "1")   final int days,
             @RequestParam(value = "pageNumber", required = false, defaultValue = "1")  final int pageNumber,
             @RequestParam(value = "pageSize",   required = false, defaultValue = "10") final int pageSize
     ) {
         PageRequest pageable = PageRequest.of(pageNumber - 1, pageSize);
-        List<ArticleResponse> articles = communityService.getAll(user, keyword, days, pageable);
+        List<ArticleResponse> articles = communityService.getAll(user, keyword, pageable);
         return Response.success(articles);
     }
 

@@ -1,6 +1,5 @@
 package competnion.domain.community.repository;
 
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,7 +23,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     public List<ArticleQueryDto> findAllByKeywordAndDistance(
             Point userPoint,
             String keyword,
-            int days,
+//            int days,
             Double distance,
 //            String orderBy,
             long offset,
@@ -34,7 +33,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 .select(new QArticleQueryDto(article.title, article.date))
                 .from(article)
                 .where(
-                        all(keyword, days),
+                        all(keyword),
                         Expressions.numberTemplate(Double.class,
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point).loe(distance),
                         article.date.after(LocalDateTime.now())
@@ -47,23 +46,24 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     }
 
     private BooleanExpression all(
-            String keyword,
-            int days
+            String keyword
+//            int days
     ) {
-        return days(days).and(keyword(keyword));
+//        return days(days).and(keyword(keyword));
+        return (keyword(keyword));
     }
 
     private BooleanExpression keyword(String keyword) {
         return keyword != null && !keyword.isEmpty()
-                ? article.title.containsIgnoreCase(keyword)
+                ? article.title.contains(keyword)
                 : null;
     }
 
-    private BooleanExpression days(int days) {
-        return days == 7
-                ? article.date.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days))
-                : null;
-    }
+//    private BooleanExpression days(int days) {
+//        return days == 7
+//                ? article.date.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7))
+//                : null;
+//    }
 
 //    private OrderSpecifier<?> order(String order) {
 //        if (order.equals("meetingDateDesc")) {

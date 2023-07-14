@@ -119,11 +119,11 @@ public class CommunityService {
         return mapper.articleToSingleArticleResponse(images,article,attendees);
     }
 
-    public List<ArticleResponse> getAll(User user, String keyword, int days, Pageable pageable) {
+    public List<ArticleResponse> getAll(User user, String keyword, Pageable pageable) {
         List<ArticleQueryDto> articles = articleRepository.findAllByKeywordAndDistance(
                 user.getPoint(),
                 keyword,
-                days,
+//                days,
                 3000.0,
                 pageable.getPageNumber(),
                 pageable.getPageSize());
