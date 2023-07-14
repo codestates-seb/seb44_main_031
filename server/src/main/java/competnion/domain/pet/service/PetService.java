@@ -7,14 +7,11 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
-import competnion.infra.s3.util.S3Util;
+import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Optional;
 
 import static competnion.global.exception.ExceptionCode.*;
 import static java.util.Optional.ofNullable;
@@ -62,7 +59,8 @@ public class PetService {
     }
 
     public Pet checkExistsPetOrThrow(final User user, final Long petId) {
-        Pet findPet = findPetById(petId);
+        Pet findPet = petRepository.findById(petId)
+                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
         boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
 
@@ -70,14 +68,13 @@ public class PetService {
         return findPet;
     }
 
+    public void checkUserHasPet(User user) {
+        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
+    }
+
     public void hasSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
         if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
-    }
-
-    public Pet findPetById(final Long petId) {
-        return petRepository.findById(petId)
-                .orElseThrow(() -> new BusinessLogicException(PET_NOT_FOUND));
     }
 
     private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {

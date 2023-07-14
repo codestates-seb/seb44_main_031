@@ -1,6 +1,10 @@
-package competnion.infra.s3.util;
+package competnion.infra.s3;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import competnion.global.exception.BusinessLogicException;
@@ -10,9 +14,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static competnion.global.exception.ExceptionCode.*;
@@ -26,6 +33,21 @@ public class S3Util {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
+    @Value("${cloud.aws.credentials.accessKey}")
+    private String accessKey;
+    @Value("${cloud.aws.credentials.secretKey}")
+    private String secretKey;
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
+    @PostConstruct
+    public AmazonS3Client amazonS3Client() {
+        BasicAWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        return (AmazonS3Client) AmazonS3ClientBuilder.standard()
+                .withRegion(region)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCredentials))
+                .build();
+    }
 
     public String uploadImage(MultipartFile multipartFile) throws BusinessLogicException {
         String imageName = String.format("%s-%s", UUID.randomUUID(), multipartFile.getOriginalFilename());
@@ -46,6 +68,30 @@ public class S3Util {
 
         URL imageUrl = amazonS3Client.getUrl(bucket, imageName);
         return imageUrl.toString();
+    }
+
+    /**
+     * TODO : 리팩토링 필요.........
+     */
+    public List<String> uploadImageList(List<MultipartFile> imageList) throws BusinessLogicException{
+        List<String> imgUrlList = new ArrayList<>();
+
+        for (MultipartFile image : imageList) {
+            String imageName = String.format("%s-%s", UUID.randomUUID(), image.getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(image.getSize());
+            objectMetadata.setContentType(image.getContentType());
+
+            try {
+                amazonS3Client.putObject(
+                        new PutObjectRequest(bucket, imageName, image.getInputStream(), objectMetadata)
+                );
+                imgUrlList.add(amazonS3Client.getUrl(bucket, imageName).toString());
+            } catch (IOException e) {
+                throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED);
+            }
+        }
+        return imgUrlList;
     }
 
     public void deleteImage(String imgUrl) {

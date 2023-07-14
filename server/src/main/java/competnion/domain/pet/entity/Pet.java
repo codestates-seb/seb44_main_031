@@ -1,17 +1,22 @@
 package competnion.domain.pet.entity;
 
+import competnion.domain.community.entity.Article;
+import competnion.domain.community.entity.Attend;
 import competnion.domain.user.entity.User;
 import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.util.Lazy;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -46,11 +51,13 @@ public class Pet extends BaseEntity {
     @Column(nullable = false)
     @NotBlank
     private String vaccine;
-    private Boolean isSelected;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "article_id")
+    private Article article;
 
     public void updateImgUrl(final String imgUrl) {
         hasText(imgUrl, "imgUrl must not be null");
@@ -75,6 +82,11 @@ public class Pet extends BaseEntity {
     public void updateVaccine(final String vaccine) {
         hasText(vaccine, "vaccine must not be empty");
         this.vaccine = vaccine;
+    }
+
+    public void updateArticle(final Article article) {
+        notNull(article, "article must not be null");
+        this.article = article;
     }
 
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")

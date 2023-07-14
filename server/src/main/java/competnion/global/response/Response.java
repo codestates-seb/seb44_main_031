@@ -9,14 +9,14 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Response<T> {
-    private String success;
+    private Boolean success;
     private T result;
 
     public static<T> Response<T> success() {
-        return new Response<>("요청 성공!!!!!", null);
+        return new Response<>(true, null);
     }
 
     public static<T> Response<T> success(T data) {
-        return new Response<>("요청 성공!!!!!", data);
+        return new Response<>(true, data);
     }
 }

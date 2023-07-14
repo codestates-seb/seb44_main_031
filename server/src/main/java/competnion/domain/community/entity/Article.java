@@ -1,61 +1,54 @@
 package competnion.domain.community.entity;
 
 import competnion.domain.comment.entity.Comment;
+import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.entity.User;
-import lombok.*;
-import net.bytebuddy.asm.Advice;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import competnion.global.common.BaseEntity;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
-import java.time.Duration;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
 @Getter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = PROTECTED)
 @Table(name = "articles")
-public class Article {
+public class Article extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "article_id")
-    private Long articleId;
+    private Long id;
     @Column(nullable = false)
     private String title;
-
     @Column(nullable = false)
     private String body;
     @Column(nullable = false)
     private String location;
-
+    @NotNull
     private Point point;
-
     @Column(nullable = false)
     private LocalDateTime date;
-
-    /**
-     * limit은 예약어라 불가피하게 변경
-     */
     @Column(nullable = false)
     private int attendant;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+    @OneToMany(mappedBy = "article")
+    private List<ArticleImage> images = new ArrayList<>();
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    private List<Pet> pets = new ArrayList<>();
 
-    @OnDelete(action= OnDeleteAction.CASCADE)
+//    @OnDelete(action= OnDeleteAction.CASCADE)
     @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
     private List<Comment> comments = new ArrayList<>();
 //    private Duration timeDifference;
@@ -72,17 +65,18 @@ public class Article {
 //    }
 
     @Builder(builderClassName = "CreateArticle", builderMethodName = "CreateArticle")
-    private Article(User user, String title, String body, String location, int attendant, LocalDateTime date) {
+    private Article(User user, String title, String body, String location, int attendant, LocalDateTime date, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
         this.attendant = attendant;
         this.location = location;
+        this.point = point;
         this.date = date;
     }
 
     /** 게시글 수정 */
-    public void update(Article updatedArticle) {
+    public void updateInfo(Article updatedArticle) {
         if (updatedArticle.getTitle() != null) {
             this.title = updatedArticle.getTitle();
         }
