@@ -53,4 +53,14 @@ public class UserController {
     ) {
         return Response.success(userService.uploadProfileImage(user, image));
     }
+
+    @GetMapping("/get-articles-written-by")
+    public Response<?> findAllArticlesWrittenByUser(@UserContext final User user) {
+        return Response.success(userService.findAllArticlesWrittenByUser(user));
+    }
+
+    @GetMapping("/get-articles-attended")
+    public Response<?> findAllArticlesUserAttended(@UserContext final User user) {
+        return Response.success(userService.findAllArticlesUserAttended(user));
+    }
 }

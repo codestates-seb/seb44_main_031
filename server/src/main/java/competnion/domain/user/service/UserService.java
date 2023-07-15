@@ -1,5 +1,7 @@
 package competnion.domain.user.service;
 
+import competnion.domain.community.dto.ArticleQueryDto;
+import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
@@ -23,13 +25,13 @@ import java.util.stream.Collectors;
 
 import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
 
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PetRepository petRepository;
+    private final ArticleRepository articleRepository;
     private final CoordinateUtil coordinateUtil;
     private final S3Util s3Util;
 
@@ -77,6 +79,16 @@ public class UserService {
         user.updateImgUrl(imgUrl);
 
         return imgUrl;
+    }
+
+    @Transactional
+    public List<ArticleQueryDto> findAllArticlesWrittenByUser(User user) {
+        return articleRepository.findAllArticlesWrittenByUser(user);
+    }
+
+    @Transactional
+    public List<ArticleQueryDto> findAllArticlesUserAttended(User user) {
+        return articleRepository.findAllArticlesUserAttended(user);
     }
 
     public User returnExistsUserByIdOrThrow(final Long userId) {

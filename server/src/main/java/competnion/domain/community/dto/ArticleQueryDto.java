@@ -11,12 +11,22 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class ArticleQueryDto {
+    private Long articleId;
     private String title;
     private LocalDateTime date;
+    private LocalDateTime createdAt;
 
     @QueryProjection
     public ArticleQueryDto(String title, LocalDateTime date) {
         this.title = title;
         this.date = date;
+    }
+
+    @QueryProjection
+    public ArticleQueryDto(Long articleId, String title, LocalDateTime date, LocalDateTime createdAt) {
+        this.articleId = articleId;
+        this.title = title;
+        this.date = date;
+        this.createdAt = createdAt;
     }
 }
