@@ -2,6 +2,7 @@ package competnion.domain.pet.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import competnion.domain.pet.entity.Pet;
+import competnion.domain.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -28,9 +29,6 @@ public class PetResponse {
         this.imgUrl = imgUrl;
     }
 
-    public PetResponse(String name) {
-        this.name = name;
-    }
 
     public static PetResponse of(Pet pet) {
         return new PetResponse(
@@ -52,11 +50,19 @@ public class PetResponse {
         );
     }
 
-    public static PetResponse petName(Pet pet) {
-        return new PetResponse(
-                pet.getName()
-        );
+    @Getter
+    @AllArgsConstructor
+    public static class ForArticleResponse {
+
+       private String name;
+
+
+       public static PetResponse.ForArticleResponse getSimplePetName(Pet pet) {
+           return new ForArticleResponse(pet.getName());
+       }
+
     }
+
 
 
 }

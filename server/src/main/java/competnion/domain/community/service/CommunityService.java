@@ -242,6 +242,8 @@ public class CommunityService {
         return attendRepository.findUsersFromAttendByArticleId(articleId);
     }
 
+
+
 //    /** 게시글을 수정할 때 작성자인지 확인하는 메서드 */
 //    private void validateAuthorEqualUser(Long authorId, Long userId) {
 //        if (!authorId.equals(userId)) {

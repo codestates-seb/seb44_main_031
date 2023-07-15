@@ -25,12 +25,7 @@ public class UserResponse {
         this.pets = pets;
     }
 
-    public UserResponse(long id, String username, String imgUrl, List<PetResponse> pets) {
-        this.id = id;
-        this.username = username;
-        this.imgUrl = imgUrl;
-        this.pets = pets;
-    }
+
 
     public static UserResponse of(User user, List<PetResponse> pets) {
         return new UserResponse(
@@ -41,13 +36,28 @@ public class UserResponse {
         );
     }
 
-    public static UserResponse inArticleResponse(User user, List<PetResponse> pets) {
-        return new UserResponse(
-                user.getId(),
-                user.getUsername(),
-                user.getImgUrl(),
-                pets
-        );
+
+
+    @Getter
+    @AllArgsConstructor
+    public static class InArticleResponse {
+
+        private long id;
+        private String username;
+        private String imgUrl;
+        private List<PetResponse.ForArticleResponse> pets;
+
+
+
+    public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
+            return new UserResponse.InArticleResponse(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getImgUrl(),
+                    pets
+            );
+        }
+
     }
 
 }
