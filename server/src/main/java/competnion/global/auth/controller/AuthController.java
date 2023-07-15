@@ -64,13 +64,6 @@ public class AuthController { // VerificationFilter 이후의 처리
         return Response.success();
     }
 
-    // 비밃번호 재설정
-    @PatchMapping("/reset-password")
-    public Response<Void> resetPassword(@Valid @RequestBody final ResetPasswordRequest resetPasswordRequest) {
-        authService.resetPassword(resetPasswordRequest);
-        return Response.success();
-    }
-
     // 회원탈퇴 이메일 코드 전송
     @GetMapping("/delete/send-verification-email")
     public Response<Void> checkValidateEmailAndSendEmail(
@@ -78,6 +71,16 @@ public class AuthController { // VerificationFilter 이후의 처리
             @Email @RequestParam("email") final String email
     ) {
         authService.checkValidateEmailAndSendEmail(user, email);
+        return Response.success();
+    }
+
+    // 비밀번호 재설정
+    @PostMapping("/reset-password")
+    public Response<?> resetPassword(
+            @UserContext        final User user,
+            @Valid @RequestBody final ResetPasswordRequest resetPasswordRequest
+    ) {
+        authService.resetPassword(user, resetPasswordRequest);
         return Response.success();
     }
 

@@ -82,12 +82,12 @@ public class UserService {
     }
 
     @Transactional
-    public List<ArticleQueryDto> findAllArticlesWrittenByUser(User user) {
+    public List<ArticleQueryDto> findAllArticlesWrittenByUser(final User user) {
         return articleRepository.findAllArticlesWrittenByUser(user);
     }
 
     @Transactional
-    public List<ArticleQueryDto> findAllArticlesUserAttended(User user) {
+    public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
         return articleRepository.findAllArticlesUserAttended(user);
     }
 

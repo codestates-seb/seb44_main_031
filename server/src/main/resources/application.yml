@@ -7,7 +7,7 @@ cloud:
     stack:
       auto: false # CloudFormation 구성을 사용하지 않도록 설정
     credentials:
-      accessKey: 
+      accessKey:
       secretKey:
 
 Spring:
@@ -57,12 +57,13 @@ Spring:
 #        format_sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3307/petmilyy?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3307/yyyy?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: create
       naming:
@@ -74,6 +75,10 @@ Spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+  sql:
+    init:
+      mode: always
 
 jwt:
   key: fasdfdasfasdfdsfasdfasdfasdfasdfasdf

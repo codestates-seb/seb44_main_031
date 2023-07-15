@@ -3,10 +3,13 @@ package competnion.domain.pet.service;
 import competnion.domain.pet.dto.request.RegisterPetRequest;
 import competnion.domain.pet.dto.request.UpdatePetInfoRequest;
 import competnion.domain.pet.dto.response.PetResponse;
+import competnion.domain.pet.entity.Breed;
 import competnion.domain.pet.entity.Pet;
+import competnion.domain.pet.repository.BreedRepository;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import static java.util.Optional.ofNullable;
 public class PetService {
 
     private final PetRepository petRepository;
+    private final BreedRepository breedRepository;
     private final S3Util s3Util;
 
     public PetResponse registerPet(
@@ -33,9 +37,9 @@ public class PetService {
         s3Util.isFileAnImageOrThrow(image);
         String imgUrl = s3Util.uploadImage(image);
 
-        Pet pet = savePet(user, registerPetRequest, imgUrl);
+        Breed breed = returnExistsBreedOrThrow(registerPetRequest.getBreedId());
+        Pet pet = savePet(user, registerPetRequest, imgUrl, breed);
         user.addPet(pet);
-
         return PetResponse.of(pet);
     }
 
@@ -68,7 +72,7 @@ public class PetService {
         return findPet;
     }
 
-    public void checkUserHasPet(User user) {
+    public void checkUserHasPet(final User user) {
         if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
     }
 
@@ -77,7 +81,12 @@ public class PetService {
         if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
     }
 
-    private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl) {
+    public Breed returnExistsBreedOrThrow(final Long breedId) {
+        return breedRepository.findById(breedId)
+                .orElseThrow(() -> new BusinessLogicException(BREED_NOT_FOUND));
+    }
+
+    private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl, Breed breed) {
         return petRepository.save(Pet.RegisterPet()
                 .name(registerPetRequest.getName())
                 .birth(registerPetRequest.getBirth())
@@ -86,6 +95,8 @@ public class PetService {
                 .imgUrl(imgUrl)
                 .vaccine(registerPetRequest.getVaccine())
                 .user(user)
+                .mbti(registerPetRequest.getMbti())
+                .breed(breed)
                 .build());
     }
 }

@@ -116,16 +116,16 @@ public class AuthService {
     }
 
     @Transactional
-    public void signUp(final SignUpRequest signUpRequest) {
-        checkDuplicatedUsername(signUpRequest.getUsername());
-        checkDuplicatedEmail(signUpRequest.getEmail());
+    public void signUp(final SignUpRequest request) {
+        checkDuplicatedUsername(request.getUsername());
+        checkDuplicatedEmail(request.getEmail());
 
-        Point point = coordinateUtil.coordinateToPoint(signUpRequest.getLatitude(), signUpRequest.getLongitude());
-        List<String> roles = authorityUtils.createRoles(signUpRequest.getEmail());
-        String encode = passwordEncoder.encode(signUpRequest.getPassword());
+        Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        List<String> roles = authorityUtils.createRoles(request.getEmail());
+        String encode = passwordEncoder.encode(request.getPassword());
 
-        userService.saveUser(point, signUpRequest, encode, roles);
-        redisUtil.deleteData(signUpRequest.getEmail());
+        userService.saveUser(point, request, encode, roles);
+        redisUtil.deleteData(request.getEmail());
     }
 
     @Transactional
@@ -143,6 +143,17 @@ public class AuthService {
     @Transactional
     public void deleteUser(final User user) {
         userService.deleteUser(user);
+    }
+
+    @Transactional
+    public void resetPassword(final User user, final ResetPasswordRequest request) {
+        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
+            throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
+
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
     public void verifyEmailCode(final String code, final String email) {
@@ -169,9 +180,5 @@ public class AuthService {
         String code = emailUtil.generateRandomCode();
         redisUtil.setDataAndExpire(email, code, 600000L);
         emailUtil.sendVerificationEmail(email, code);
-    }
-
-    public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
-
     }
 }

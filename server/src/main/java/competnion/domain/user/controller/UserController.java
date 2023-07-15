@@ -1,8 +1,10 @@
 package competnion.domain.user.controller;
 
+import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
 import competnion.domain.user.dto.request.AddressRequest;
+import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 @Validated
 @RestController
@@ -55,12 +58,12 @@ public class UserController {
     }
 
     @GetMapping("/get-articles-written-by")
-    public Response<?> findAllArticlesWrittenByUser(@UserContext final User user) {
+    public Response<List<ArticleQueryDto>> findAllArticlesWrittenByUser(@UserContext final User user) {
         return Response.success(userService.findAllArticlesWrittenByUser(user));
     }
 
     @GetMapping("/get-articles-attended")
-    public Response<?> findAllArticlesUserAttended(@UserContext final User user) {
+    public Response<List<ArticleQueryDto>> findAllArticlesUserAttended(@UserContext final User user) {
         return Response.success(userService.findAllArticlesUserAttended(user));
     }
 }
