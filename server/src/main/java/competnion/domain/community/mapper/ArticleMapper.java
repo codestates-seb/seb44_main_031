@@ -23,21 +23,23 @@ public interface ArticleMapper {
         User user = article.getUser();
 
 
-        UserResponse owner = UserResponse.inArticleResponse(user, petsToPetSimpleNameResponse(user.getPets()));
+        UserResponse.InArticleResponse owner = UserResponse.InArticleResponse.getResponse(user, petsToPetSimpleNameResponse(user.getPets()));
 
-        ArticleResponseDto articles = ArticleResponseDto.ofSingleArticleResponse(imgUrl,article,commentsToCommentResponses(article.getComments()));
+        // petsTo ~~~ : List<PetResponse> : ["솜이","달래"
 
-        List<UserResponse> attendees = users.stream()
-                .map(attendee -> UserResponse.inArticleResponse(attendee,petsToPetSimpleNameResponse(attendee.getPets())))
+        ArticleResponseDto.OfSingleResponse articles = ArticleResponseDto.OfSingleResponse.getSingleResponse(imgUrl,article,commentsToCommentResponses(article.getComments()));
+
+        List<UserResponse.InArticleResponse> attendees = users.stream()
+                .map(attendee -> UserResponse.InArticleResponse.getResponse(attendee,petsToPetSimpleNameResponse(attendee.getPets())))
                 .collect(Collectors.toList());
 
 
         return new SingleArticleResponseDto(owner,articles,attendees);
     }
 
-    default List<PetResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
+    default List<PetResponse.ForArticleResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
         return pets.stream()
-                    .map(PetResponse::petName)
+                    .map(PetResponse.ForArticleResponse::getSimplePetName)
                     .collect(Collectors.toList());
     }
 

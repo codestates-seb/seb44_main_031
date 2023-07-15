@@ -13,11 +13,10 @@ import java.util.List;
 public class SingleArticleResponseDto {
 
 
-    private UserResponse owner;
+    private UserResponse.InArticleResponse owner;
 
-    private ArticleResponseDto article;
+    private ArticleResponseDto.OfSingleResponse article;
 
-    private List<UserResponse> attendees;
-
+    private List<UserResponse.InArticleResponse> attendees;
 
 }

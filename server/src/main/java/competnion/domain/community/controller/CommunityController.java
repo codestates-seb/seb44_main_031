@@ -59,6 +59,7 @@ public class CommunityController {
         return Response.success();
     }
 
+    // 게시글 상세 조회
     @GetMapping("/{article-id}")
     public ResponseEntity<SingleArticleResponseDto> getArticle(@PathVariable("article-id") @Positive Long articleId){
         return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
