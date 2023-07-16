@@ -56,7 +56,10 @@ public class CommunityService {
         return WriterResponse.of(user, petResponseList);
     }
 
-    public List<PetResponse> getAttendeePetInfo(final User user) {
+    public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
+        Article article = getArticleByIdOrThrow(articleId);
+        checkNotArticleOwnerOrThrow(user, article);
+        // TODO : 강아지 리스트를 보여줄때, 참여가능한 강아지들만 보여줄지????
         return getPetResponses(user);
     }
     
