@@ -2,12 +2,12 @@
 import { useState, useRef } from 'react';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import { styled } from 'styled-components';
-import useWalkMateForm from './useWalkMateForm';
+import useWalkMateForm from './hooks/useWalkMateForm';
 import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
 import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
-import { axiosInstance } from '../../api/walkMateAxios';
+import { axiosInstance, postCreateArticleUrl } from '../../api/walkMateAxios';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -98,7 +98,7 @@ const WalkMateCreate = () => {
 
       try {
         setIsLoading(true);
-        const response = await axiosInstance.post('articles', {
+        const response = await axiosInstance.post(postCreateArticleUrl, {
           data: formData,
         });
         toast.success('산책 모집 글 등록 성공!');

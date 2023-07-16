@@ -3,12 +3,11 @@ import {
   dateToStringDate,
   dateToStringTime,
   nowDateAfterSomeMinutes,
-} from '../../utils/date-utils';
-import { axiosInstance } from '../../api/walkMateAxios';
-import { useNavigate } from 'react-router-dom';
+} from '../../../utils/date-utils';
+import { axiosInstance, getCreateArticleUrl } from '../../../api/walkMateAxios';
 import { AxiosError } from 'axios';
 
-export interface inputValueType {
+export interface FormDatas {
   image: string;
   title: string;
   body: string;
@@ -23,7 +22,7 @@ export interface inputValueType {
   selectedPets: number[];
 }
 
-export interface isValidType {
+export interface Validations {
   image: boolean;
   title: boolean;
   body: boolean;
@@ -33,7 +32,7 @@ export interface isValidType {
   location: boolean;
 }
 
-export interface isTouchedType {
+export interface IsTouched {
   image: boolean;
   title: boolean;
   body: boolean;
@@ -49,9 +48,8 @@ const useWalkMateForm = () => {
   // onChange Handler: input 값 binding, validation check
   // error 메세지, isTouched 가 ture && !isValid 일때만 에러 메세지 띄워줌
   // 성공적으로 submit 하면 초기 state 값으로 reset 해야함 (근데 어차피 페이지 navigate 되니까 상관없을듯)
-  const navigate = useNavigate();
 
-  const [inputValue, setInputValue] = useState<inputValueType>({
+  const [formDatas, setFormDatas] = useState<FormDatas>({
     image: '',
     title: '',
     body: '',
@@ -66,7 +64,7 @@ const useWalkMateForm = () => {
     selectedPets: [],
   });
 
-  const [isValid, setIsValid] = useState<isValidType>({
+  const [validations, setValidations] = useState<Validations>({
     image: false,
     title: false,
     body: false,
@@ -96,20 +94,22 @@ const useWalkMateForm = () => {
     const stringFormatDate = dateToStringDate(thirtyMinLater);
     const stringFormatTime = dateToStringTime(thirtyMinLater);
 
-    setInputValue((prev) => {
-      return { ...prev, initDate: stringFormatDate, date: stringFormatDate };
-    });
-    setInputValue((prev) => {
-      return { ...prev, time: stringFormatTime };
+    setFormDatas((prev) => {
+      return {
+        ...prev,
+        initDate: stringFormatDate,
+        date: stringFormatDate,
+        time: stringFormatTime,
+      };
     });
 
     // GET 요청보내서 사용자 위치 정보, 강아지정보, 로그인여부 받아와야함.
     const fetchUserData = async () => {
       try {
         setIsPageLoading(true);
-        const response = await axiosInstance.get('articles-info');
+        const response = await axiosInstance.get(getCreateArticleUrl);
         const data = response.data;
-        setInputValue((prev) => {
+        setFormDatas((prev) => {
           return {
             ...prev,
             pets: data.result.pets,
@@ -120,15 +120,13 @@ const useWalkMateForm = () => {
             },
           };
         });
-      } catch (err: unknown) {
-        // 토큰 인증이 안됐을 경우 현재 페이지 주소를 state 으로 담아서 로그인 페이지로 이동.
-        if (err instanceof AxiosError) {
-          if (err.status === 401) {
-            navigate('/users/sign-in', {
-              state: { path: '/walk-mate/create' },
-            });
-          }
-          setError(err.message);
+      } catch (error: unknown | Error | AxiosError) {
+        if (error instanceof AxiosError) {
+          setError(error.message);
+          return;
+        }
+        if (error instanceof Error) {
+          setError(error.message);
         }
       } finally {
         setIsPageLoading(false);
@@ -139,53 +137,51 @@ const useWalkMateForm = () => {
   }, []);
 
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setInputValue({ ...inputValue, image: e.currentTarget.value });
+    setFormDatas({ ...formDatas, image: e.currentTarget.value });
     setIsTouched({ ...isTouched, image: true });
 
-    // valid: 꼭 한개 이상의 파일이 담겨있어야되 = 초기 value 값이 아니어야되 ''
+    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
     const isImageValid = e.currentTarget.value !== '';
-    if (!isImageValid) {
-      setIsValid({ ...isValid, image: false });
-    }
     if (isImageValid) {
-      setIsValid({ ...isValid, image: true });
+      setValidations({ ...validations, image: true });
+    } else if (!isImageValid) {
+      setValidations({ ...validations, image: false });
     }
   };
 
   const handleTitleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    setInputValue({ ...inputValue, title: e.currentTarget.value });
+    setFormDatas({ ...formDatas, title: e.currentTarget.value });
     setIsTouched({ ...isTouched, title: true });
 
     const isTitleValid =
       e.currentTarget.value.trim().length >= 15 &&
       e.currentTarget.value.trim().length <= 100;
-    if (!isTitleValid) {
-      setIsValid({ ...isValid, title: false });
-    }
     if (isTitleValid) {
-      setIsValid({ ...isValid, title: true });
+      setValidations({ ...validations, title: true });
+    } else if (!isTitleValid) {
+      setValidations({ ...validations, title: false });
     }
   };
 
   const handleBodyChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
     e
   ) => {
-    setInputValue({ ...inputValue, body: e.currentTarget.value });
+    setFormDatas({ ...formDatas, body: e.currentTarget.value });
     setIsTouched({ ...isTouched, body: true });
 
     const isBodyValid =
       e.currentTarget.value.trim().length >= 30 &&
       e.currentTarget.value.trim().length <= 250;
     if (!isBodyValid) {
-      setIsValid({ ...isValid, body: false });
+      setValidations({ ...validations, body: false });
     }
     if (isBodyValid) {
-      setIsValid({ ...isValid, body: true });
+      setValidations({ ...validations, body: true });
     }
   };
 
   const handleDateChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setInputValue({ ...inputValue, date: e.currentTarget.value });
+    setFormDatas({ ...formDatas, date: e.currentTarget.value });
     setIsTouched({ ...isTouched, date: true });
 
     // valid: 작성하는 시점에 지정한 날짜가 작성하는 시점 + 30min 의 날짜여야됨.
@@ -204,29 +200,29 @@ const useWalkMateForm = () => {
     // 날짜 유효성 검사
     const isDateValid = inputDate >= dateAfterThirtyMin;
     if (!isDateValid) {
-      setIsValid({ ...isValid, date: false });
+      setValidations({ ...validations, date: false });
     }
     if (isDateValid) {
-      setIsValid({ ...isValid, date: true });
+      setValidations({ ...validations, date: true });
     }
 
     // 시간 유효성 검사
     const userInputDate = new Date(
-      `${e.currentTarget.value}T${inputValue.time}:00`
+      `${e.currentTarget.value}T${formDatas.time}:00`
     );
     const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
     const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
 
     if (!isDateAndTimeValid) {
-      setIsValid({ ...isValid, time: false });
+      setValidations({ ...validations, time: false });
     }
     if (isDateAndTimeValid) {
-      setIsValid({ ...isValid, time: true });
+      setValidations({ ...validations, time: true });
     }
   };
 
   const handleTimeChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setInputValue({ ...inputValue, time: e.currentTarget.value });
+    setFormDatas({ ...formDatas, time: e.currentTarget.value });
     setIsTouched({ ...isTouched, time: true });
 
     // valid: 작성하는 시점에 지정한 시간이 꼭 작성하는 시점으로부터 최소 30분 이후여야함.
@@ -238,31 +234,34 @@ const useWalkMateForm = () => {
     // 그러므로 시간만 보면 안되고 날짜와 시간을 합친 Date 전체 시간기준 + 30으로 계산해야함.
     // 유저가 입력한 Date 과 현재 시각 30분 후의 Date 을 비교하면 됨
     const userInputDate = new Date(
-      `${inputValue.date}T${e.currentTarget.value}:00`
+      `${formDatas.date}T${e.currentTarget.value}:00`
     );
     const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
     const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
 
     if (!isDateAndTimeValid) {
-      setIsValid({ ...isValid, time: false });
+      setValidations({ ...validations, time: false });
     }
     if (isDateAndTimeValid) {
-      setIsValid({ ...isValid, time: true });
+      setValidations({ ...validations, time: true });
     }
   };
 
   const handleAttendantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setInputValue({ ...inputValue, attendant: Number(e.currentTarget.value) });
+    setFormDatas({
+      ...formDatas,
+      attendant: Number(e.currentTarget.value),
+    });
     setIsTouched({ ...isTouched, attendant: true });
 
     //valid: 어떤걸 선택해도 되서 인원은 무조건 ture 임.
   };
 
   return {
-    inputValue,
-    setInputValue,
-    isValid,
-    setIsValid,
+    inputValue: formDatas,
+    setInputValue: setFormDatas,
+    isValid: validations,
+    setIsValid: setValidations,
     isTouched,
     setIsTouched,
     isPageLoading,

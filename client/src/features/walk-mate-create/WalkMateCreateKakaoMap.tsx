@@ -1,18 +1,12 @@
 import { useEffect, useRef, Dispatch, SetStateAction } from 'react';
 import { distance } from '../../utils/distance';
-import { inputValueType, isTouchedType, isValidType } from './useWalkMateForm';
+import { FormDatas, IsTouched, Validations } from './hooks/useWalkMateForm';
 
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
-
-interface propType {
-  inputValue: inputValueType;
-  setInputValue: Dispatch<SetStateAction<inputValueType>>;
-  setIsTouched: Dispatch<SetStateAction<isTouchedType>>;
-  setIsValid: Dispatch<SetStateAction<isValidType>>;
+interface PropType {
+  inputValue: FormDatas;
+  setInputValue: Dispatch<SetStateAction<FormDatas>>;
+  setIsTouched: Dispatch<SetStateAction<IsTouched>>;
+  setIsValid: Dispatch<SetStateAction<Validations>>;
 }
 
 const WalkMateCreateKakaoMap = ({
@@ -20,7 +14,7 @@ const WalkMateCreateKakaoMap = ({
   setInputValue,
   setIsTouched,
   setIsValid,
-}: propType) => {
+}: PropType) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

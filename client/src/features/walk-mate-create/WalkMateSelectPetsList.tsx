@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction } from 'react';
 import { styled } from 'styled-components';
-import { inputValueType } from './useWalkMateForm';
+import { FormDatas } from './hooks/useWalkMateForm';
 
 interface propType {
-  inputValue: inputValueType;
-  setInputValue: Dispatch<SetStateAction<inputValueType>>;
+  inputValue: FormDatas;
+  setInputValue: Dispatch<SetStateAction<FormDatas>>;
 }
 
 interface PetCardPropType {
@@ -12,8 +12,8 @@ interface PetCardPropType {
   imgUrl: string;
   name: string;
   selectedPets: number[];
-  inputValue: inputValueType;
-  setInputValue: Dispatch<SetStateAction<inputValueType>>;
+  inputValue: FormDatas;
+  setInputValue: Dispatch<SetStateAction<FormDatas>>;
 }
 
 // 개별 펫카드 컴포넌트
@@ -50,21 +50,21 @@ const PetCard = ({
   };
 
   return (
-    <PetCardContainer
+    <StyledPetCardContainer
       className="pet-card-container"
       onClick={handlePetCardClick}
       $isSelected={isSelected}
     >
       <img src={imgUrl} alt="img" className="pet-image" />
       <p>{name}</p>
-    </PetCardContainer>
+    </StyledPetCardContainer>
   );
 };
 
 // 페이지 컴포넌트 단에서 렌더될 PetCard의 컨테이너 컴포넌트
 const WalkMateSelectPetsList = ({ inputValue, setInputValue }: propType) => {
   return (
-    <PetsListContainer>
+    <StyledPetsListContainer>
       {inputValue.pets.map((pet) => (
         <PetCard
           key={pet.id}
@@ -76,12 +76,12 @@ const WalkMateSelectPetsList = ({ inputValue, setInputValue }: propType) => {
           setInputValue={setInputValue}
         />
       ))}
-    </PetsListContainer>
+    </StyledPetsListContainer>
   );
 };
 
 // 스타일드 컴포넌츠
-const PetsListContainer = styled.ul`
+const StyledPetsListContainer = styled.ul`
   display: flex;
   gap: 20px;
   margin-top: 8px;
@@ -91,7 +91,7 @@ interface PetCardContainerProps {
   readonly $isSelected: boolean;
 }
 
-const PetCardContainer = styled.li<PetCardContainerProps>`
+const StyledPetCardContainer = styled.li<PetCardContainerProps>`
   display: flex;
   flex-direction: column;
   justify-content: center;
