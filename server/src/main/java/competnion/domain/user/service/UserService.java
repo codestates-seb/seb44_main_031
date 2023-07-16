@@ -15,6 +15,7 @@ import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +58,9 @@ public class UserService {
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
         boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+
+        if (userRepository.findByUsername(request.getNewUsername()).isPresent())
+            throw new BusinessLogicException((DUPLICATE_USERNAME));
 
         user.updateUsername(request.getNewUsername());
         return UpdateUsernameResponse.of(user.getUsername());

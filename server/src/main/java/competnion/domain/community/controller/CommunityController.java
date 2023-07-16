@@ -36,9 +36,12 @@ public class CommunityController {
         return Response.success(communityService.getWriterInfo(user));
     }
 
-    @GetMapping("/attendee-info")
-    public Response<List<PetResponse>> getAttendeeInfo(@UserContext final User user) {
-        return Response.success(communityService.getAttendeePetInfo(user));
+    @GetMapping("/attendee-info/{article-id}")
+    public Response<List<PetResponse>> getAttendeeInfo(
+            @UserContext                          final User user,
+            @Positive @PathVariable("article-id") final Long articleId
+    ) {
+        return Response.success(communityService.getAttendeePetInfo(user, articleId));
     }
 
     /** 게시글 작성 **/

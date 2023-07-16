@@ -58,7 +58,8 @@ public class CommunityService {
 
     public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
-        checkNotArticleOwnerOrThrow(user, article);
+        checkNotArticleOwner(user, article);
+        checkUserAlreadyAttended(user, article);
         // TODO : 강아지 리스트를 보여줄때, 참여가능한 강아지들만 보여줄지????
         return getPetResponses(user);
     }
@@ -85,10 +86,11 @@ public class CommunityService {
     public void attend(final User user, final AttendRequest request) {
         Article article = getArticleByIdOrThrow(request.getArticleId());
 
-        checkNotArticleOwnerOrThrow(user, article);
+        checkMeetingTimeClosed(request);
+        checkNotArticleOwner(user, article);
+        checkUserAlreadyAttended(user, article);
         checkPet(user, request.getPetIds());
-        checkSpaceForAttendOrThrow(request);
-        checkMeetingTimeClosedOrThrow(request);
+        checkSpaceForAttend(request);
 
         saveAttends(user, article, request.getPetIds());
     }
@@ -127,21 +129,37 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    private void checkNotArticleOwnerOrThrow(User user, Article article) {
+    private void checkNotArticleOwner(User user, Article article) {
         if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
     }
 
-    private void checkMeetingTimeClosedOrThrow(AttendRequest attendRequest) {
+    private void checkMeetingTimeClosed(AttendRequest attendRequest) {
         LocalDateTime now = LocalDateTime.now();
         long minutes = MINUTES.between(now, attendRequest.getDate());
         if (now.isAfter(attendRequest.getDate()) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
-    private void checkSpaceForAttendOrThrow(AttendRequest attendRequest) {
+    private void checkSpaceForAttend(AttendRequest attendRequest) {
         long count = attendRepository.countByArticleId(attendRequest.getArticleId());
         if (count >= attendRequest.getAttendant())
             throw new BusinessLogicException(NO_SPACE_FOR_ATTEND);
+    }
+
+    private void checkPet(User user, List<Long> petIds) {
+        petService.checkUserHasPetOrThrow(user);
+
+        List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
+
+        for (Pet pet : pets) {
+            petService.checkPetMatchUser(user, pet);
+            petService.checkValidPetOrThrow(pet);
+        }
+    }
+
+    private void checkUserAlreadyAttended(final User user, final Article article) {
+        if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
     }
 
     private List<User> extractUserFromAttend(long articleId) {
@@ -199,16 +217,5 @@ public class CommunityService {
         return user.getPets().stream()
                 .map(PetResponse::simple)
                 .collect(Collectors.toList());
-    }
-
-    private void checkPet(User user, List<Long> petIds) {
-        petService.checkUserHasPetOrThrow(user);
-
-        List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
-
-        for (Pet pet : pets) {
-            petService.checkPetMatchUser(user, pet);
-            petService.checkValidPetOrThrow(pet);
-        }
     }
 }
