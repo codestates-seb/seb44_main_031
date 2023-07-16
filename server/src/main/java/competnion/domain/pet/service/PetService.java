@@ -56,6 +56,7 @@ public class PetService {
         String imgUrl = s3Util.uploadImage(image);
         pet.updateImgUrl(imgUrl);
         return imgUrl;
+
     }
 
     public Pet updatePetInfo(final User user, final Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
