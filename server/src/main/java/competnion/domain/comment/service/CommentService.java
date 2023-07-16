@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final CommentMapper mapper;
-    private final CommentRepository commentRepository;
-    private final ArticleRepository articleRepository;
     private final UserRepository userRepository;
+    private final ArticleRepository articleRepository;
+    private final CommentRepository commentRepository;
 
+    private final CommentMapper mapper;
 
 
     public void createComment(CommentDto.Post post, long articleId) {

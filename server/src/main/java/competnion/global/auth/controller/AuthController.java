@@ -74,16 +74,6 @@ public class AuthController { // VerificationFilter 이후의 처리
         return Response.success();
     }
 
-    // 비밀번호 재설정
-    @PostMapping("/reset-password")
-    public Response<?> resetPassword(
-            @UserContext        final User user,
-            @Valid @RequestBody final ResetPasswordRequest resetPasswordRequest
-    ) {
-        authService.resetPassword(user, resetPasswordRequest);
-        return Response.success();
-    }
-
     // 이메일 인증 후 유저 탈퇴
     @DeleteMapping
     public Response<Void> deleteUser(@UserContext final User user) {

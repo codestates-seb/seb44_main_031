@@ -24,6 +24,7 @@ public class AttendRepositoryCustomImpl implements AttendRepositoryCustom{
                 .select(new QArticleQueryDto(article.id, article.title, article.date, article.createdAt))
                 .from(attend)
                 .join(attend.article, article)
+                .join(attend.user, user)
                 .where(
                         attend.user.eq(userEntity)
                 )

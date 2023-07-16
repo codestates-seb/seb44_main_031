@@ -19,8 +19,4 @@ public interface ArticleRepositoryCustom {
     List<ArticleQueryDto> findAllArticlesWrittenByUser(
             User user
     );
-
-    List<ArticleQueryDto> findAllArticlesUserAttended(
-            User user
-    );
 }

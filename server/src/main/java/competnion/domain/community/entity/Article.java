@@ -15,6 +15,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static competnion.domain.community.entity.ArticleStatus.OPEN;
+import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
@@ -40,6 +42,8 @@ public class Article extends BaseEntity {
     private LocalDateTime date;
     @Column(nullable = false)
     private int attendant;
+    @Enumerated(STRING)
+    private ArticleStatus articleStatus;
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -73,6 +77,11 @@ public class Article extends BaseEntity {
         this.location = location;
         this.point = point;
         this.date = date;
+        this.articleStatus = OPEN;
+    }
+
+    public void updateStatus(ArticleStatus articleStatus) {
+        this.articleStatus = articleStatus;
     }
 
     /** 게시글 수정 */

@@ -1,6 +1,5 @@
 package competnion.global.auth.service;
 
-import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
@@ -23,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static competnion.global.exception.ExceptionCode.*;
 
@@ -32,16 +32,18 @@ import static competnion.global.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JwtTokenizer jwtTokenizer;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final JwtUtils jwtUtils;
+    private final EmailUtil emailUtil;
+    private final RedisUtil redisUtil;
+    private final UserService userService;
     private final CoordinateUtil coordinateUtil;
     private final CustomAuthorityUtils authorityUtils;
+
+    private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
-    private final EmailUtil emailUtil;
-    private final JwtUtils jwtUtils;
-    private final RedisUtil redisUtil;
 
     @Transactional
     public void logout(HttpServletRequest request) {
@@ -142,18 +144,7 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(final User user) {
-        userService.deleteUser(user);
-    }
-
-    @Transactional
-    public void resetPassword(final User user, final ResetPasswordRequest request) {
-        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
-
-        if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
-            throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
-
-        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.delete(user);
     }
 
     public void verifyEmailCode(final String code, final String email) {
