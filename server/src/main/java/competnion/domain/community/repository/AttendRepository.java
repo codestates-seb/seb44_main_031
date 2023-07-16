@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AttendRepository extends JpaRepository<Attend, Long> {
+public interface AttendRepository extends JpaRepository<Attend, Long>, AttendRepositoryCustom {
     long countByArticleId(Long articleId);
 
 

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.util.Lazy;
+import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -51,6 +52,9 @@ public class Pet extends BaseEntity {
     @Column(nullable = false)
     @NotBlank
     private String vaccine;
+    @Column(nullable = false)
+    @NotBlank
+    private String mbti;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
@@ -58,6 +62,9 @@ public class Pet extends BaseEntity {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "breed_id")
+    private Breed breed;
 
     public void updateImgUrl(final String imgUrl) {
         hasText(imgUrl, "imgUrl must not be null");
@@ -90,14 +97,16 @@ public class Pet extends BaseEntity {
     }
 
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
-    private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final String vaccine, final User user) {
-        hasText(name, "name must not be null");
+    private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final String vaccine, final User user, final String mbti, final Breed breed) {
+        hasText(name, "name must not be empty");
         notNull(birth, "birth must not be null");
         isInstanceOf(Boolean.class, gender, "Boolean expected");
         isInstanceOf(Boolean.class, neutralization, "Boolean expected");
-        hasText(imgUrl, "imgUrl must not be null");
-        hasText(vaccine, "inoculated must not be null");
+        hasText(imgUrl, "imgUrl must not be empty");
+        hasText(vaccine, "inoculated must not be empty");
         notNull(user, "user must not be null");
+        hasText(mbti, "mbti must not be empty");
+        notNull(breed, "breed must not be null");
         this.name = name;
         this.birth = birth;
         this.gender = gender;
@@ -105,5 +114,7 @@ public class Pet extends BaseEntity {
         this.imgUrl = imgUrl;
         this.vaccine = vaccine;
         this.user = user;
+        this.mbti = mbti;
+        this.breed = breed;
     }
 }

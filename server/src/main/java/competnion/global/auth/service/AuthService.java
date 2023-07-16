@@ -1,6 +1,5 @@
 package competnion.global.auth.service;
 
-import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
@@ -23,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static competnion.global.exception.ExceptionCode.*;
 
@@ -32,16 +32,18 @@ import static competnion.global.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final JwtTokenizer jwtTokenizer;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final JwtUtils jwtUtils;
+    private final EmailUtil emailUtil;
+    private final RedisUtil redisUtil;
+    private final UserService userService;
     private final CoordinateUtil coordinateUtil;
     private final CustomAuthorityUtils authorityUtils;
+
+    private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
-    private final EmailUtil emailUtil;
-    private final JwtUtils jwtUtils;
-    private final RedisUtil redisUtil;
 
     @Transactional
     public void logout(HttpServletRequest request) {
@@ -116,16 +118,16 @@ public class AuthService {
     }
 
     @Transactional
-    public void signUp(final SignUpRequest signUpRequest) {
-        checkDuplicatedUsername(signUpRequest.getUsername());
-        checkDuplicatedEmail(signUpRequest.getEmail());
+    public void signUp(final SignUpRequest request) {
+        checkDuplicatedUsername(request.getUsername());
+        checkDuplicatedEmail(request.getEmail());
 
-        Point point = coordinateUtil.coordinateToPoint(signUpRequest.getLatitude(), signUpRequest.getLongitude());
-        List<String> roles = authorityUtils.createRoles(signUpRequest.getEmail());
-        String encode = passwordEncoder.encode(signUpRequest.getPassword());
+        Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        List<String> roles = authorityUtils.createRoles(request.getEmail());
+        String encode = passwordEncoder.encode(request.getPassword());
 
-        userService.saveUser(point, signUpRequest, encode, roles);
-        redisUtil.deleteData(signUpRequest.getEmail());
+        userService.saveUser(point, request, encode, roles);
+        redisUtil.deleteData(request.getEmail());
     }
 
     @Transactional
@@ -142,7 +144,7 @@ public class AuthService {
 
     @Transactional
     public void deleteUser(final User user) {
-        userService.deleteUser(user);
+        userRepository.delete(user);
     }
 
     public void verifyEmailCode(final String code, final String email) {
@@ -169,9 +171,5 @@ public class AuthService {
         String code = emailUtil.generateRandomCode();
         redisUtil.setDataAndExpire(email, code, 600000L);
         emailUtil.sendVerificationEmail(email, code);
-    }
-
-    public void resetPassword(final ResetPasswordRequest resetPasswordRequest) {
-
     }
 }

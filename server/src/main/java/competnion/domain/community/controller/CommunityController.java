@@ -53,9 +53,18 @@ public class CommunityController {
 
     // 게시글 참여
     @PostMapping("/attend")
-    public Response<?> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest attendRequest
-    ) {
+    public Response<?> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest attendRequest) {
         communityService.attend(user, attendRequest);
+        return Response.success();
+    }
+
+    // 게시글 참여 취소
+    @DeleteMapping("/cancel/{article-id}")
+    public Response<?> cancelAttend(
+            @UserContext                          final User user,
+            @Positive @PathVariable("article-id") final Long articleId
+    ) {
+        communityService.cancelAttend(user, articleId);
         return Response.success();
     }
 
@@ -69,12 +78,12 @@ public class CommunityController {
     public Response<List<ArticleResponse>> getAllArticles(
             @UserContext final User user,
             @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
-//            @RequestParam(value = "days",    required = false, defaultValue = "1")   final int days,
+            @RequestParam(value = "days",       required = false, defaultValue = "30") final int days,
             @RequestParam(value = "pageNumber", required = false, defaultValue = "1")  final int pageNumber,
             @RequestParam(value = "pageSize",   required = false, defaultValue = "10") final int pageSize
     ) {
         PageRequest pageable = PageRequest.of(pageNumber - 1, pageSize);
-        List<ArticleResponse> articles = communityService.getAll(user, keyword, pageable);
+        List<ArticleResponse> articles = communityService.getAll(user, keyword, days, pageable);
         return Response.success(articles);
     }
 

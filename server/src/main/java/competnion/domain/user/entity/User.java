@@ -71,10 +71,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Attend> attends = new ArrayList<>();
 
-
-
-
-
     public void updateAddressAndCoordinates(final String address, final Point point) {
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
@@ -92,27 +88,32 @@ public class User extends BaseEntity {
         this.username = username;
     }
 
-    public void addPet(Pet pet) {
-        notNull(pet, "pet must not be null");
-        this.pets.add(pet);
-    }
-
-    public void idToDetails(Long id) {
-        notNull(id, "id must not be null");
-        this.id = id;
-    }
-
-    public void emailToDetails(String email) {
-        hasText(email, "email must not be empty");
-        this.email = email;
-    }
-
-    public void passwordToDetails(String password) {
+    public void updatePassword(final String password) {
         hasText(password, "password must not be empty");
         this.password = password;
     }
 
-    public void rolesToDetails(List<String> roles) {
+    public void addPet(final Pet pet) {
+        notNull(pet, "pet must not be null");
+        this.pets.add(pet);
+    }
+
+    public void idToDetails(final Long id) {
+        notNull(id, "id must not be null");
+        this.id = id;
+    }
+
+    public void emailToDetails(final String email) {
+        hasText(email, "email must not be empty");
+        this.email = email;
+    }
+
+    public void passwordToDetails(final String password) {
+        hasText(password, "password must not be empty");
+        this.password = password;
+    }
+
+    public void rolesToDetails(final List<String> roles) {
         notNull(roles, "roles must not be null");
         this.roles = roles;
     }

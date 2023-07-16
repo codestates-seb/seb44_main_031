@@ -1,9 +1,14 @@
 package competnion.domain.user.service;
 
+import competnion.domain.community.dto.ArticleQueryDto;
+import competnion.domain.community.repository.ArticleRepository;
+import competnion.domain.community.repository.AttendRepository;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.dto.request.AddressRequest;
+import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
+import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
 import competnion.domain.user.dto.response.UserResponse;
@@ -14,6 +19,7 @@ import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,17 +27,21 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
-
+import static competnion.global.exception.ExceptionCode.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
     private final PetRepository petRepository;
-    private final CoordinateUtil coordinateUtil;
+    private final UserRepository userRepository;
+    private final AttendRepository attendRepository;
+    private final ArticleRepository articleRepository;
+
     private final S3Util s3Util;
+    private final CoordinateUtil coordinateUtil;
+    
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
@@ -44,39 +54,53 @@ public class UserService {
     }
 
     @Transactional
-    public UpdateUsernameResponse updateUsername(
-            final User user,
-            final String username
-    ) {
-        user.updateUsername(username);
+    public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
+        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+
+        user.updateUsername(request.getNewUsername());
         return UpdateUsernameResponse.of(user.getUsername());
     }
 
     @Transactional
-    public UpdateAddressResponse updateAddress(
-            final User user,
-            final AddressRequest addressRequest
-    ) {
-        Point point = coordinateUtil.coordinateToPoint(addressRequest.getLatitude(), addressRequest.getLongitude());
-        user.updateAddressAndCoordinates(addressRequest.getAddress(), point);
+    public void resetPassword(final User user, final ResetPasswordRequest request) {
+        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
+            throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
+
+        user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+
+    @Transactional
+    public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
+        Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        user.updateAddressAndCoordinates(request.getAddress(), point);
         return UpdateAddressResponse.of(
-                addressRequest.getLatitude(), addressRequest.getLongitude(), addressRequest.getAddress()
+                request.getLatitude(), request.getLongitude(), request.getAddress()
         );
     }
 
     @Transactional
-    public String uploadProfileImage(
-            final User user,
-            final MultipartFile image
-    ) {
+    public String uploadProfileImage(final User user, final MultipartFile image) {
         s3Util.isFileAnImageOrThrow(image);
-        if (user.getImgUrl() != null)
-            s3Util.deleteImage(user.getImgUrl());
+
+        if (user.getImgUrl() != null) s3Util.deleteImage(user.getImgUrl());
+
         String imgUrl = s3Util.uploadImage(image);
-
         user.updateImgUrl(imgUrl);
-
         return imgUrl;
+    }
+
+    @Transactional
+    public List<ArticleQueryDto> findAllArticlesWrittenByUser(final User user) {
+        return articleRepository.findAllArticlesWrittenByUser(user);
+    }
+
+    @Transactional
+    public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
+        return attendRepository.findAllArticlesUserAttended(user);
     }
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
@@ -96,19 +120,15 @@ public class UserService {
         return user.getEmail().equals(email);
     }
 
-    public void deleteUser(final User user) {
-        userRepository.delete(user);
-    }
-
-    public void saveUser(Point point, SignUpRequest signUpRequest, String encode, List<String> roles) {
+    public void saveUser(final Point point, final SignUpRequest request, final String encode, final List<String> roles) {
         userRepository.save(User.SignUp()
-                .email(signUpRequest.getEmail())
-                .username(signUpRequest.getUsername())
+                .email(request.getEmail())
+                .username(request.getUsername())
                 .password(encode)
-                .address(signUpRequest.getAddress())
+                .address(request.getAddress())
                 .point(point)
-                .latitude(signUpRequest.getLatitude())
-                .longitude(signUpRequest.getLongitude())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .roles(roles)
                 .build());
     }

@@ -12,5 +12,7 @@ public class RegisterPetRequest {
     private LocalDate birth;
     private Boolean gender;
     private Boolean neutralization;
+    private String mbti;
+    private Long breedId;
     private String vaccine;
 }
