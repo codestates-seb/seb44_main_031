@@ -10,10 +10,6 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 public interface ArticleRepository extends JpaRepository<Article, Long>, ArticleRepositoryCustom {
-//    @Query("SELECT a FROM Article a WHERE " +
-//            "FUNCTION('ST_DISTANCE', a.location, :userPoint) * 1000 <= 3000")
-//    Page<Article> findNearbyArticles(@Param("userPoint") Point userPoint,Pageable pageable);
-
 
     Article findArticleById(long articleId);
 

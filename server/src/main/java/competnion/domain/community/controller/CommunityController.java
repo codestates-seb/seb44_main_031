@@ -3,16 +3,22 @@ package competnion.domain.community.controller;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.response.ArticleResponse;
+import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
+import competnion.domain.community.entity.Article;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
+import competnion.global.security.interceptor.JwtParseInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -22,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Validated
@@ -77,6 +84,7 @@ public class CommunityController {
         return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
     }
 
+    /** 전체 조회 **/
     @GetMapping("/all")
     public Response<List<ArticleResponse>> getAllArticles(
             @UserContext final User user,
@@ -90,24 +98,10 @@ public class CommunityController {
         return Response.success(articles);
     }
 
-    /** 전체 조회 **/
-//    @GetMapping
-//    public ResponseEntity getAllArticlesWithin3Km(@UserContext final Long userId,
-//                                                  @PageableDefault(size = 30) Pageable pageable) {
-//        /**로그인한 사용자의 위치정보를 알기 위해서는 security정보 필요, 당장은 임의로 넣음 */
-//        Page<Article> articlePage = communityService.findNearbyArticles(userId, pageable);
-//        List<Article> articles = articlePage.getContent();
-//
-//        List<ArticleResponseDto> articleResponseDtos = articles.stream()
-//                .map(ArticleResponseDto::new)
-//                .collect(Collectors.toList());
-//
-//        MultiResponseDto<ArticleResponseDto> multiResponseDto = new MultiResponseDto<>(articleResponseDtos, articlePage);
-//
-//        return new ResponseEntity<>(multiResponseDto, HttpStatus.OK);
-//    }
 
-//    /** 질문 삭제 **/
+
+
+    /** 질문 삭제 **/
 //    @DeleteMapping("/{article-id}")
 //    public ResponseEntity deleteArticle(@PathVariable("article-id") @Positive long articleId){
 //        /** 삭제하려는 게시글이 작성자인지 확인하는 로직 필요(해결) */
