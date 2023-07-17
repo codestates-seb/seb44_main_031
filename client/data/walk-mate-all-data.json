@@ -1,0 +1,63 @@
+{
+  "articles": {
+    "success": "요청 성공!!!!!",
+    "result": {
+      "articles": [
+        {
+          "imgUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Bukchon_Hanok_Village_%EB%B6%81%EC%B4%8C_%ED%95%9C%EC%98%A5%EB%A7%88%EC%9D%84_October_1_2020_15.jpg",
+          "date": "2023-07-20T16:23",
+          "title": "북촌 육경에서 강아지들 산책하실분~",
+          "body": "저녁 6시에 미니스탑 편의점에서 만나서 애기들 산책하실분 구합니다",
+          "location":"서울특별시 종로구 가회동 31-48",
+          "latitude": 37.582660916157515,
+          "longitude": 126.98361081274618,
+          "attendant" : 3,
+          "남은 자리": 1, 
+          "유저의 참석 여부": true
+        },
+        {
+          "imgUrl": "https://lh5.googleusercontent.com/p/AF1QipOagIs9NdeuAtqDoCj3AvQjXxU-rUt_Ad1E28Hi=w408-h544-k-no",
+          "date": "2023-07-20T18:00",
+          "title": "그랑핸드 북촌에서 만나서 애기들 산책해요",
+          "body": "저녁 7시에 애기들 산첵해요",
+          "location":"서울특별시 종로구 북촌로11길 19",
+          "latitude": 37.581976981710646,
+          "longitude": 126.98394110924652,
+          "attendant" : 4,
+          "남은 자리": 2, 
+          "유저의 참석 여부": false
+        },
+        {
+          "imgUrl": "https://lh5.googleusercontent.com/p/AF1QipOagIs9NdeuAtqDoCj3AvQjXxU-rUt_Ad1E28Hi=w408-h544-k-no",
+          "date": "2023-07-20T18:00",
+          "title": "그랑핸드 북촌에서 만나서 애기들 산책해요",
+          "body": "저녁 7시에 애기들 산첵해요",
+          "location":"서울특별시 종로구 북촌로11길 19",
+          "latitude": 37.581976981710646,
+          "longitude": 126.98394110924652,
+          "attendant" : 4,
+          "남은 자리": 2, 
+          "유저의 참석 여부": false
+        },
+        {
+          "imgUrl": "https://lh5.googleusercontent.com/p/AF1QipOagIs9NdeuAtqDoCj3AvQjXxU-rUt_Ad1E28Hi=w408-h544-k-no",
+          "date": "2023-07-20T18:00",
+          "title": "그랑핸드 북촌에서 만나서 애기들 산책해요",
+          "body": "저녁 7시에 애기들 산첵해요",
+          "location":"서울특별시 종로구 북촌로11길 19",
+          "latitude": 37.581976981710646,
+          "longitude": 126.98394110924652,
+          "attendant" : 4,
+          "남은 자리": 2, 
+          "유저의 참석 여부": false
+        }
+      ],
+      "user": {
+        "location": "서울특별시 종로구 가회동 북촌로 64",
+        "latitude": 37.58251737488069,
+        "longitude": 126.98517705739235
+      }
+      
+    }
+  }
+}

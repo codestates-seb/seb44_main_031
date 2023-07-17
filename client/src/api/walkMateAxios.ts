@@ -4,18 +4,26 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // NOTE: 개발 상황에 따라 baseURL, Token 값을 설정해서 쓰면 됩니다 (영탁)
 // TODO: 백엔드 배포 완료 후 실제 서버와 연결할때는, BASE_URL 에 해당 배포된 API URL 값을 지정해서 axiosInstance의 baseURL 로 설정해 주시면 됩니다. Token 도 현재는 주석처리 되어있는 localStorage 에서 실제 토큰을 가져오는 로직으로 대체해서 사용해 주시면 됩니다
 
-const JSON_SERVER = 'http://localhost:3001';
-// const BASE_URL = '';
+const Token =
+  'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sInVzZXJJZCI6MiwidXNlcm5hbWUiOiJ0ZXN0dGVzdCIsImlhdCI6MTY4OTU4Mjg5OSwiZXhwIjoxNjg5OTQyODk5fQ.t78Ceh8_KDX5BevdM3MX3_W_FAlorQPQ3fZZql875e0';
 // const Token = 'Bearer ' + localStorage.getItem('token');
 
-const Token = '';
+// const JSON_SERVER = 'http://localhost:3001';
+const BASE_URL = 'http://localhost:3001';
+// const BASE_URL = 'ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
-export const getCreateArticleUrl = 'articles-info';
-export const postCreateArticleUrl = 'articles';
+// URL PATH
 export const signInUrl = '/users/sign-in';
 
+export const getCreateArticleUrl = 'articles-writer-info';
+// export const getCreateArticleUrl = 'articles/writer-info';
+export const postCreateArticleUrl = 'articles';
+
+export const getArticlesUrl = 'articles';
+
+// axios default instance
 export const axiosInstance = axios.create({
-  baseURL: JSON_SERVER,
+  baseURL: BASE_URL,
   headers: {
     Authorization: Token,
   },
