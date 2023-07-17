@@ -64,4 +64,20 @@ public class UserResponse {
 
     }
 
+    @Getter
+    @AllArgsConstructor
+    public static class OfMultiArticleResponse {
+        private String address;
+        private Double latitude;
+        private Double longitude;
+
+        public static  UserResponse.OfMultiArticleResponse getResponse(User user) {
+            return new OfMultiArticleResponse(
+                    user.getAddress(),
+                    user.getLatitude(),
+                    user.getLongitude()
+            );
+        }
+    }
+
 }
