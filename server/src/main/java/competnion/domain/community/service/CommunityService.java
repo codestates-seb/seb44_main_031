@@ -38,6 +38,7 @@ import static competnion.global.exception.ExceptionCode.*;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class CommunityService {
     private final PetRepository petRepository;
@@ -51,13 +52,15 @@ public class CommunityService {
 
     private final ArticleMapper mapper;
 
+    @Transactional(readOnly = true)
     public WriterResponse getWriterInfo(final User user) {
-        List<PetResponse> petResponseList = getPetResponses(user);
+        final List<PetResponse> petResponseList = getPetResponses(user);
         return WriterResponse.of(user, petResponseList);
     }
 
+    @Transactional(readOnly = true)
     public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
-        Article article = getArticleByIdOrThrow(articleId);
+        final Article article = getArticleByIdOrThrow(articleId);
         checkNotArticleOwner(user, article);
         checkUserAlreadyAttended(user, article);
         // TODO : 강아지 리스트를 보여줄때, 참여가능한 강아지들만 보여줄지????
@@ -65,7 +68,6 @@ public class CommunityService {
     }
     
     // 산책 갈래요 작성
-    @Transactional
     public Long createArticle(
             final User user,
             final ArticlePostRequest request,
@@ -73,18 +75,17 @@ public class CommunityService {
     ) {
         checkPet(user, request.getPetIds());
 
-        List<String> imageUrlList = s3Util.uploadImageList(images);
+        final List<String> imageUrlList = s3Util.uploadImageList(images);
 
-        Article article = saveArticle(user, request);
+        final Article article = saveArticle(user, request);
         saveAttends(user, article, request.getPetIds());
         saveImages(imageUrlList, article);
         return article.getId();
     }
 
     // 산책 갈래요 참여
-    @Transactional
     public void attend(final User user, final AttendRequest request) {
-        Article article = getArticleByIdOrThrow(request.getArticleId());
+        final Article article = getArticleByIdOrThrow(request.getArticleId());
 
         checkMeetingTimeClosed(request);
         checkNotArticleOwner(user, article);
@@ -105,18 +106,24 @@ public class CommunityService {
     }
 
     // 게시글 상세 조회
-    public SingleArticleResponseDto findArticle(Long articleId) {
-        Article article = getArticleByIdOrThrow(articleId);
+    public SingleArticleResponseDto findArticle(final Long articleId) {
+        final Article article = getArticleByIdOrThrow(articleId);
 
-        List<String> images = getImgUrlsFromArticle(article);
+        final List<String> images = getImgUrlsFromArticle(article);
 
-        List<User> attendees = extractUserFromAttend(articleId);
+        final List<User> attendees = extractUserFromAttend(articleId);
 
         return mapper.articleToSingleArticleResponse(images,article,attendees);
     }
 
-    public List<ArticleResponse> getAll(User user, String keyword, int days, Pageable pageable) {
-        List<ArticleQueryDto> articles = articleRepository.findAllByKeywordAndDistance(
+    @Transactional(readOnly = true)
+    public List<ArticleResponse> getAll(
+            final User user,
+            final String keyword,
+            final int days,
+            final Pageable pageable
+    ) {
+        final List<ArticleQueryDto> articles = articleRepository.findAllByKeywordAndDistanceAndDays(
                 user.getPoint(),
                 keyword,
                 days,
@@ -129,27 +136,29 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    private void checkNotArticleOwner(User user, Article article) {
+    private void checkNotArticleOwner(final User user, final Article article) {
         if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
     }
 
-    private void checkMeetingTimeClosed(AttendRequest attendRequest) {
-        LocalDateTime now = LocalDateTime.now();
-        long minutes = MINUTES.between(now, attendRequest.getDate());
-        if (now.isAfter(attendRequest.getDate()) || minutes <= 30)
+    private void checkMeetingTimeClosed(final AttendRequest request) {
+        final LocalDateTime now = LocalDateTime.now();
+        final long minutes = MINUTES.between(now, request.getDate());
+        if (now.isAfter(request.getDate()) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
-    private void checkSpaceForAttend(AttendRequest attendRequest) {
-        long count = attendRepository.countByArticleId(attendRequest.getArticleId());
-        if (count >= attendRequest.getAttendant())
+    @Transactional(readOnly = true)
+    private void checkSpaceForAttend(final AttendRequest request) {
+        final long count = attendRepository.countByArticleId(request.getArticleId());
+        if (count >= request.getAttendant())
             throw new BusinessLogicException(NO_SPACE_FOR_ATTEND);
     }
 
-    private void checkPet(User user, List<Long> petIds) {
+    @Transactional(readOnly = true)
+    private void checkPet(final User user, final List<Long> petIds) {
         petService.checkUserHasPetOrThrow(user);
 
-        List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
+        final List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
 
         for (Pet pet : pets) {
             petService.checkPetMatchUser(user, pet);
@@ -157,18 +166,33 @@ public class CommunityService {
         }
     }
 
-    private void checkUserAlreadyAttended(final User user, final Article article) {
-        if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
-            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
-    }
-
-    private List<User> extractUserFromAttend(long articleId) {
+    private List<User> extractUserFromAttend(final long articleId) {
         return attendRepository.findUsersFromAttendByArticleId(articleId);
     }
 
-    private Article getArticleByIdOrThrow(Long articleId) {
+    private Article getArticleByIdOrThrow(final Long articleId) {
         return articleRepository.findById(articleId)
                 .orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND));
+    }
+
+    private List<String> getImgUrlsFromArticle(final Article article) {
+        final List<ArticleImage> articleImages = article.getImages();
+        final List<String> imageUrls = new ArrayList<>();
+        for (ArticleImage articleImage : articleImages) {
+            imageUrls.add(articleImage.getImgUrl());
+        }
+        return imageUrls;
+    }
+
+    private List<PetResponse> getPetResponses(final User user) {
+        return user.getPets().stream()
+                .map(PetResponse::simple)
+                .collect(Collectors.toList());
+    }
+
+    private void checkUserAlreadyAttended(final User user, final Article article) {
+        if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
     }
 
     private Article saveArticle(final User user, final ArticlePostRequest request) {
@@ -184,38 +208,23 @@ public class CommunityService {
     }
 
     private void saveAttends(final User user, final Article article, final List<Long> petIds) {
-        Attend attend = Attend.CreateAttend()
+        final Attend attend = Attend.CreateAttend()
                 .article(article)
                 .user(user)
                 .build();
         attendRepository.save(attend);
 
-        List<Pet> pets = petRepository.findAllById(petIds);
+        final List<Pet> pets = petRepository.findAllById(petIds);
 
         pets.forEach(pet -> article.getPets().add(pet));
         pets.forEach(pet -> pet.updateArticle(article));
     }
 
-    private void saveImages(List<String> imageUrlList, Article article) {
+    private void saveImages(final List<String> imageUrlList, final Article article) {
         for (String imageUrl : imageUrlList) {
-            ArticleImage articleImage = ArticleImage.saveImage().imgUrl(imageUrl).article(article).build();
+            final ArticleImage articleImage = ArticleImage.saveImage().imgUrl(imageUrl).article(article).build();
             articleImageRepository.save(articleImage);
             article.getImages().add(articleImage);
         }
-    }
-
-    private List<String> getImgUrlsFromArticle(Article article) {
-        List<ArticleImage> articleImages = article.getImages();
-        List<String> imageUrls = new ArrayList<>();
-        for (ArticleImage articleImage : articleImages) {
-            imageUrls.add(articleImage.getImgUrl());
-        }
-        return imageUrls;
-    }
-
-    private List<PetResponse> getPetResponses(User user) {
-        return user.getPets().stream()
-                .map(PetResponse::simple)
-                .collect(Collectors.toList());
     }
 }

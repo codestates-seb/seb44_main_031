@@ -118,7 +118,7 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
-    @Builder(builderClassName = "SignUp", builderMethodName = "SignUp")
+    @Builder(builderMethodName = "signUp")
     private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude) {
         hasText(username, "username must not be empty");
         hasText(email, "email must not be empty");

@@ -1,5 +1,6 @@
 package competnion.domain.user.dto.response;
 
+import competnion.domain.user.dto.request.AddressRequest;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,9 +13,11 @@ public class UpdateAddressResponse {
     private Double longitude;
     private String address;
 
-    public static UpdateAddressResponse of(Double latitude, Double longitude, String address) {
+    public static UpdateAddressResponse of(AddressRequest request) {
         return new UpdateAddressResponse(
-                latitude, longitude, address
+                request.getLatitude(),
+                request.getLongitude(),
+                request.getAddress()
         );
     }
 }

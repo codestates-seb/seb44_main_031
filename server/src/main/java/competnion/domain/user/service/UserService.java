@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import static competnion.global.exception.ExceptionCode.*;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
@@ -54,10 +55,8 @@ public class UserService {
         return UserResponse.of(existsUser, pets);
     }
 
-    @Transactional
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
-        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+        checkMatchPassword(request.getPassword(), user.getPassword());
 
         if (userRepository.findByUsername(request.getNewUsername()).isPresent())
             throw new BusinessLogicException((DUPLICATE_USERNAME));
@@ -66,10 +65,8 @@ public class UserService {
         return UpdateUsernameResponse.of(user.getUsername());
     }
 
-    @Transactional
     public void resetPassword(final User user, final ResetPasswordRequest request) {
-        boolean matches = passwordEncoder.matches(request.getPassword(), user.getPassword());
-        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+        checkMatchPassword(request.getPassword(), user.getPassword());
 
         if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
             throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
@@ -77,16 +74,12 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
 
-    @Transactional
     public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
         Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
         user.updateAddressAndCoordinates(request.getAddress(), point);
-        return UpdateAddressResponse.of(
-                request.getLatitude(), request.getLongitude(), request.getAddress()
-        );
+        return UpdateAddressResponse.of(request);
     }
 
-    @Transactional
     public String uploadProfileImage(final User user, final MultipartFile image) {
         s3Util.isFileAnImageOrThrow(image);
 
@@ -97,19 +90,17 @@ public class UserService {
         return imgUrl;
     }
 
-    @Transactional
+    public User returnExistsUserByIdOrThrow(final Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
+    }
+
     public List<ArticleQueryDto> findAllArticlesWrittenByUser(final User user) {
         return articleRepository.findAllArticlesWrittenByUser(user);
     }
 
-    @Transactional
     public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
         return attendRepository.findAllArticlesUserAttended(user);
-    }
-
-    public User returnExistsUserByIdOrThrow(final Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
     }
 
     public Boolean checkExistsUserByUsername(final String username) {
@@ -124,8 +115,18 @@ public class UserService {
         return user.getEmail().equals(email);
     }
 
-    public void saveUser(final Point point, final SignUpRequest request, final String encode, final List<String> roles) {
-        userRepository.save(User.SignUp()
+    private void checkMatchPassword(final String password, final String encodePassword) {
+        boolean matches = passwordEncoder.matches(password, encodePassword);
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+    }
+
+    public void saveUser(
+            final Point point,
+            final SignUpRequest request,
+            final String encode,
+            final List<String> roles
+    ) {
+        userRepository.save(User.signUp()
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(encode)

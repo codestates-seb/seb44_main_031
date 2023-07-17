@@ -5,9 +5,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static lombok.AccessLevel.PRIVATE;
+
 @Getter
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@JsonInclude(NON_NULL)
+@AllArgsConstructor(access = PRIVATE)
 public class Response<T> {
     private Boolean success;
     private T result;

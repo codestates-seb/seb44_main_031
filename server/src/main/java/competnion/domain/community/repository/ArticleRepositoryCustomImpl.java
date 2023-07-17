@@ -39,7 +39,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     }
 
     @Override
-    public List<ArticleQueryDto> findAllByKeywordAndDistance(
+    public List<ArticleQueryDto> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
             int days,

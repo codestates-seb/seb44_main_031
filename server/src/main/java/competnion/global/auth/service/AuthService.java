@@ -29,6 +29,7 @@ import static competnion.global.exception.ExceptionCode.*;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -45,7 +46,6 @@ public class AuthService {
     private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     public void logout(HttpServletRequest request) {
         log.info("AuthService - logout");
         log.info("=======================================");
@@ -65,7 +65,6 @@ public class AuthService {
         log.info("Blacklist 추가 완료");
     }
 
-    @Transactional
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
 
         // AccessToken Header & 만료시간 체크, 만료 response는 VerificationFilter에서 선처리
@@ -117,7 +116,6 @@ public class AuthService {
         }
     }
 
-    @Transactional
     public void signUp(final SignUpRequest request) {
         checkDuplicatedUsername(request.getUsername());
         checkDuplicatedEmail(request.getEmail());
@@ -130,19 +128,18 @@ public class AuthService {
         redisUtil.deleteData(request.getEmail());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void checkDuplicateEmailAndSendVerificationEmail(final String email) {
         checkDuplicatedEmail(email);
         sendEmail(email);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void checkValidateEmailAndSendEmail(final User user, final String email) {
         checkEmailValidate(user, email);
         sendEmail(email);
     }
 
-    @Transactional
     public void deleteUser(final User user) {
         userRepository.delete(user);
     }

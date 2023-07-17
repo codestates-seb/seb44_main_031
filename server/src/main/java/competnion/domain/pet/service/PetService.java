@@ -76,26 +76,6 @@ public class PetService {
         petRepository.delete(pet);
     }
 
-    public void checkValidPetOrThrow(final Pet pet) {
-        if (pet.getArticle() != null) throw new BusinessLogicException(PET_ALREADY_ATTENDED);
-    }
-
-    public void checkUserHasPetOrThrow(final User user) {
-        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
-    }
-
-    public void checkPetMatchUser(final User user, final Pet findPet) {
-        boolean petMatch = user.getPets().stream()
-                .anyMatch(pet -> pet.equals(findPet));
-
-        if (!petMatch) throw new BusinessLogicException(PET_NOT_MATCH);
-    }
-
-    private void checkSpaceForRegisterPetOrThrow (final Long userId) {
-        final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
-    }
-
     public Breed returnExistsBreedOrThrow(final Long breedId) {
         return breedRepository.findById(breedId)
                 .orElseThrow(() -> new BusinessLogicException(BREED_NOT_FOUND));
@@ -107,23 +87,47 @@ public class PetService {
     }
 
     public List<Pet> returnExistsPetsOrThrow(final List<Long> petIds) {
-        List<Pet> pets = new ArrayList<>();
+        final List<Pet> pets = new ArrayList<>();
         for (Long petId : petIds) {
             pets.add(returnExistsPetOrThrow(petId));
         }
         return pets;
     }
 
-    private Pet savePet(User user, RegisterPetRequest registerPetRequest, String imgUrl, Breed breed) {
+    public void checkValidPetOrThrow(final Pet pet) {
+        if (pet.getArticle() != null) throw new BusinessLogicException(PET_ALREADY_ATTENDED);
+    }
+
+    public void checkUserHasPetOrThrow(final User user) {
+        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
+    }
+
+    public void checkPetMatchUser(final User user, final Pet findPet) {
+        final boolean petMatch = user.getPets().stream()
+                .anyMatch(pet -> pet.equals(findPet));
+        if (!petMatch) throw new BusinessLogicException(PET_NOT_MATCH);
+    }
+
+    private void checkSpaceForRegisterPetOrThrow (final Long userId) {
+        final Integer count = petRepository.countByUserId(userId);
+        if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
+    }
+
+    private Pet savePet(
+            final User user,
+            final RegisterPetRequest request,
+            final String imgUrl,
+            final Breed breed
+    ) {
         return petRepository.save(Pet.RegisterPet()
-                .name(registerPetRequest.getName())
-                .birth(registerPetRequest.getBirth())
-                .gender(registerPetRequest.getGender())
-                .neutralization(registerPetRequest.getNeutralization())
+                .name(request.getName())
+                .birth(request.getBirth())
+                .gender(request.getGender())
+                .neutralization(request.getNeutralization())
                 .imgUrl(imgUrl)
-                .vaccine(registerPetRequest.getVaccine())
+                .vaccine(request.getVaccine())
                 .user(user)
-                .mbti(registerPetRequest.getMbti())
+                .mbti(request.getMbti())
                 .breed(breed)
                 .build());
     }

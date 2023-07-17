@@ -7,7 +7,7 @@ import org.locationtech.jts.geom.Point;
 import java.util.List;
 
 public interface ArticleRepositoryCustom {
-    List<ArticleQueryDto> findAllByKeywordAndDistance(
+    List<ArticleQueryDto> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
             int days,
