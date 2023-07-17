@@ -7,13 +7,10 @@ import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.locationtech.jts.geom.Point;
-import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -25,7 +22,6 @@ import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.util.Assert.*;
 import static org.springframework.util.Assert.hasText;
 import static org.springframework.util.Assert.notNull;
 
@@ -43,7 +39,7 @@ public class User extends BaseEntity {
     private Long id;
     @Column(unique = true, nullable = false)
     @NotBlank
-    private String username;
+    private String nickname;
     @Column(unique = true, nullable = false)
     @NotBlank
     private String email;
@@ -83,9 +79,9 @@ public class User extends BaseEntity {
         this.imgUrl = imgUrl;
     }
 
-    public void updateUsername(final String username) {
-        hasText(username, "username must not be empty");
-        this.username = username;
+    public void updateUsername(final String nickname) {
+        hasText(nickname, "nickname must not be empty");
+        this.nickname = nickname;
     }
 
     public void updatePassword(final String password) {
@@ -103,9 +99,9 @@ public class User extends BaseEntity {
         this.id = id;
     }
 
-    public void emailToDetails(final String email) {
-        hasText(email, "email must not be empty");
-        this.email = email;
+    public void nicknameToDetails(final String nickname) {
+        hasText(nickname, "nickname must not be empty");
+        this.nickname = nickname;
     }
 
     public void passwordToDetails(final String password) {
@@ -119,14 +115,14 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderMethodName = "signUp")
-    private User(final String username, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude) {
-        hasText(username, "username must not be empty");
+    private User(final String nickname, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude) {
+        hasText(nickname, "nickname must not be empty");
         hasText(email, "email must not be empty");
         hasText(password, "password must not be empty");
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
         notNull(roles, "roles must not be null");
-        this.username = username;
+        this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.address = address;

@@ -17,7 +17,6 @@ public class CommentController {
 
     private final CommentService commentService;
 
-
     @PostMapping
     public Response<Void> postComment(@RequestBody CommentDto.Post postDto,
                                       @PathVariable("article-id") long articleId) {

@@ -40,7 +40,7 @@ public class ArticleResponseDto {
         public static ArticleResponseDto of(Article article, List<String> imageUrls) {
                 return new ArticleResponseDto(
                         article.getId(),
-                        article.getUser().getUsername(),
+                        article.getUser().getNickname(),
                         article.getTitle(),
                         article.getBody(),
                         imageUrls
@@ -69,7 +69,7 @@ public class ArticleResponseDto {
                         return new OfSingleResponse(
                                 imageUrls,
                                 article.getId(),
-                                article.getUser().getUsername(),
+                                article.getUser().getNickname(),
                                 article.getTitle(),
                                 article.getBody(),
                                 article.getDate(),

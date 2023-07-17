@@ -142,8 +142,8 @@ public class CommunityService {
 
     private void checkMeetingTimeClosed(final AttendRequest request) {
         final LocalDateTime now = LocalDateTime.now();
-        final long minutes = MINUTES.between(now, request.getDate());
-        if (now.isAfter(request.getDate()) || minutes <= 30)
+        final long minutes = MINUTES.between(now, request.getMeetingDate());
+        if (now.isAfter(request.getMeetingDate()) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
