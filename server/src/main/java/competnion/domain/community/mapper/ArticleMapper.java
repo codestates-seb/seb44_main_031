@@ -49,7 +49,7 @@ public interface ArticleMapper {
                         .map(comment -> new CommentDto.Response(
                                 comment.getCommentId(),
                                 comment.getUser().getId(),
-                                comment.getUser().getUsername(),
+                                comment.getUser().getNickname(),
                                 comment.getBody(),
                                 comment.getCreatedAt()))
                         .collect(Collectors.toList());

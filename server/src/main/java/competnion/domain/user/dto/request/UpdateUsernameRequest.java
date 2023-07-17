@@ -12,5 +12,6 @@ public class UpdateUsernameRequest {
     @NotBlank
     private String password;
     @ValidUsername
-    private String newUsername;
+    @NotBlank
+    private String newNickname;
 }

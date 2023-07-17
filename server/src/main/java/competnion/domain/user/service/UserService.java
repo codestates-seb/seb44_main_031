@@ -58,11 +58,11 @@ public class UserService {
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
         checkMatchPassword(request.getPassword(), user.getPassword());
 
-        if (userRepository.findByUsername(request.getNewUsername()).isPresent())
+        if (userRepository.findByNickname(request.getNewNickname()).isPresent())
             throw new BusinessLogicException((DUPLICATE_USERNAME));
 
-        user.updateUsername(request.getNewUsername());
-        return UpdateUsernameResponse.of(user.getUsername());
+        user.updateUsername(request.getNewNickname());
+        return UpdateUsernameResponse.of(user.getNickname());
     }
 
     public void resetPassword(final User user, final ResetPasswordRequest request) {
@@ -104,7 +104,7 @@ public class UserService {
     }
 
     public Boolean checkExistsUserByUsername(final String username) {
-        return userRepository.findByUsername(username).isEmpty();
+        return userRepository.findByNickname(username).isEmpty();
     }
 
     public Boolean checkExistsUserByEmail(final String email) {
@@ -128,7 +128,7 @@ public class UserService {
     ) {
         userRepository.save(User.signUp()
                 .email(request.getEmail())
-                .username(request.getUsername())
+                .nickname(request.getUsername())
                 .password(encode)
                 .address(request.getAddress())
                 .point(point)

@@ -31,7 +31,7 @@ public class UserResponse {
 
     public static UserResponse of(User user, List<PetResponse> pets) {
         return new UserResponse(
-                user.getUsername(),
+                user.getNickname(),
                 user.getAddress(),
                 user.getImgUrl(),
                 user.getLatitude(),
@@ -56,7 +56,7 @@ public class UserResponse {
     public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
             return new UserResponse.InArticleResponse(
                     user.getId(),
-                    user.getUsername(),
+                    user.getNickname(),
                     user.getImgUrl(),
                     pets
             );
