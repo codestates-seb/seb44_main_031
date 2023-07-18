@@ -99,9 +99,9 @@ public class User extends BaseEntity {
         this.id = id;
     }
 
-    public void nicknameToDetails(final String nickname) {
-        hasText(nickname, "nickname must not be empty");
-        this.nickname = nickname;
+    public void emailToDetails(final String email) {
+        hasText(email, "nickname must not be empty");
+        this.email = email;
     }
 
     public void passwordToDetails(final String password) {
