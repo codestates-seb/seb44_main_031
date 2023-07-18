@@ -55,7 +55,6 @@ public class ArticleResponseDto {
 
                 private List<String> imageUrls;
                 private Long articleId;
-                private String username;
                 private String title;
                 private String body;
                 private LocalDateTime date;
@@ -71,7 +70,6 @@ public class ArticleResponseDto {
                         return new OfSingleResponse(
                                 imageUrls,
                                 article.getId(),
-                                article.getUser().getNickname(),
                                 article.getTitle(),
                                 article.getBody(),
                                 article.getDate(),

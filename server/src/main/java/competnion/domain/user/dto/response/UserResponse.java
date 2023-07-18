@@ -46,7 +46,7 @@ public class UserResponse {
     @AllArgsConstructor
     public static class InArticleResponse {
 
-        private long id;
+        private long userId;
         private String username;
         private String imgUrl;
         private List<PetResponse.ForArticleResponse> pets;
