@@ -12,9 +12,9 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class ArticleResponse {
     private String title;
-    private LocalDateTime date;
+    private LocalDateTime startDate;
 
     public static ArticleResponse of(ArticleQueryDto articleQueryDto) {
-        return new ArticleResponse(articleQueryDto.getTitle(), articleQueryDto.getDate());
+        return new ArticleResponse(articleQueryDto.getTitle(), articleQueryDto.getStartDate());
     }
 }

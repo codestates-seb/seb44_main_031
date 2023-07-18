@@ -58,12 +58,16 @@ public class PetResponse {
     @AllArgsConstructor
     public static class ForArticleResponse {
 
-       private String name;
+        private String name;
+        private boolean gender;
 
 
-       public static PetResponse.ForArticleResponse getSimplePetName(Pet pet) {
-           return new ForArticleResponse(pet.getName());
-       }
+        public static PetResponse.ForArticleResponse getSimplePetName(Pet pet) {
+            return new ForArticleResponse(
+                    pet.getName(),
+                    pet.getGender()
+            );
+        }
 
     }
 

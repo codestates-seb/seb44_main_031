@@ -53,7 +53,7 @@ public class UserResponse {
 
 
 
-    public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
+        public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
             return new UserResponse.InArticleResponse(
                     user.getId(),
                     user.getNickname(),
@@ -62,6 +62,22 @@ public class UserResponse {
             );
         }
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class OfMultiArticleResponse {
+        private String address;
+        private Double latitude;
+        private Double longitude;
+
+        public static  UserResponse.OfMultiArticleResponse getResponse(User user) {
+            return new OfMultiArticleResponse(
+                    user.getAddress(),
+                    user.getLatitude(),
+                    user.getLongitude()
+            );
+        }
     }
 
 }

@@ -11,6 +11,8 @@ public class AttendRequest {
     private List<Long> petIds;
     private Long articleId;
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    private LocalDateTime meetingDate;
+    private LocalDateTime startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime endDate;
     private int attendant;
 }

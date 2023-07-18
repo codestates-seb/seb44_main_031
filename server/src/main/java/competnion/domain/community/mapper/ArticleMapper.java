@@ -4,6 +4,7 @@ import competnion.domain.comment.dto.CommentDto;
 import competnion.domain.comment.entity.Comment;
 import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.entity.Article;
+import competnion.domain.community.response.MultiArticleResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
@@ -37,21 +38,33 @@ public interface ArticleMapper {
         return new SingleArticleResponseDto(owner,articles,attendees);
     }
 
+
+//    default MultiArticleResponse articleToMultiArticleResponses(List<String> imgUrl, List<Article> articles, User user) {
+//
+//        List<ArticleResponseDto.OfMultiResponse> articlesInfo = articles.stream()
+//                .map(article -> ArticleResponseDto.getResponse(articles));
+//
+//        UserResponse.OfMultiArticleResponse userinfo = UserResponse.OfMultiArticleResponse.getResponse(user);
+//
+//
+//        return new MultiArticleResponse(,userinfo);
+//    }
+
     default List<PetResponse.ForArticleResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
         return pets.stream()
-                    .map(PetResponse.ForArticleResponse::getSimplePetName)
-                    .collect(Collectors.toList());
+                .map(PetResponse.ForArticleResponse::getSimplePetName)
+                .collect(Collectors.toList());
     }
 
 
     default List<CommentDto.Response> commentsToCommentResponses(List<Comment> comments) {
         return comments.stream()
-                        .map(comment -> new CommentDto.Response(
-                                comment.getCommentId(),
-                                comment.getUser().getId(),
-                                comment.getUser().getNickname(),
-                                comment.getBody(),
-                                comment.getCreatedAt()))
-                        .collect(Collectors.toList());
+                .map(comment -> new CommentDto.Response(
+                        comment.getCommentId(),
+                        comment.getUser().getId(),
+                        comment.getUser().getNickname(),
+                        comment.getBody(),
+                        comment.getCreatedAt()))
+                .collect(Collectors.toList());
     }
 }

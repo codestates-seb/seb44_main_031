@@ -15,6 +15,7 @@ public interface AttendRepository extends JpaRepository<Attend, Long>, AttendRep
     long countByArticleId(Long articleId);
 
     Optional<Attend> findByUserIdAndArticleId(Long userId, Long articleId);
+    List<Attend> findAllByArticleId(Long articleId);
 
     @Query (value = "select u from User u left join u.attends a "
                   + "on u.id = a.user.id "
