@@ -124,7 +124,7 @@ public class JwtTokenizer {
         Map<String,Object> claims = new HashMap<>();
         claims.put("userId",user.getId());
         claims.put("roles",user.getRoles());
-        claims.put("username",user.getNickname());
+        claims.put("username",user.getEmail());
         String subject = user.getEmail();
         Date expiration = getTokenExpiration(getAccessTokenExpirationMinutes());
         String encodedSecretKey = encodeBase64SecretKey(getSecretKey());

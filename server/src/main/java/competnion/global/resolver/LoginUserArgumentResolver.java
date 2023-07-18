@@ -29,7 +29,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String nickname = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByNickname(nickname).orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
     }
 }
