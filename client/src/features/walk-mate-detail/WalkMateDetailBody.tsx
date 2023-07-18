@@ -40,7 +40,7 @@ interface WalkMateDetailData {
   attendees: Attendee[];
 }
 
-const WalkMateDetailBody: React.FC = () => {
+const WalkMateDetailBody = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
 
@@ -51,7 +51,7 @@ const WalkMateDetailBody: React.FC = () => {
   const fetchComments = async () => {
     try {
       const response = await axios.get<Comment[]>(
-        'http://localhost:3001/walk-mate'
+        'http://localhost:3001/articles'
       );
       setComments(response.data);
     } catch (error) {
@@ -67,7 +67,7 @@ const WalkMateDetailBody: React.FC = () => {
     if (newComment.trim() !== '') {
       try {
         const response = await axios.post<Comment>(
-          'http://localhost:3001/walk-mate',
+          'http://localhost:3001/articles',
           {
             content: newComment,
           }
@@ -82,7 +82,7 @@ const WalkMateDetailBody: React.FC = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3001/walk-mate/${id}`);
+      await axios.delete(`http://localhost:3001/articles/${id}`);
       const updatedComments = comments.filter(
         (comment) => comment.commentId !== id
       );
@@ -139,11 +139,6 @@ const WalkMateDetailBody: React.FC = () => {
           <div className="TextBoxBody">{walkMateDetailData.post.body}</div>
         </TextBox>
         <UserCard />
-
-        <ButtonBox>
-          <button>참가하기</button>
-          <button>수정하기</button>
-        </ButtonBox>
 
         {walkMateDetailData.post.comments.map((comment) => (
           <Comment key={comment.commentId}>
@@ -211,24 +206,6 @@ const TextBox = styled.div`
     line-height: 1.6;
     font-size: 16px;
     color: #666666;
-  }
-`;
-
-const ButtonBox = styled.div`
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: var(--pink-400);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
   }
 `;
 

@@ -47,7 +47,7 @@ const WalkMateDetailHeader = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get<WalkMateData>(
-          `http://localhost:3001/walk-mate/`
+          'http://localhost:3001/articles/'
         );
         setWalkMateData(response.data);
       } catch (error) {

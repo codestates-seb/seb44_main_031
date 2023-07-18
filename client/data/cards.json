@@ -1,0 +1,138 @@
+{
+  "articles": {
+    "owner": {
+      "userId": 1,
+      "username": "JohnDoe",
+      "userimUrl": "/src/assets/Profile.png",
+      "pets": [
+        {
+          "petImUrl": "강아지 이미지.png",
+          "petName": "아롱"
+        },
+        {
+          "petImUrl": "강아지 이미지2.png",
+          "petName": "다롱"
+          
+        }
+      ]
+    },
+    "article": {
+      "articleId": 1,
+      "title": "산책 장소 수정합니다",
+      "body": "호수 공원에 1시간 정도 같이 산책 다녀오실 분 계신가요?",
+      "location": "일산 호수 공원",
+      "attendants": 3,
+      "date": "2023-07-11 15:00:00",
+      "comments": [
+        {
+          "commentId": 1,
+          "userId": 2,
+          "username": "Kevin",
+          "commentContent": "참여 눌렀습니다, 이따봐요!",
+          "createdAt": "2023-07-11 15:00:00"
+        }
+      ]
+    },
+    "attendees": [
+      {
+        "userId": 1,
+        "username": "JohnDoe",
+        "userimUrl": "/src/assets/Undefined.png",
+        "pets": [
+          {
+           
+            "petName": "아롱",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "boy"
+          },
+          {
+            
+            "petName": "다롱",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "boy"
+          }
+        ]
+      },
+      {
+        "userId": 2,
+        "username": "Huni",
+        "userimUrl": "/src/assets/Undefined.png",
+        "pets": [
+          {
+            
+            "petName": "쫑이",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "girl"
+          },
+          {
+            
+            "petName": "해피",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "girl"
+          }
+        ]
+      },
+      {
+        "userId": 3,
+        "username": "micle",
+        "userimUrl": "/src/assets/Undefined.png",
+        "pets": [
+          {
+            
+            "petName": "쫑이",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "girl"
+          },
+          {
+            
+            "petName": "해피",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "boy"
+          }
+        ]
+      },
+      {
+        "userId": 4,
+        "username": "zun",
+        "userimUrl": "/src/assets/Undefined.png",
+        "pets": [
+          {
+            
+            "petName": "쫑이",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "boy"
+          },
+          {
+           
+            "petName": "해피",
+            "meetingDate" : "2023-07-13T16:23",
+            "gender": "girl"
+          }
+        ]
+      }
+    ]
+  },
+  "attendee-info": [
+    {
+      "petId": 1,
+      "petname": "민트",
+      "petimgUrl": "/src/assets/petmily-logo-pink.png"
+    },
+    {
+      "petId": 2,
+      "petname": "초코",
+      "petimgUrl": "/src/assets/petmily-logo-pink.png"
+    },
+    {
+      "petId": 3,
+      "petname": "딸기",
+      "petimgUrl": "/src/assets/petmily-logo-pink.png"
+    }
+  ]
+}
+
+
+
+
+
+
