@@ -9,11 +9,11 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-//@AllArgsConstructor
-//@Getter
-//public class MultiArticleResponse {
-//    private List <ArticleResponseDto.OfMultiResponse> article;
-//    private UserResponse.OfMultiArticleResponse userInfo;
-//
-//
-//}
+@AllArgsConstructor
+@Getter
+public class MultiArticleResponse {
+    private List <ArticleResponseDto.OfMultiResponse> article;
+    private UserResponse.OfMultiArticleResponse userInfo;
+
+
+}
