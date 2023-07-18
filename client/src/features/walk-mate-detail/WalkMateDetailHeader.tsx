@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-const WalkMateDetailHeader: React.FC = () => {
+const WalkMateDetailHeader = () => {
   return (
     <Container>
       <WalkMateDetailHeaderBox>

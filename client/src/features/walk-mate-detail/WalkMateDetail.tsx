@@ -1,11 +1,9 @@
-import React from 'react';
-
 import WalkMateDetailHeader from './WalkMateDetailHeader';
 import WalkMateDetailBody from './WalkMateDetailBody';
 import { styled } from 'styled-components';
 import WalkMateDetailSide from './WalkMateDetailSide';
 
-const WalkMateDetail: React.FC = () => {
+const WalkMateDetail = () => {
   return (
     <WalkMateDetailContainer>
       <WalkMateDetailHeader />
