@@ -4,7 +4,7 @@ import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import { styled } from 'styled-components';
 import useWalkMateForm from './hooks/useWalkMateForm';
 import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
-import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
+import { nowDateAfterSomeMinutes } from '../../utils/date-utils';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
 import { axiosInstance, postCreateArticleUrl } from '../../api/walkMateAxios';
@@ -80,6 +80,20 @@ const WalkMateCreate = () => {
       // 이미지 데이터
       formData.append('image', inputValue.image);
 
+      // 이미지 데이터
+      // const imageBlob = new Blob([inputValue.image], {
+      //   type: 'image/jpeg',
+      // });
+
+      // formData.append('image', imageBlob);
+
+      // 이미지 데이터
+      // const imageFile = new File([inputValue.image], 'image.jpg', {
+      //   type: 'image/jpeg',
+      // });
+
+      // formData.append('image', imageFile);
+
       // json 으로 보낼 blob 데이터
       const requestData = {
         title: inputValue.title,
@@ -87,7 +101,9 @@ const WalkMateCreate = () => {
         location: inputValue.walkAddress,
         latitude: inputValue.walkLocation.lat,
         longitude: inputValue.walkLocation.lng,
-        date: stringToDate(inputValue.date, inputValue.time),
+        // date: stringToDate(inputValue.date, inputValue.time),
+        startDate: `${inputValue.date}'T'${inputValue.time}`,
+        endDate: inputValue.duration,
         attendant: inputValue.attendant,
         petIds: inputValue.selectedPets,
       };
@@ -95,6 +111,9 @@ const WalkMateCreate = () => {
         type: 'application/json',
       });
       formData.append('request', blob);
+      console.log(requestData);
+      console.log(blob);
+      console.log(formData.getAll('request'), formData.getAll('image'));
 
       try {
         setIsLoading(true);
@@ -229,6 +248,29 @@ const WalkMateCreate = () => {
                 현재 시각의 30분 후 부터 선택 가능합니다.
               </p>
             )}
+          </div>
+          <div className="input-field">
+            <label htmlFor="duration">예상 소요 시간</label>
+            <select
+              id="duration"
+              name="selectedDuration"
+              className="input-field-duration"
+              value={inputValue.duration}
+              onChange={(e) => {
+                setInputValue({
+                  ...inputValue,
+                  duration: Number(e.target.value),
+                });
+              }}
+              required
+            >
+              <option value={30}>30분</option>
+              <option value={60}>1시간</option>
+              <option value={90}>1시간 30분</option>
+              <option value={120}>2시간</option>
+              <option value={150}>2시간 30분</option>
+              <option value={180}>3시간</option>
+            </select>
           </div>
         </div>
         <p className="notice-p notice-p-date">
@@ -450,5 +492,18 @@ const StyledForm = styled.form`
 
   .input-attendant-container {
     margin-top: 10px;
+  }
+
+  .input-field-duration {
+    font-size: 16px;
+    border: 1.5px solid var(--black-400);
+    border-radius: 15px;
+    padding: 10px;
+    width: 100%;
+
+    &:focus {
+      outline: 0;
+      border: 2px solid var(--pink-400);
+    }
   }
 `;

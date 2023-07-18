@@ -14,6 +14,7 @@ export interface FormDatas {
   date: string;
   initDate: string;
   time: string;
+  duration: number;
   attendant: number;
   location: { lat: number; lng: number };
   walkLocation: { lat: number; lng: number };
@@ -28,6 +29,7 @@ export interface Validations {
   body: boolean;
   date: boolean;
   time: boolean;
+  duration: boolean;
   attendant: boolean;
   location: boolean;
 }
@@ -56,6 +58,7 @@ const useWalkMateForm = () => {
     date: '',
     initDate: '',
     time: '',
+    duration: 60,
     attendant: 4,
     location: { lat: 33.450701, lng: 126.570667 },
     walkLocation: { lat: 33.450701, lng: 126.570667 },
@@ -70,6 +73,7 @@ const useWalkMateForm = () => {
     body: false,
     date: true,
     time: true,
+    duration: true,
     attendant: true,
     location: true,
   });
@@ -90,9 +94,9 @@ const useWalkMateForm = () => {
 
   useEffect(() => {
     // 유저가 페이지에 접속한 시점의 Date initial value
-    const thirtyMinLater = nowDateAfterSomeMinutes(30);
-    const stringFormatDate = dateToStringDate(thirtyMinLater);
-    const stringFormatTime = dateToStringTime(thirtyMinLater);
+    const fourtyMinLater = nowDateAfterSomeMinutes(40);
+    const stringFormatDate = dateToStringDate(fourtyMinLater);
+    const stringFormatTime = dateToStringTime(fourtyMinLater);
 
     setFormDatas((prev) => {
       return {
