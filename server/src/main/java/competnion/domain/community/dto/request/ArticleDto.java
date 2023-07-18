@@ -5,10 +5,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,8 +33,8 @@ public class ArticleDto {
         private String location;
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
         private LocalDateTime startDate;
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-        private LocalDateTime endDate;
+        @Pattern(regexp = "^(30|60|90|120|150|180)$")
+        private String endDate;
         private Integer attendant;
         private List<Long> petIds;
     }

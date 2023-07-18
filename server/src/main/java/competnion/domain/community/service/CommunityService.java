@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static competnion.domain.community.entity.ArticleStatus.CLOSED;
 import static competnion.global.exception.ExceptionCode.*;
+import static java.lang.Integer.parseInt;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
 @Service
@@ -71,6 +72,7 @@ public class CommunityService {
             final ArticlePostRequest request,
             final List<MultipartFile> images
     ) {
+        checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
         checkPet(user, request.getPetIds());
         checkValidMeetingDate(request);
         checkDuplicateOwnersMeetingDate(user, request);
@@ -88,7 +90,7 @@ public class CommunityService {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
         checkUserAlreadyAttended(user, article);
-        checkDuplicateAttendeeMeetingDate(user, request);
+        checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
         checkMeetingTimeClosed(request);
         checkNotArticleOwner(user, article);
         checkPet(user, request.getPetIds());
@@ -170,7 +172,7 @@ public class CommunityService {
     private void checkMeetingTimeClosed(final AttendRequest request) {
         final LocalDateTime now = LocalDateTime.now();
         final long minutes = MINUTES.between(now, request.getStartDate());
-        if (now.isAfter(request.getEndDate()) || minutes <= 30)
+        if (now.isAfter(request.getStartDate().plusMinutes(parseInt(request.getEndDate()))) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
@@ -199,21 +201,23 @@ public class CommunityService {
     }
 
     private void checkDuplicateOwnersMeetingDate(User user, ArticlePostRequest request) {
-        articleRepository.findDuplicateMeetingDate(user, request.getStartDate(), request.getEndDate());
+        articleRepository.findDuplicateMeetingDate(
+                user, request.getStartDate(), request.getStartDate().plusMinutes(parseInt(request.getEndDate())));
     }
 
-    private void checkDuplicateAttendeeMeetingDate(User user, AttendRequest request) {
-        attendRepository.findAttendeeDuplicateMeetingDate(user, request.getStartDate(), request.getEndDate());
+    private void checkDuplicateAttendeeMeetingDate(User user, LocalDateTime startDate, String endDate) {
+        attendRepository.findAttendeeDuplicateMeetingDate(
+                user, startDate, startDate.plusMinutes(parseInt(endDate)));
     }
 
     private void checkValidMeetingDate(ArticlePostRequest request) {
         LocalDateTime startDate = request.getStartDate().plusMinutes(29);
-        LocalDateTime endDate = request.getEndDate();
+        int endDate = parseInt(request.getEndDate());
 
         if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(25)))
             throw new BusinessLogicException(NOT_VALID_START_DATE);
 
-        if (startDate.plusMinutes(1).isAfter(endDate) || startDate.equals(endDate))
+        if (startDate.isAfter(startDate.plusMinutes(endDate)) || startDate.equals(startDate.plusMinutes(endDate)))
             throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
     }
 
@@ -250,7 +254,7 @@ public class CommunityService {
                 .point(coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude()))
                 .attendant(request.getAttendant())
                 .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
+                .endDate(request.getStartDate().plusMinutes(parseInt(request.getEndDate())))
                 .build());
     }
 
