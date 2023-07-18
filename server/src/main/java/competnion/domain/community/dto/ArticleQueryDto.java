@@ -13,20 +13,20 @@ import java.time.LocalDateTime;
 public class ArticleQueryDto {
     private Long articleId;
     private String title;
-    private LocalDateTime date;
+    private LocalDateTime startDate;
     private LocalDateTime createdAt;
 
     @QueryProjection
-    public ArticleQueryDto(String title, LocalDateTime date) {
+    public ArticleQueryDto(String title, LocalDateTime startDate) {
         this.title = title;
-        this.date = date;
+        this.startDate = startDate;
     }
 
     @QueryProjection
-    public ArticleQueryDto(Long articleId, String title, LocalDateTime date, LocalDateTime createdAt) {
+    public ArticleQueryDto(Long articleId, String title, LocalDateTime startDate, LocalDateTime createdAt) {
         this.articleId = articleId;
         this.title = title;
-        this.date = date;
+        this.startDate = startDate;
         this.createdAt = createdAt;
     }
 }

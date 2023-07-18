@@ -19,7 +19,6 @@ import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static competnion.domain.community.entity.ArticleStatus.CLOSED;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.time.temporal.ChronoUnit.MINUTES;
 
@@ -63,7 +62,6 @@ public class CommunityService {
         final Article article = getArticleByIdOrThrow(articleId);
         checkNotArticleOwner(user, article);
         checkUserAlreadyAttended(user, article);
-        // TODO : 강아지 리스트를 보여줄때, 참여가능한 강아지들만 보여줄지????
         return getPetResponses(user);
     }
     
@@ -74,6 +72,8 @@ public class CommunityService {
             final List<MultipartFile> images
     ) {
         checkPet(user, request.getPetIds());
+        checkValidMeetingDate(request);
+        checkDuplicateOwnersMeetingDate(user, request);
 
         final List<String> imageUrlList = s3Util.uploadImageList(images);
 
@@ -87,21 +87,44 @@ public class CommunityService {
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
+        checkUserAlreadyAttended(user, article);
+        checkDuplicateAttendeeMeetingDate(user, request);
         checkMeetingTimeClosed(request);
         checkNotArticleOwner(user, article);
-        checkUserAlreadyAttended(user, article);
         checkPet(user, request.getPetIds());
         checkSpaceForAttend(request);
 
         saveAttends(user, article, request.getPetIds());
     }
 
-    @Transactional
+    /**
+     * TODO : 1. 자 산책완료 버튼...
+     *        2. startDate 기준 30분부터 버튼 클릭가능(호스트만)
+     *        3. 호스트가 버튼을 안누를것을 대비하여 종료시간이 되면 30분 단위로 산책완료(스케줄러)
+     *        4. attend 테이블은 지우지말고 유저 참여 검증할때 closed된 아티클은 제외하면 될듯?...모르겠다.
+     */
+    public void close(final User user, final Long articleId) {
+        Article article = getArticleByIdOrThrow(articleId);
+        if (LocalDateTime.now().isBefore(article.getStartDate().plusMinutes(30)))
+            throw new BusinessLogicException(CAN_NOT_CLOSE);
+        article.updateStatus(CLOSED);
+
+        List<Pet> pets = petRepository.findAllByArticleId(articleId);
+        pets.forEach(pet -> pet.updateArticle(null));
+        article.getPets().clear();
+    }
+
+    public void closeScheduled() {
+        List<Article> articles = articleRepository.findArticlesOpen();
+        articles.forEach(article -> article.updateStatus(CLOSED));
+        articles.forEach(article -> ar);
+    }
+
     public void cancelAttend(User user, Long articleId) {
         /**
          * TODO : 1. 한번 취소하면 재참여 불가능
-                  2. 취소할때 산책 모임 20분전에는 취소 불가능
-                  3.
+         2. 취소할때 산책 모임 20분전에는 취소 불가능
+         3.
          */
     }
 
@@ -142,8 +165,8 @@ public class CommunityService {
 
     private void checkMeetingTimeClosed(final AttendRequest request) {
         final LocalDateTime now = LocalDateTime.now();
-        final long minutes = MINUTES.between(now, request.getMeetingDate());
-        if (now.isAfter(request.getMeetingDate()) || minutes <= 30)
+        final long minutes = MINUTES.between(now, request.getStartDate());
+        if (now.isAfter(request.getEndDate()) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
@@ -164,6 +187,30 @@ public class CommunityService {
             petService.checkPetMatchUser(user, pet);
             petService.checkValidPetOrThrow(pet);
         }
+    }
+
+    private void checkUserAlreadyAttended(final User user, final Article article) {
+        if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+    }
+
+    private void checkDuplicateOwnersMeetingDate(User user, ArticlePostRequest request) {
+        articleRepository.findDuplicateMeetingDate(user, request.getStartDate(), request.getEndDate());
+    }
+
+    private void checkDuplicateAttendeeMeetingDate(User user, AttendRequest request) {
+        attendRepository.findAttendeeDuplicateMeetingDate(user, request.getStartDate(), request.getEndDate());
+    }
+
+    private void checkValidMeetingDate(ArticlePostRequest request) {
+        LocalDateTime startDate = request.getStartDate().plusMinutes(29);
+        LocalDateTime endDate = request.getEndDate();
+
+        if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(30)))
+            throw new BusinessLogicException(NOT_VALID_START_DATE);
+
+        if (startDate.isAfter(endDate) || startDate.equals(endDate))
+            throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
     }
 
     private List<User> extractUserFromAttend(final long articleId) {
@@ -190,20 +237,16 @@ public class CommunityService {
                 .collect(Collectors.toList());
     }
 
-    private void checkUserAlreadyAttended(final User user, final Article article) {
-        if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
-            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
-    }
-
     private Article saveArticle(final User user, final ArticlePostRequest request) {
-        return articleRepository.save(Article.CreateArticle()
+        return articleRepository.save(Article.createArticle()
                 .user(user)
                 .title(request.getTitle())
                 .body(request.getBody())
                 .location(request.getLocation())
                 .point(coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude()))
                 .attendant(request.getAttendant())
-                .date(request.getDate())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
                 .build());
     }
 
