@@ -50,9 +50,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
         return cursorId == null ? null : article.id.gt(cursorId);
     }
 
-    private BooleanExpression cursorId(Long cursorId) {
-        return cursorId == null ? null : article.id.gt(cursorId);
-    }
 
     @Override
     public List<ArticleQueryDto> findAllByKeywordAndDistanceAndDays(
