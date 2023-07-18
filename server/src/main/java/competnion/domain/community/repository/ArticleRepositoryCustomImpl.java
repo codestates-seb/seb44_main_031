@@ -1,5 +1,6 @@
 package competnion.domain.community.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -42,6 +44,10 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
     private BooleanExpression days(int days) {
         return days == 7 ? article.startDate.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7)) : null;
+    }
+
+    private BooleanExpression cursorId(Long cursorId) {
+        return cursorId == null ? null : article.id.gt(cursorId);
     }
 
     private BooleanExpression cursorId(Long cursorId) {
@@ -122,6 +128,38 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
                 .limit(pageable.getPageSize())
                 .fetch();
+
+
+    @Override
+    public Page<Article> findArticlesByConditionsWithCursorPaging(
+                                                                    Long cursorId,
+                                                                    Point userPoint,
+                                                                    Double distance,
+                                                                    Pageable pageable) {
+
+        List<Article> articles = jpaQueryFactory
+                                .select(article)
+                                .from(article)
+                                .where(
+
+                                        cursorId(cursorId),
+
+
+                                        Expressions.numberTemplate(
+                                                Double.class,
+                                                "ST_Distance_Sphere({0}, {1})", userPoint, article.point
+                                        ).loe(distance),
+
+
+
+                                        article.date.after(LocalDateTime.now())
+
+
+
+                                )
+
+                                .limit(pageable.getPageSize())
+                                .fetch();
 
 
 

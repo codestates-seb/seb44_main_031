@@ -68,9 +68,15 @@ public class PetResponse {
                     pet.getGender()
             );
         }
+       private String name;
+       private boolean gender;
 
+
+       public static PetResponse.ForArticleResponse getSimplePetName(Pet pet) {
+           return new ForArticleResponse(
+                   pet.getName(),
+                   pet.getGender()
+           );
+       }
     }
-
-
-
 }
