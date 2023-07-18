@@ -117,7 +117,7 @@ public class CommunityService {
     public void closeScheduled() {
         List<Article> articles = articleRepository.findArticlesOpen();
         articles.forEach(article -> article.updateStatus(CLOSED));
-        articles.forEach(article -> ar);
+//        articles.forEach(article -> ar);
     }
 
     public void cancelAttend(User user, Long articleId) {

@@ -74,7 +74,7 @@ public class ArticleResponseDto {
                                 article.getUser().getNickname(),
                                 article.getTitle(),
                                 article.getBody(),
-                                article.getDate(),
+                                article.getStartDate(),
                                 article.getLocation(),
                                 article.getAttendant(),
                                 comments
@@ -101,19 +101,19 @@ public class ArticleResponseDto {
                 private Boolean isSelectedToJoinByViewer;
 
 
-                public static ArticleResponseDto.OfMultiResponse getResponse(List<String> imageUrls, Article article) {
-                        return new ArticleResponseDto.OfMultiResponse(
-                                imageUrls,
-                                article.getId(),
-                                article.getStartDate(),
-                                article.getEndDate(),
-                                article.getTitle(),
-                                article.getBody(),
-                                article.getLocation(),
-                                article.getAttendant(),
-                                article.getLefts(),
-                                article.getIselectedToJoinByViewer()
-                        );
-                }
+//                public static ArticleResponseDto.OfMultiResponse getResponse(List<String> imageUrls, Article article) {
+//                        return new ArticleResponseDto.OfMultiResponse(
+//                                imageUrls,
+//                                article.getId(),
+//                                article.getStartDate(),
+//                                article.getEndDate(),
+//                                article.getTitle(),
+//                                article.getBody(),
+//                                article.getLocation(),
+//                                article.getAttendant(),
+//                                article.getLefts(),
+//                                article.getIselectedToJoinByViewer()
+//                        );
+//                }
         }
 }
