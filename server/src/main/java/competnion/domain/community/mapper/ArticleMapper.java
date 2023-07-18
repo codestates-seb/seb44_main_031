@@ -27,7 +27,8 @@ public interface ArticleMapper {
 
 
         List<Pet> dogs = user.getPets().stream()
-                .filter(pet -> Objects.equals(pet.getArticle().getId(), article.getId()))
+                .filter(pet -> pet.getArticle() != null)
+                .filter(pet -> pet.getArticle().getId().equals(article.getId()))
                 .collect(Collectors.toList());
 
 
@@ -37,7 +38,10 @@ public interface ArticleMapper {
         ArticleResponseDto.OfSingleResponse articles = ArticleResponseDto.OfSingleResponse.getSingleResponse(imgUrl,article,commentsToCommentResponses(article.getComments()));
 
         List<UserResponse.InArticleResponse> attendees = users.stream()
-                .map(attendee -> UserResponse.InArticleResponse.getResponse(attendee,petsToPetSimpleNameResponse(attendee.getPets())))
+                .map(attendee -> UserResponse.InArticleResponse.getResponse(attendee,petsToPetSimpleNameResponse(attendee.getPets().stream()
+                        .filter(pet -> pet.getArticle() != null)
+                        .filter(pet -> pet.getArticle().getId().equals(article.getId()))
+                        .collect(Collectors.toList()))))
                 .collect(Collectors.toList());
 
 
