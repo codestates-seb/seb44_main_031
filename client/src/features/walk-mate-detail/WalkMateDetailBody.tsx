@@ -4,8 +4,40 @@ import UserCard from './UserCard';
 import axios from 'axios';
 
 interface Comment {
-  id: number;
-  content: string;
+  commentId: number;
+  userId: number;
+  username: string;
+  commentContent: string;
+  createdAt: string;
+}
+
+interface Owner {
+  userId: number;
+  username: string;
+  userimUrl: string;
+}
+
+interface Post {
+  postId: number;
+  title: string;
+  body: string;
+  location: string;
+  attendants: number;
+  createdAt: string;
+  modifiedAt: string;
+  comments: Comment[];
+}
+
+interface Attendee {
+  userId: number;
+  username: string;
+  userimUrl: string;
+}
+
+interface WalkMateDetailData {
+  owner: Owner;
+  post: Post;
+  attendees: Attendee[];
 }
 
 const WalkMateDetailBody = () => {
@@ -19,7 +51,7 @@ const WalkMateDetailBody = () => {
   const fetchComments = async () => {
     try {
       const response = await axios.get<Comment[]>(
-        'http://localhost:3001/comments'
+        'http://localhost:3001/articles'
       );
       setComments(response.data);
     } catch (error) {
@@ -35,7 +67,7 @@ const WalkMateDetailBody = () => {
     if (newComment.trim() !== '') {
       try {
         const response = await axios.post<Comment>(
-          'http://localhost:3001/comments',
+          'http://localhost:3001/articles',
           {
             content: newComment,
           }
@@ -50,12 +82,52 @@ const WalkMateDetailBody = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3001/comments/${id}`);
-      const updatedComments = comments.filter((comment) => comment.id !== id);
+      await axios.delete(`http://localhost:3001/articles/${id}`);
+      const updatedComments = comments.filter(
+        (comment) => comment.commentId !== id
+      );
       setComments(updatedComments);
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
+  };
+
+  const walkMateDetailData: WalkMateDetailData = {
+    owner: {
+      userId: 1,
+      username: 'JohnDoe',
+      userimUrl: 'imageURL',
+    },
+    post: {
+      postId: 1,
+      title: '산책 장소 수정합니다',
+      body: '호수 공원에 1시간 정도 같이 산책 다녀오실 분 계신가요?',
+      location: '일산 호수 공원',
+      attendants: 3,
+      createdAt: '2023-07-11 15:00:00',
+      modifiedAt: '2023-07-11 15:00:00',
+      comments: [
+        {
+          commentId: 1,
+          userId: 2,
+          username: 'Kevin',
+          commentContent: '참여 눌렀습니다, 이따봐요!',
+          createdAt: '2023-07-11 15:00:00',
+        },
+      ],
+    },
+    attendees: [
+      {
+        userId: 1,
+        username: 'JohnDoe',
+        userimUrl: 'default',
+      },
+      {
+        userId: 2,
+        username: 'Kevin',
+        userimUrl: 'imageURL',
+      },
+    ],
   };
 
   return (
@@ -63,30 +135,20 @@ const WalkMateDetailBody = () => {
       <WalkMateBodyContainer>
         <WalkDogImage src="/src/assets/Walkdog.png" alt="강아지사진" />
         <TextBox>
-          <div className="TextBoxTitle">간단한 소개! (글제목)</div>
-          <div className="TextBoxBody">
-            우리 콩이가 소형견 이다보니 대형견을 보면 무서워 해요 ㅠㅠ 그래서
-            사교성 좋은 강아지들이랑 산책하고 싶어요! (대형견도 사교성 좋은
-            강아지면 괜찮을것 같아요!) 매너좋은 반려견, 견주분들 이셨 으면
-            좋겠습니다.!
-          </div>
+          <div className="TextBoxTitle">{walkMateDetailData.post.title}</div>
+          <div className="TextBoxBody">{walkMateDetailData.post.body}</div>
         </TextBox>
         <UserCard />
 
-        <ButtonBox>
-          <button>참가하기</button>
-          <button>수정하기</button>
-        </ButtonBox>
-
-        {comments.map((comment) => (
-          <Comment key={comment.id}>
+        {walkMateDetailData.post.comments.map((comment) => (
+          <Comment key={comment.commentId}>
             <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
             <CommentContent>
-              <CommentAuthor>작성자 이름</CommentAuthor>
-              <CommentText>{comment.content}</CommentText>
+              <CommentAuthor>{comment.username}</CommentAuthor>
+              <CommentText>{comment.commentContent}</CommentText>
             </CommentContent>
             <CommentDeleteButton
-              onClick={() => handleCommentDelete(comment.id)}
+              onClick={() => handleCommentDelete(comment.commentId)}
             >
               삭제
             </CommentDeleteButton>
@@ -144,24 +206,6 @@ const TextBox = styled.div`
     line-height: 1.6;
     font-size: 16px;
     color: #666666;
-  }
-`;
-
-const ButtonBox = styled.div`
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-
-  button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    background-color: var(--pink-400);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
   }
 `;
 
