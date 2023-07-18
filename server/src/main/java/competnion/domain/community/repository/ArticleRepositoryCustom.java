@@ -33,4 +33,5 @@ public interface ArticleRepositoryCustom {
 
     void findDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);
     List<Article> findArticlesOpen();
+
 }

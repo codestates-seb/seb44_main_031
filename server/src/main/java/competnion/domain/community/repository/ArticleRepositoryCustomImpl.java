@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.QArticleQueryDto;
 import competnion.domain.community.entity.Article;
+import competnion.domain.community.entity.ArticleStatus;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +70,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point
                         ).loe(distance),
 
+                        article.articleStatus.eq(OPEN),
                         article.startDate.after(LocalDateTime.now())
                 )
 //                .orderBy(order(orderBy))

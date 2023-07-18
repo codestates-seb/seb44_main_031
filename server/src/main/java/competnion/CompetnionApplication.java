@@ -11,9 +11,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class CompetnionApplication {
 
-	static {
-		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");  // 추가
-	}
+//	static {
+//		System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");  // 추가
+//	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(CompetnionApplication.class, args);

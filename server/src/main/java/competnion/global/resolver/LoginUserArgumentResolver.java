@@ -14,6 +14,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.HashMap;
+
 import static competnion.global.exception.ExceptionCode.USER_NOT_FOUND;
 
 @Component
@@ -29,7 +31,8 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String nickname = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepository.findByNickname(nickname).orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("eeeeeeeemmmmmmmmmmmmmmaaaaaaaaaaaaaiiiiiiiiillllllll : " + email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
     }
 }
