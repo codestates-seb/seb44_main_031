@@ -1,0 +1,50 @@
+{
+  "articles-info": {
+    "success": "요청 성공!!!!!",
+    "result": {
+      "latitude": 37.5796,
+      "longitude": 126.977,
+      "pets": [
+        {
+          "id": 1,
+          "name": "민트",
+          "birth": null,
+          "gender": null,
+          "neutralization": null,
+          "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTbSCo3k2xLRynhS7ieetL888DL0h9hRxiVvqF8WjopIZ5TJsCdXXDOxeBlFVob7LZR4k&usqp=CAU",
+          "vaccine": null
+        },
+        {
+          "id": 2,
+          "name": "초코",
+          "birth": null,
+          "gender": null,
+          "neutralization": null,
+          "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRv6zt50rc9YX61OUe9DfmPSh8hgxkDWl6NxqAaaIaZm2e_4hKlL72RIvEIqeskPAkl860&usqp=CAU",
+          "vaccine": null
+        },
+        {
+          "id": 3,
+          "name": "콩이",
+          "birth": null,
+          "gender": null,
+          "neutralization": null,
+          "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9jm3s0paQxxgIYn29q0j5qyLd0USCPHktvg&usqp=CAU",
+          "vaccine": null
+        },
+        {
+          "id": 4,
+          "name": "별이",
+          "birth": null,
+          "gender": null,
+          "neutralization": null,
+          "imgUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8xZj0TKFWq_EUZ2w1eM2pPebY_s3qWwewAQ&usqp=CAU",
+          "vaccine": null
+        }
+      ]
+    }
+  },
+  "articles": {
+    "data": {}
+  }
+}

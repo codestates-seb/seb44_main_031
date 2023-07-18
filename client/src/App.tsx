@@ -8,6 +8,10 @@ import SignUp from './features/sign-up/SignUp';
 import SignIn from './features/sign-in/SignIn';
 import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
 import Main from './components/Main';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
+
 
 function App() {
   return (
@@ -27,6 +31,7 @@ function App() {
         </Route>
       </Routes>
       <Footer />
+      <ToastContainer autoClose={AUTO_CLOSE_MS_TIME} />
     </div>
   );
 }
