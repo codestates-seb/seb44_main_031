@@ -3,24 +3,19 @@ package competnion.domain.community.controller;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.response.ArticleResponse;
-import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
-import competnion.domain.community.entity.Article;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
-import competnion.global.security.interceptor.JwtParseInterceptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Validated
@@ -76,6 +70,22 @@ public class CommunityController {
     ) {
         communityService.cancelAttend(user, articleId);
         return Response.success();
+    }
+
+    // 산책 완료
+    @PostMapping("/close/{article-id}")
+    public Response<?> close(
+            @UserContext final User user,
+            @Positive @PathVariable("article-id") final Long articleId
+    ) {
+        communityService.close(user, articleId);
+        return Response.success();
+    }
+
+    @Scheduled(cron = "0 0/30 6-24 * * *", zone = "Asia/Seoul")
+    @GetMapping("/scheduled-close")
+    public void close() {
+        communityService.closeScheduled();
     }
 
     // 게시글 상세 조회

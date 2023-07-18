@@ -53,7 +53,7 @@ public class UserResponse {
 
 
 
-    public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
+        public static UserResponse.InArticleResponse getResponse(User user, List<PetResponse.ForArticleResponse> pets) {
             return new UserResponse.InArticleResponse(
                     user.getId(),
                     user.getNickname(),
@@ -79,5 +79,4 @@ public class UserResponse {
             );
         }
     }
-
 }

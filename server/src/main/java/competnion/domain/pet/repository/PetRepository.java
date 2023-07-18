@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface PetRepository extends JpaRepository<Pet, Long> {
     List<Pet> findAllByUserId(Long userId);
     Integer countByUserId(Long userId);
+
+    List<Pet> findAllByArticleId(Long articleId);
 }

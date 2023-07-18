@@ -39,7 +39,9 @@ public class Article extends BaseEntity {
     @NotNull
     private Point point;
     @Column(nullable = false)
-    private LocalDateTime date;
+    private LocalDateTime startDate;
+    @Column(nullable = false)
+    private LocalDateTime endDate;
     @Column(nullable = false)
     private int attendant;
     @Enumerated(STRING)
@@ -49,7 +51,7 @@ public class Article extends BaseEntity {
     private User user;
     @OneToMany(mappedBy = "article")
     private List<ArticleImage> images = new ArrayList<>();
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "article")
     private List<Pet> pets = new ArrayList<>();
 
 //    @OnDelete(action= OnDeleteAction.CASCADE)
@@ -68,15 +70,16 @@ public class Article extends BaseEntity {
 //        return Duration.between(date, now);
 //    }
 
-    @Builder(builderClassName = "CreateArticle", builderMethodName = "CreateArticle")
-    private Article(User user, String title, String body, String location, int attendant, LocalDateTime date, Point point) {
+    @Builder(builderMethodName = "createArticle")
+    private Article(User user, String title, String body, String location, int attendant, LocalDateTime startDate, LocalDateTime endDate, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
         this.attendant = attendant;
         this.location = location;
         this.point = point;
-        this.date = date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.articleStatus = OPEN;
     }
 
@@ -95,8 +98,8 @@ public class Article extends BaseEntity {
         if (updatedArticle.getLocation() != null) {
             this.location = updatedArticle.getLocation();
         }
-        if (updatedArticle.getDate() != null) {
-            this.date = updatedArticle.getDate();
+        if (updatedArticle.getStartDate() != null) {
+            this.startDate = updatedArticle.getStartDate();
         }
         if (updatedArticle.getAttendant() != 0) {
             this.attendant = updatedArticle.getAttendant();

@@ -30,7 +30,9 @@ public class ArticleDto {
         @NotBlank
         private String location;
         @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-        private LocalDateTime date;
+        private LocalDateTime startDate;
+        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+        private LocalDateTime endDate;
         private Integer attendant;
         private List<Long> petIds;
     }
