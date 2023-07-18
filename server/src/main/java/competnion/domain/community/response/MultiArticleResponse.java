@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class MultiArticleResponse {
-    private List <ArticleResponseDto.OfMultiResponse> article;
+//    private List <ArticleResponseDto.OfMultiResponse> article;
     private UserResponse.OfMultiArticleResponse userInfo;
 
 

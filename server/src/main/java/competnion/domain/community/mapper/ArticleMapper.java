@@ -39,16 +39,16 @@ public interface ArticleMapper {
     }
 
 
-    default MultiArticleResponse articleToMultiArticleResponses(List<String> imgUrl, List<Article> articles, User user) {
-
-        List<ArticleResponseDto.OfMultiResponse> articlesInfo = articles.stream()
-                .map(article -> ArticleResponseDto.getResponse(articles))
-
-        UserResponse.OfMultiArticleResponse userinfo = UserResponse.OfMultiArticleResponse.getResponse(user);
-
-
-        return new MultiArticleResponse(,userinfo);
-    }
+//    default MultiArticleResponse articleToMultiArticleResponses(List<String> imgUrl, List<Article> articles, User user) {
+//
+//        List<ArticleResponseDto.OfMultiResponse> articlesInfo = articles.stream()
+//                .map(article -> ArticleResponseDto.getResponse(articles))
+//
+//        UserResponse.OfMultiArticleResponse userinfo = UserResponse.OfMultiArticleResponse.getResponse(user);
+//
+//
+//        return new MultiArticleResponse(,userinfo);
+//    }
 
     default List<PetResponse.ForArticleResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
         return pets.stream()

@@ -85,37 +85,37 @@ public class ArticleResponseDto {
 
         }
 
-        @Getter
-        @AllArgsConstructor
-        public static class OfMultiResponse {
-
-                private List<String> imageUrls;
-                private Long articleId;
-                private LocalDateTime startDate;
-                private LocalDateTime endDate;
-                private String title;
-                private String body;
-                private String location;
-                private int attandant;
-                private int lefts;
-                private Boolean isSelectedToJoinByViewer;
-
-
-                public static ArticleResponseDto.OfMultiResponse getResponse(List<String> imageUrls, Article article) {
-                        return new ArticleResponseDto.OfMultiResponse(
-                                imageUrls,
-                                article.getId(),
-                                article.getStartDate(),
-                                article.getEndDate(),
-                                article.getTitle(),
-                                article.getBody(),
-                                article.getLocation(),
-                                article.getAttendant(),
-                                article.getLefts(),
-                                article.getIselectedToJoinByViewer()
-                        );
-                }
-        }
+//        @Getter
+//        @AllArgsConstructor
+//        public static class OfMultiResponse {
+//
+//                private List<String> imageUrls;
+//                private Long articleId;
+//                private LocalDateTime startDate;
+//                private LocalDateTime endDate;
+//                private String title;
+//                private String body;
+//                private String location;
+//                private int attandant;
+//                private int lefts;
+//                private Boolean isSelectedToJoinByViewer;
+//
+//
+//                public static ArticleResponseDto.OfMultiResponse getResponse(List<String> imageUrls, Article article) {
+//                        return new ArticleResponseDto.OfMultiResponse(
+//                                imageUrls,
+//                                article.getId(),
+//                                article.getStartDate(),
+//                                article.getEndDate(),
+//                                article.getTitle(),
+//                                article.getBody(),
+//                                article.getLocation(),
+//                                article.getAttendant(),
+//                                article.getLefts(),
+//                                article.getIselectedToJoinByViewer()
+//                        );
+//                }
+//        }
 }
 
 
