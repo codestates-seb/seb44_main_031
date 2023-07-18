@@ -117,7 +117,11 @@ public class CommunityService {
     public void closeScheduled() {
         List<Article> articles = articleRepository.findArticlesOpen();
         articles.forEach(article -> article.updateStatus(CLOSED));
-//        articles.forEach(article -> ar);
+
+        for (Article article : articles) {
+            article.getPets().forEach(pet -> pet.updateArticle(null));
+            article.getPets().clear();
+        }
     }
 
     public void cancelAttend(User user, Long articleId) {
@@ -206,10 +210,10 @@ public class CommunityService {
         LocalDateTime startDate = request.getStartDate().plusMinutes(29);
         LocalDateTime endDate = request.getEndDate();
 
-        if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(30)))
+        if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(25)))
             throw new BusinessLogicException(NOT_VALID_START_DATE);
 
-        if (startDate.isAfter(endDate) || startDate.equals(endDate))
+        if (startDate.plusMinutes(1).isAfter(endDate) || startDate.equals(endDate))
             throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
     }
 
