@@ -46,7 +46,7 @@ public class Article extends BaseEntity {
     private int attendant;
     @Enumerated(STRING)
     private ArticleStatus articleStatus;
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User user;
     @OneToMany(mappedBy = "article")

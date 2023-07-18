@@ -270,4 +270,9 @@ public class CommunityService {
             article.getImages().add(articleImage);
         }
     }
+
+    private List<Pet> extractJoiningPets(final Long userId, final Long articleId) {
+        return petRepository.findParticipatingPetsByUserIdAndArticleId(userId,articleId);
+    }
+
 }

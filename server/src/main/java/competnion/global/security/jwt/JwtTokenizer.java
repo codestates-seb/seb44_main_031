@@ -125,7 +125,7 @@ public class JwtTokenizer {
         claims.put("userId",user.getId());
         claims.put("roles",user.getRoles());
         claims.put("username",user.getEmail());
-        String subject = user.getEmail();
+        String subject = user.getNickname();
         Date expiration = getTokenExpiration(getAccessTokenExpirationMinutes());
         String encodedSecretKey = encodeBase64SecretKey(getSecretKey());
 

@@ -12,7 +12,9 @@ import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import org.mapstruct.Mapper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -21,12 +23,16 @@ public interface ArticleMapper {
 
     default SingleArticleResponseDto articleToSingleArticleResponse(List<String> imgUrl,Article article,List<User> users) {
 
-        User user = article.getUser();
+        User user = article.getUser(); // 작성자
 
 
-        UserResponse.InArticleResponse owner = UserResponse.InArticleResponse.getResponse(user, petsToPetSimpleNameResponse(user.getPets()));
+        List<Pet> dogs = user.getPets().stream()
+                .filter(pet -> Objects.equals(pet.getArticle().getId(), article.getId()))
+                .collect(Collectors.toList());
 
-        // petsTo ~~~ : List<PetResponse> : ["솜이","달래"
+
+        UserResponse.InArticleResponse owner = UserResponse.InArticleResponse.getResponse(user, petsToPetSimpleNameResponse(dogs));
+
 
         ArticleResponseDto.OfSingleResponse articles = ArticleResponseDto.OfSingleResponse.getSingleResponse(imgUrl,article,commentsToCommentResponses(article.getComments()));
 

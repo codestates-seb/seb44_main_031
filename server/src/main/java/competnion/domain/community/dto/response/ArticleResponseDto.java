@@ -19,7 +19,8 @@ public class ArticleResponseDto {
         private String username;
         private String title;
         private String body;
-        private LocalDateTime date;
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
         private String location;
         private int attendant;
         private List<String> imageUrls;
@@ -58,7 +59,8 @@ public class ArticleResponseDto {
                 private String username;
                 private String title;
                 private String body;
-                private LocalDateTime date;
+                private LocalDateTime startDate;
+                private LocalDateTime endDate;
                 private String location;
                 private int attendant;
                 private List<CommentDto.Response> comments;
@@ -75,6 +77,7 @@ public class ArticleResponseDto {
                                 article.getTitle(),
                                 article.getBody(),
                                 article.getStartDate(),
+                                article.getEndDate(),
                                 article.getLocation(),
                                 article.getAttendant(),
                                 comments

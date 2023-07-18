@@ -47,7 +47,7 @@ public class UserResponse {
     public static class InArticleResponse {
 
         private long userId;
-        private String username;
+        private String nickname;
         private String imgUrl;
         private List<PetResponse.ForArticleResponse> pets;
 
