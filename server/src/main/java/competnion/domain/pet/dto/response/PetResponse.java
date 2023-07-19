@@ -21,7 +21,6 @@ public class PetResponse {
     private Boolean gender;
     private Boolean neutralization;
     private String imgUrl;
-    private String vaccine;
     private String mbti;
     private String breedName;
 
@@ -40,7 +39,6 @@ public class PetResponse {
                 pet.getGender(),
                 pet.getNeutralization(),
                 pet.getImgUrl(),
-                pet.getVaccine(),
                 pet.getMbti(),
                 pet.getBreed().getName()
         );

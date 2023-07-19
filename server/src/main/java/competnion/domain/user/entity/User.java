@@ -115,12 +115,13 @@ public class User extends BaseEntity {
     }
 
     @Builder(builderMethodName = "signUp")
-    private User(final String nickname, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude) {
+    private User(final String nickname, final String email, final String password, final String address, final Point point, final List<String> roles, final Double latitude, final Double longitude, final String imgUrl) {
         hasText(nickname, "nickname must not be empty");
         hasText(email, "email must not be empty");
         hasText(password, "password must not be empty");
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
+        hasText(imgUrl, "imgUrl must not be empty");
         notNull(roles, "roles must not be null");
         this.nickname = nickname;
         this.email = email;
@@ -129,6 +130,7 @@ public class User extends BaseEntity {
         this.point = point;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.imgUrl = imgUrl;
         this.roles = roles;
     }
 }

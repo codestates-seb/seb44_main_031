@@ -65,7 +65,6 @@ public class PetService {
         ofNullable(updatePetInfoRequest.getName()).ifPresent(pet::updateName);
         ofNullable(updatePetInfoRequest.getBirth()).ifPresent(pet::updateBirth);
         ofNullable(updatePetInfoRequest.getNeutralization()).ifPresent(pet::updateNeutralization);
-        ofNullable(updatePetInfoRequest.getVaccine()).ifPresent(pet::updateVaccine);
         return pet;
     }
 
@@ -125,7 +124,6 @@ public class PetService {
                 .gender(request.getGender())
                 .neutralization(request.getNeutralization())
                 .imgUrl(imgUrl)
-                .vaccine(request.getVaccine())
                 .user(user)
                 .mbti(request.getMbti())
                 .breed(breed)
