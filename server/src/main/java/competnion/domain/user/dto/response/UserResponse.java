@@ -20,17 +20,9 @@ public class UserResponse {
     private Double longitude;
     private List<PetResponse> pets;
 
-    private UserResponse(String username, String address, String imgUrl, Double latitude, Double longitude, List<PetResponse> pets) {
-        this.username = username;
-        this.address = address;
-        this.imgUrl = imgUrl;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.pets = pets;
-    }
-
     public static UserResponse of(User user, List<PetResponse> pets) {
         return new UserResponse(
+                user.getId(),
                 user.getNickname(),
                 user.getAddress(),
                 user.getImgUrl(),

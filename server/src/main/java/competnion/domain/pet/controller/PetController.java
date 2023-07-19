@@ -55,11 +55,8 @@ public class PetController {
 
     // 펫 삭제
     @DeleteMapping
-    public Response<?> deletePet(
-            @UserContext                      final User user,
-            @Positive @PathVariable("pet-id") final Long petId
-    ) {
+    public Response<Void> deletePet(@UserContext final User user, @Positive @PathVariable("pet-id") final Long petId) {
         petService.deletePet(user, petId);
-       return Response.success();
+        return Response.success();
     }
 }
