@@ -11,10 +11,21 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+// import axios from 'axios';
 
 const queryClient = new QueryClient();
 
 function App() {
+  // axios.get(
+  //   'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/articles/writer-info',
+  //   {
+  //     headers: {
+  //       Authorization:
+  //         'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sInVzZXJJZCI6MSwidXNlcm5hbWUiOiJwYWxrajI1ODA0NzdAbmF2ZXIuY29tIiwic3ViIjoicGFsa2oyNTgwNDc3QG5hdmVyLmNvbSIsImlhdCI6MTY4OTY3NTczNCwiZXhwIjoxNjkwMDM1NzM0fQ.E40oqA8eIADSjL3U3PNYqX60cA_ytJLzz44OkpYHKcE',
+  //     },
+  //   }
+  // );
+
   return (
     <QueryClientProvider client={queryClient}>
       <div>

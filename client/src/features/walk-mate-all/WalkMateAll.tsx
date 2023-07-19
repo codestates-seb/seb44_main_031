@@ -5,15 +5,38 @@ import WalkMateFilters from './WalkMateFilters';
 import WalkMatesHeader from './WalkMatesHeader';
 import { createContext } from 'react';
 import { IoIosArrowDropupCircle } from 'react-icons/io';
+// import { axiosInstance, getArticlesUrl } from '../../api/walkMateAxios';
+// import { useInfiniteQuery } from '@tanstack/react-query';
 
 const WalkMateAllContext = createContext<any>(null);
+const data = '1';
 
 const WalkMateAll = () => {
-  const data = '1';
-
   const handleScrollIconClick = () => {
     window.scrollTo(0, 0);
   };
+
+  // fetch data
+  // const fetchWalkMates = async ({ pageParam = 0 }) => {
+  //   return await axiosInstance.get(getArticlesUrl(pageParam));
+  // };
+
+  // const {
+  //   data,
+  //   error,
+  //   fetchNextPage,
+  //   hasNextPage,
+  //   isFetching,
+  //   isFetchingNextPage,
+  //   status,
+  // } = useInfiniteQuery({
+  //   queryKey: ['articles'],
+  //   queryFn: fetchWalkMates,
+  //   getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
+  // });
+
+  // return status === 'loading' && <p>Loading...</p>;
+  // return status === 'error' && <p>Error: {error.message}</p>;
 
   return (
     <WalkMateAllContext.Provider value={data}>

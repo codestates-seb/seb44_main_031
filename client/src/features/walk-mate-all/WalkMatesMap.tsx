@@ -112,13 +112,17 @@ const WalkMatesMap = () => {
         );
 
         // 스크롤을 해당 카드로 이동시킵니다
-        window.scrollTo(0, 100);
+        // window.scrollTo(0, 100);
+        const testId = window.document.getElementById('1');
+        testId?.scrollIntoView({ behavior: 'smooth' });
+        // testId?.setAttribute('$isSelected', "true");
       });
 
       // 각 산책카드의 div 에 id 를 설정하고
       // getElementById 로 해당 div 요소를 선택한다음 -> 해당 id 인지 어떻게 알지? id랑 articleId 를 같게 설정해야되겠다 article1. article2 이런식으로
       // div.scrollIntoView({ behavior: "smooth"}) 하면 될거같은데?
       // 선택된 articleId 를 상태값으로 들고 있어도 될듯
+      //
     }
 
     // 인포윈도우를 표시하는 클로저를 만드는 함수입니다

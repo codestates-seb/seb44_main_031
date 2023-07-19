@@ -2,10 +2,11 @@ import { styled } from 'styled-components';
 import { CiBookmark } from 'react-icons/ci';
 import { FiShare } from 'react-icons/fi';
 import { BsCheckCircleFill } from 'react-icons/bs';
+import { Link } from 'react-router-dom';
 
-const WalkMateCard = () => {
+const WalkMateCard = ({ id }: { id: string }) => {
   return (
-    <StyledCardContainer>
+    <StyledCardContainer id={id} to={`/walk-mate/${id}`} $isSelected={false}>
       <div className="article-image-container">
         <img src="/src/assets/Walkdog.png" alt="" className="article-image" />
       </div>
@@ -24,7 +25,7 @@ const WalkMateCard = () => {
         <StyledButtonsContainer>
           <StyledAttendingContainer>
             <BsCheckCircleFill fill="green" />
-            <span>참석 예정</span>
+            <span className="attending-meeting">참석 예정</span>
           </StyledAttendingContainer>
           <StyledBottomButtonsContainer>
             <FiShare className="share-icon" stroke-width="1" />
@@ -36,9 +37,14 @@ const WalkMateCard = () => {
   );
 };
 
-const StyledCardContainer = styled.div`
+interface StyledCardContainerProps {
+  readonly $isSelected: boolean;
+}
+
+const StyledCardContainer = styled(Link)<StyledCardContainerProps>`
   display: flex;
-  border: 1px solid var(--black-600);
+  border: ${({ $isSelected }) =>
+    $isSelected ? '1.5px solid var(--pink-400)' : '1px solid var(--black-600)'};
   border-radius: 20px;
   padding: 25px 20px;
   gap: 10px;
@@ -83,6 +89,7 @@ const StyledContentsContainer = styled.div`
   }
 
   .content-title {
+    color: var(--black-900);
     font-size: 14px;
     font-weight: 600;
   }
@@ -118,6 +125,7 @@ const StyledAttendingContainer = styled.div`
   align-items: center;
   gap: 2px;
 
+  color: var(--black-800);
   background-color: var(--black-100);
   border-radius: 15px;
   /* width: 40px; */
@@ -139,10 +147,12 @@ const StyledBottomButtonsContainer = styled.div`
   .share-icon {
     width: 16px;
     height: 16px;
+    color: var(--black-800);
   }
   .bookmark-off-icon {
     width: 16px;
     height: 16px;
+    color: var(--black-800);
   }
 `;
 

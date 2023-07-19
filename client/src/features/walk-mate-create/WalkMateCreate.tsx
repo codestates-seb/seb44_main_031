@@ -7,7 +7,12 @@ import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
 import { nowDateAfterSomeMinutes } from '../../utils/date-utils';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
-import { axiosInstance, postCreateArticleUrl } from '../../api/walkMateAxios';
+import {
+  axiosInstance,
+  isAxiosError,
+  postCreateArticleUrl,
+} from '../../api/walkMateAxios';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -78,21 +83,9 @@ const WalkMateCreate = () => {
       const formData = new FormData();
 
       // 이미지 데이터
-      formData.append('image', inputValue.image);
-
-      // 이미지 데이터
-      // const imageBlob = new Blob([inputValue.image], {
-      //   type: 'image/jpeg',
-      // });
-
-      // formData.append('image', imageBlob);
-
-      // 이미지 데이터
-      // const imageFile = new File([inputValue.image], 'image.jpg', {
-      //   type: 'image/jpeg',
-      // });
-
-      // formData.append('image', imageFile);
+      if (inputValue.image !== null) {
+        formData.append('image', inputValue.image);
+      }
 
       // json 으로 보낼 blob 데이터
       const requestData = {
@@ -101,36 +94,61 @@ const WalkMateCreate = () => {
         location: inputValue.walkAddress,
         latitude: inputValue.walkLocation.lat,
         longitude: inputValue.walkLocation.lng,
-        // date: stringToDate(inputValue.date, inputValue.time),
-        startDate: `${inputValue.date}'T'${inputValue.time}`,
+        startDate: `${inputValue.date}T${inputValue.time}`,
         endDate: inputValue.duration,
         attendant: inputValue.attendant,
         petIds: inputValue.selectedPets,
       };
-      const blob = new Blob([JSON.stringify(requestData)], {
+
+      const jsonBlob = new Blob([JSON.stringify(requestData)], {
         type: 'application/json',
       });
-      formData.append('request', blob);
+      formData.append('request', jsonBlob);
+
       console.log(requestData);
-      console.log(blob);
-      console.log(formData.getAll('request'), formData.getAll('image'));
+      console.log([...formData]);
 
       try {
         setIsLoading(true);
-        const response = await axiosInstance.post(postCreateArticleUrl, {
-          data: formData,
-        });
+        const response = await axiosInstance.post(
+          postCreateArticleUrl,
+          formData
+        );
+
         toast.success('산책 모집 글 등록 성공!');
         navigate(`/walk-mate/${response.data.result}`);
-      } catch (err: unknown) {
-        if (err instanceof AxiosError) {
-          toast.error(err.message);
+      } catch (error: unknown | Error | AxiosError) {
+        console.log(error);
+        if (isAxiosError(error)) {
+          if (error.response) {
+            const responseData: unknown = error.response.data;
+            const errorMessage: string = (responseData as { message: string })
+              .message;
+            // const errorMessage: string = error.response.data.message;
+            const status: number = error.response.status;
+
+            // Show the error message as a pop-up
+            toast.error(`${status}: ${errorMessage}`);
+          } else {
+            // Handle other types of errors (e.g., network error)
+            toast.error('An error occurred. Please try again later.');
+          }
+        } else {
+          // Handle other types of errors (e.g., network error)
+          toast.error('An error occurred. Please try again later.');
         }
+        // if (err instanceof Error) {
+        //   toast.error(err.message);
+        //   return;
+        // }
+        // if (isAxiosError(err)) {
+        //   toast.error(err.message);
+        // }
       } finally {
         // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
         await setTimeout(() => {
           setIsLoading(false);
-        }, 3000);
+        }, 2000);
       }
     }
   };
@@ -165,7 +183,7 @@ const WalkMateCreate = () => {
             type="file"
             id="image"
             name="image"
-            value={inputValue.image}
+            // value={inputValue.image}
             onChange={handleImageChange}
             accept="image/png, image/jpeg"
             required
@@ -259,7 +277,7 @@ const WalkMateCreate = () => {
               onChange={(e) => {
                 setInputValue({
                   ...inputValue,
-                  duration: Number(e.target.value),
+                  duration: e.target.value,
                 });
               }}
               required
