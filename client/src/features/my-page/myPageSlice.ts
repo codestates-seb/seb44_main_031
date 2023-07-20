@@ -20,6 +20,8 @@ interface Profile {
       neutralization: boolean;
       imgUrl: string;
       breed: string;
+      breedName: string;
+
     }
   ];
 }
@@ -49,6 +51,8 @@ const initialState: UserState = {
         neutralization: true,
         imgUrl: 'string',
         breed: 'string',
+        breedName: 'string',
+
       },
     ],
   },
@@ -72,6 +76,8 @@ interface FetchUsersResponse {
         neutralization: boolean;
         imgUrl: string;
         breed: string;
+        breedName: string;
+
       }
     ];
   };
