@@ -18,7 +18,7 @@ const GlobalStyle = createGlobalStyle`
       --white: rgba(255, 255, 255, 1);
       --black: rgba(0, 0, 0, 1);
 
-      --pink-100: rgba(250, 203, 217, 1);
+      --pink-100: rgba(252, 246, 251, 1);
       --pink-200: rgba(250, 203, 217, 1);
       --pink-300: rgba(255, 170, 198, 1);
       --pink-400: rgba(255, 64, 129, 1);
