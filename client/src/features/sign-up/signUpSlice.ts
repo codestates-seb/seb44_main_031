@@ -5,8 +5,10 @@ import axios from 'axios';
 interface JoinData {
   username: string;
   email: string;
-  emailAuth: string;
   password: string;
+  latitude: number;
+  longitude: number;
+  address: string;
 }
 
 interface JoinResponse {
@@ -19,12 +21,14 @@ export const actionS = createAsyncThunk(
   async (data: JoinData) => {
     try {
       const result = await axios.post<JoinResponse>(
-        'http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/sign-up',
+        'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/sign-up',
         {
           username: data.username,
           email: data.email,
-          code: data.emailAuth,
           password: data.password,
+          latitude: data.latitude,
+          longitude: data.longitude,
+          address: data.address,
         }
       );
 
