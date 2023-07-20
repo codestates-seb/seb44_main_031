@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
@@ -7,7 +8,6 @@ interface LoginState {
   isLoggedIn: boolean;
   token: string;
   refreshToken: string;
-  id: string;
   userId: string;
   loginRejectReason: string;
 }
@@ -18,36 +18,48 @@ interface LoginData {
 }
 
 interface DecodedToken {
-  username: string;
-  memberId: string;
+  userId: any;
 }
 
 const initialState: LoginState = {
   isLoggedIn: false,
   token: '',
   refreshToken: '',
-  id: '',
   userId: '',
   loginRejectReason: '',
 };
-
-export const actionL = createAsyncThunk(
+interface ServerResponse {
+  accessToken: string;
+  userId: string;
+}
+export const actionL = createAsyncThunk<ServerResponse, LoginData>(
   'user/join',
   async (data: LoginData) => {
-    const response = await axios.post(
-      'http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/sign-in',
-      {
-        email: data.email,
-        password: data.password,
+    try {
+      const response = await axios.post(
+        'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/login',
+        {
+          email: data.email,
+          password: data.password,
+        }
+      );
+      console.log(response);
+      const authorizationHeader = response.headers['authorization'];
+      console.log(authorizationHeader);
+      if (!authorizationHeader) {
+        throw new Error('Authorization header not found in the response.');
       }
-    );
-    const accessToken = response.headers.authorization.slice(); // Extract JWT token
 
-    const userId = (jwt_decode(accessToken) as DecodedToken).username;
-    const userMemberId = (jwt_decode(accessToken) as DecodedToken).memberId;
+      const accessToken = authorizationHeader.slice();
+      const userId = (jwt_decode(accessToken) as DecodedToken).userId;
 
-    // Return the extracted token and user ID as an object
-    return { accessToken, userId, userMemberId };
+      // Return the extracted token and user ID as an object
+      return { accessToken, userId };
+    } catch (error) {
+      // 오류 발생 시 적절한 처리를 수행합니다.
+      console.log('오류 발생:', error);
+      throw error; // 오류를 다시 throw하여 reject 상태로 전달합니다.
+    }
   }
 );
 
@@ -60,7 +72,6 @@ export const loginSlice = createSlice({
         state.isLoggedIn = action.payload.isLoggedIn;
         state.token = action.payload.token;
         state.refreshToken = action.payload.refreshToken;
-        state.id = action.payload.id;
         state.userId = action.payload.userId;
         state.loginRejectReason = action.payload.loginRejectReason;
       },
@@ -69,8 +80,7 @@ export const loginSlice = createSlice({
         const isLoggedIn = localStorage.getItem('Token') ? true : false;
         const token = localStorage.getItem('Token') || '';
         const refreshToken = localStorage.getItem('refreshToken') || '';
-        const id = localStorage.getItem('Id') || '';
-        const userId = localStorage.getItem('MemberId') || '';
+        const userId = localStorage.getItem('userId') || '';
         const loginRejectReason = '';
 
         return {
@@ -78,7 +88,6 @@ export const loginSlice = createSlice({
             isLoggedIn,
             token,
             refreshToken,
-            id,
             userId,
             loginRejectReason,
           },
@@ -91,20 +100,19 @@ export const loginSlice = createSlice({
       .addCase(actionL.pending, (state) => {
         state.isLoggedIn = false; // Reset login state
         state.token = ''; // Reset token
-        state.id = ''; // Reset id
         state.userId = '';
         state.loginRejectReason = ''; // Reset reject reason
       })
       .addCase(actionL.fulfilled, (state, action) => {
         state.isLoggedIn = true; // Update login state
         state.token = action.payload.accessToken; // Set token
-        state.id = action.payload.userId;
-        state.userId = action.payload.userMemberId;
+        state.userId = action.payload.userId;
       })
       .addCase(actionL.rejected, (state, action) => {
+        console.log(action.error);
         state.isLoggedIn = false; // Reset login state
         state.token = ''; // Reset token
-        state.id = ''; // Reset id
+        state.userId = ''; // Reset id
         state.loginRejectReason = action.error.message as string; // Set reject reason
       });
   },
