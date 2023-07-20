@@ -230,6 +230,7 @@ const SignUp: React.FC = () => {
           alert('회원가입 성공');
           navigate('/users/sign-in');
         } else {
+          console.log(resultAction);
           alert('비밀번호 아이디 이메일 인증을 모두 수행하쇼');
         }
       });
@@ -260,6 +261,7 @@ const SignUp: React.FC = () => {
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
           console.log(response);
+          alert('요청을 보냈습니다');
         })
         .catch((error) => {
           console.error(error);
@@ -279,6 +281,7 @@ const SignUp: React.FC = () => {
           // 이메일 인증에 대한 로직을 추가해주세요
           console.log(response);
           setValidCode(emailAuth);
+          alert('인증에 성공하셨습니다');
         })
         .catch((error) => {
           console.error(error);
@@ -313,7 +316,6 @@ const SignUp: React.FC = () => {
     console.log(data);
     console.log(data.roadAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     setAddress(data.address);
-    //여기서 goaddress할필요가 없음 유즈이펙트땜
   };
   const handleClick = () => {
     open({ onComplete: handleComplete });

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
-import userProfileImg from '/Users/jihoon/Desktop/메인/seb44_main_031/client/src/assets/Profile.png';
+import userProfileImg from '/src/assets/Profile.png';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -19,7 +19,7 @@ interface PetData {
   birth: string;
   gender: boolean;
   neutralization: boolean;
-  breed: number;
+  breedId: number;
   mbti: string;
   image: File | null;
 }
@@ -243,7 +243,7 @@ const Mypage = () => {
     birth: '',
     gender: true,
     neutralization: false,
-    breed: 1,
+    breedId: 1,
     mbti: '',
     image: null,
   });
@@ -418,15 +418,24 @@ const Mypage = () => {
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.currentTarget.files !== null) {
-      setPetData((prevData) => ({
-        ...prevData,
-        image: e.currentTarget?.files[0], // 이미지를 input에서 선택한 파일로 업데이트
-      }));
-      console.log(e.currentTarget.files[0]);
+    // if (e.currentTarget.files !== null) {
+    //   setPetData((prevData) => ({
+    //     ...prevData,
+    //     image: e.currentTarget?.files[0], // 이미지를 input에서 선택한 파일로 업데이트
+    //   }));
+    //   console.log(e.currentTarget.files[0]);
+    //   console.log('이미지바뀜');
+
+    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
+    const files = e.currentTarget.files;
+    if (files !== null && files.length > 0) {
+      setPetData((prevData) => {
+        console.log('setPetData 실행됨');
+        return { ...prevData, image: files[0] };
+      });
+      console.log(files[0]);
       console.log('이미지바뀜');
     }
-    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
   };
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -437,8 +446,15 @@ const Mypage = () => {
 
     if (type === 'checkbox') {
       inputValue = (event.target as HTMLInputElement).checked; // 타입 캐스팅
-      if (name === 'gender' || name === 'neutralization') {
+      if (name === 'neutralization') {
         inputValue = inputValue === true; // 서버에서 문자열로 반환되는 경우 'true'를 boolean 값으로 변환
+      }
+    } else if (type === 'radio') {
+      // 선택된 라디오 버튼 값으로 변환
+      if (value === 'male') {
+        inputValue = true; // 서버에서 문자열로 반환되는 경우 'true'를 boolean 값으로 변환
+      } else if (value === 'female') {
+        inputValue = false;
       }
     }
     setPetData((prevData) => ({
@@ -452,13 +468,14 @@ const Mypage = () => {
     event.persist;
     const formData = new FormData();
     formData.append('image', petData.image || '');
+    console.log(petData.image);
     const requestData = {
       name: petData.name,
       birth: petData.birth,
       mbti: petData.mbti,
       gender: petData.gender,
       neutralization: petData.neutralization,
-      breedId: Number(petData.breed),
+      breedId: Number(petData.breedId),
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
       type: 'application/json',
@@ -480,36 +497,26 @@ const Mypage = () => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
         console.log(response.data);
         petData.petId = response.data.result.id;
-        console.log(petData.petId);
+        console.log(petData);
+        setOpenAddPetModal(false);
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.error(error);
+        console.log(petData);
       });
   };
-
-  const handleModifySubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleDeletePetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    event.persist;
-    const formData = new FormData();
-    formData.append('image', petData.image || '');
-    const requestData = {
-      name: petData.name,
-      birth: petData.birth,
-      mbti: petData.mbti,
-      gender: petData.gender,
-      neutralization: petData.neutralization,
-      breedId: Number(petData.breed),
-    };
-    const jsonBlob = new Blob([JSON.stringify(requestData)], {
-      type: 'application/json',
-    });
-    formData.append('request', jsonBlob);
-    // 서버로 formData 전송
+    const petId = event.currentTarget.dataset.petid; // Get the petId from the clicked button
+    if (!petId) {
+      console.error('PetId not found.');
+      return;
+    }
+
     axios
-      .patch(
-        `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/pets/${petData.id}`,
-        formData,
+      .delete(
+        `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/pets/${petId}`,
         {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
@@ -518,7 +525,40 @@ const Mypage = () => {
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(petData.petId);
+        console.log(petId);
+        console.log(response.data);
+      })
+      .catch((error) => {
+        // 요청 처리 중에 에러가 발생했을 때 실행할 코드
+        console.log(petId);
+        console.error(error);
+      });
+  };
+
+  const handleModifySubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    event.persist;
+
+    // 서버로 formData 전송
+    axios
+      .patch(
+        `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/pets/information/${petData.id}`,
+        {
+          name: petData.name,
+          birth: petData.birth,
+          mbti: petData.mbti,
+          gender: petData.gender,
+          neutralization: petData.neutralization,
+          breedId: Number(petData.breedId),
+        },
+        {
+          headers: {
+            Authorization: localStorage.getItem('accessToken'),
+          },
+        }
+      )
+      .then((response) => {
+        // 요청이 성공적으로 처리되었을 때 실행할 코드
         console.log(response.data);
       })
       .catch((error) => {
@@ -529,6 +569,7 @@ const Mypage = () => {
         console.error(error);
       });
   };
+
   return (
     <Container>
       <UserContainer>
@@ -663,6 +704,9 @@ const Mypage = () => {
                 <PetImgRe>
                   <label htmlFor="userProfile">
                     <BsFillGearFill className="Gear" />
+                    <StyledButtonPink3D>
+                      선택한 이미지로 변경하기
+                    </StyledButtonPink3D>
                   </label>
                   <input
                     type="file"
@@ -674,9 +718,9 @@ const Mypage = () => {
                 <div>
                   <p>이름 : {pet.name}</p>
                   <p>강아지 mbti : {pet.mbti}</p>
-                  <p>견종 : {pet.breed}</p>
-                  <p>중성화 여부 : {pet.neutralization}</p>
-                  <p>성별 : {pet.gender}</p>
+                  <p>견종 : {pet.breedName}</p>
+                  <p>중성화 여부 : {pet.neutralization ? '했음' : '안했음'}</p>
+                  <p>성별 : {pet.gender ? '남자' : '여자'}</p>
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>
@@ -687,7 +731,12 @@ const Mypage = () => {
                     >
                       변경
                     </StyledButtonPink3D>
-                    <StyledButtonPink3D>삭제</StyledButtonPink3D>
+                    <StyledButtonPink3D
+                      data-petid={pet.id}
+                      onClick={handleDeletePetClick}
+                    >
+                      삭제
+                    </StyledButtonPink3D>
                   </div>
                 </PetSetting>
               </PetCard>
@@ -767,14 +816,36 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
-                      <InputField
-                        type="text"
-                        name="breed"
-                        id="breed"
-                        maxLength={8}
-                        value={petData.breed}
+                      <select
+                        name="breedId"
+                        id="breedId"
+                        value={petData.breedId}
                         onChange={handleInputChange}
-                      />
+                      >
+                        <option value="1">토이 푸들</option>
+                        <option value="2">미니어쳐 푸들</option>
+                        <option value="3">스탠다드 푸들</option>
+                        <option value="4">말티즈</option>
+                        <option value="5">골든 리트리버</option>
+                        <option value="6">시츄</option>
+                        <option value="7">시바 이누</option>
+                        <option value="8">포메라니안</option>
+                        <option value="9">웰시코기</option>
+                        <option value="10">비글</option>
+                        <option value="11">사모예드</option>
+                        <option value="12">닥스훈트</option>
+                        <option value="13">슈나우저</option>
+                        <option value="14">보더 콜리</option>
+                        <option value="15">허스키</option>
+                        <option value="16">코카 스파니엘</option>
+                        <option value="17">요크셔 테리어</option>
+                        <option value="18">그레이하운드</option>
+                        <option value="19">스피츠</option>
+                        <option value="20">치와와</option>
+                        <option value="21">믹스견</option>
+                        <option value="22">골든 리트리버</option>
+                        <option value="23">진돗개</option>
+                      </select>
                     </InputWrapper>
                   </InputContainer>
                 </div>
@@ -908,14 +979,36 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
-                      <InputField
-                        type="text"
-                        name="breed"
-                        id="breed"
-                        maxLength={8}
-                        value={petData.breed}
+                      <select
+                        name="breedId"
+                        id="breedId"
+                        value={petData.breedId}
                         onChange={handleInputChange}
-                      />
+                      >
+                        <option value="1">토이 푸들</option>
+                        <option value="2">미니어쳐 푸들</option>
+                        <option value="3">스탠다드 푸들</option>
+                        <option value="4">말티즈</option>
+                        <option value="5">골든 리트리버</option>
+                        <option value="6">시츄</option>
+                        <option value="7">시바 이누</option>
+                        <option value="8">포메라니안</option>
+                        <option value="9">웰시코기</option>
+                        <option value="10">비글</option>
+                        <option value="11">사모예드</option>
+                        <option value="12">닥스훈트</option>
+                        <option value="13">슈나우저</option>
+                        <option value="14">보더 콜리</option>
+                        <option value="15">허스키</option>
+                        <option value="16">코카 스파니엘</option>
+                        <option value="17">요크셔 테리어</option>
+                        <option value="18">그레이하운드</option>
+                        <option value="19">스피츠</option>
+                        <option value="20">치와와</option>
+                        <option value="21">믹스견</option>
+                        <option value="22">골든 리트리버</option>
+                        <option value="23">진돗개</option>
+                      </select>
                     </InputWrapper>
                   </InputContainer>
                 </div>
