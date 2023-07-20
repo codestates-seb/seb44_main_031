@@ -20,8 +20,14 @@ export const signInUrl = '/users/sign-in';
 export const getCreateArticleUrl = 'articles/writer-info';
 export const postCreateArticleUrl = 'articles';
 
-export const getArticlesUrl = (page: number, size = 15) =>
-  `articles?page=${page}&size=${size}`;
+export const getArticlesUrl = (
+  page: number,
+  size = 10,
+  selectedFilter: string
+) => {
+  console.log(selectedFilter);
+  return `articles?page=${page}&size=${size}`;
+};
 
 // axios default instance
 export const axiosInstance = axios.create({

@@ -1,3 +1,4 @@
+import React from 'react';
 import { styled } from 'styled-components';
 import { Link } from 'react-router-dom';
 import { myPageUrl } from '../../api/reactRouterUrl';
@@ -47,7 +48,12 @@ const customStyles = {
   }),
 };
 
-const WalkMateFilters = () => {
+interface WalkMateFiltersProps {
+  setSelectedFilter: React.Dispatch<React.SetStateAction<string>>;
+  // Add other prop types as needed
+}
+
+const WalkMateFilters = ({ setSelectedFilter }: WalkMateFiltersProps) => {
   const [period, setPeriod] = useState<Option | null>({
     value: 'whole-period',
     label: '전체 기간',
@@ -70,7 +76,10 @@ const WalkMateFilters = () => {
         theme={customTheme}
         styles={customStyles}
         isSearchable={false}
-        onChange={setPeriod}
+        onChange={(selectedOption) => {
+          setSelectedFilter(selectedOption?.value || '');
+          setPeriod(selectedOption);
+        }}
         defaultValue={period}
       />
       <Select

@@ -134,16 +134,6 @@ const useWalkMateForm = () => {
           toast.error('An error occurred. Please try again later.');
           setError('An error occurred. Please try again later.');
         }
-
-        // if (error instanceof AxiosError) {
-        //   setError(error.message);
-        //   toast.error(error.message);
-        //   return;
-        // }
-        // if (error instanceof Error) {
-        //   setError(error.message);
-        //   toast.error(error.message);
-        // }
       } finally {
         setIsPageLoading(false);
       }

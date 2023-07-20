@@ -1,41 +1,69 @@
+import React from 'react';
 import { styled } from 'styled-components';
 import { CiBookmark } from 'react-icons/ci';
 import { FiShare } from 'react-icons/fi';
 import { BsCheckCircleFill } from 'react-icons/bs';
 import { Link } from 'react-router-dom';
+import { Article } from './WalkMateAll';
 
-const WalkMateCard = ({ id }: { id: string }) => {
-  return (
-    <StyledCardContainer id={id} to={`/walk-mate/${id}`} $isSelected={false}>
-      <div className="article-image-container">
-        <img src="/src/assets/Walkdog.png" alt="" className="article-image" />
-      </div>
-      <StyledContentsContainer>
-        <p className="content-date">SUN, JUL 2 13:00 KST</p>
-        <p className="content-title">
-          북촌 한옥 마을 돌면서 강아시 산책하실분 구해요~
-        </p>
-        <p className="content-summary">
-          오후 1시에 미니스탑 편의점에서 만나서 애기들 산책하실...
-        </p>
-        <StyledAttendInfoContainer>
-          <span className="attendees">2 참석자</span>
-          <span className="left-attendants">2 자리 남음</span>
-        </StyledAttendInfoContainer>
-        <StyledButtonsContainer>
-          <StyledAttendingContainer>
-            <BsCheckCircleFill fill="green" />
-            <span className="attending-meeting">참석 예정</span>
-          </StyledAttendingContainer>
-          <StyledBottomButtonsContainer>
-            <FiShare className="share-icon" stroke-width="1" />
-            <CiBookmark className="bookmark-off-icon" stroke-width="0" />
-          </StyledBottomButtonsContainer>
-        </StyledButtonsContainer>
-      </StyledContentsContainer>
-    </StyledCardContainer>
-  );
+type ArticleProps = {
+  article: Article;
 };
+
+const WalkMateCard = React.forwardRef<HTMLElement, ArticleProps>(
+  ({ article }, ref: React.ForwardedRef<any>) => {
+    // const content = ref ? (
+    //   <StyledCardContainer
+    //     id={`${article.articleId}`}
+    //     to={`/walk-mate/${article.articleId}`}
+    //     $isSelected={false}
+    //     ref={ref}
+    //   ></StyledCardContainer>
+    // ) : (
+    //   <StyledCardContainer
+    //     id={`${article.articleId}`}
+    //     to={`/walk-mate/${article.articleId}`}
+    //     $isSelected={false}
+    //   ></StyledCardContainer>
+    // );
+
+    return (
+      <StyledCardContainer
+        id={`${article.articleId}`}
+        to={`/walk-mate/${article.articleId}`}
+        $isSelected={false}
+        ref={ref}
+      >
+        <div className="article-image-container">
+          <img src="/src/assets/Walkdog.png" alt="" className="article-image" />
+        </div>
+        <StyledContentsContainer>
+          <p className="content-date">SUN, JUL 2 13:00 KST</p>
+          <p className="content-title">
+            북촌 한옥 마을 돌면서 강아시 산책하실분 구해요~
+          </p>
+          <p className="content-summary">
+            오후 1시에 미니스탑 편의점에서 만나서 애기들 산책하실...
+          </p>
+          <StyledAttendInfoContainer>
+            <span className="attendees">2 참석자</span>
+            <span className="left-attendants">2 자리 남음</span>
+          </StyledAttendInfoContainer>
+          <StyledButtonsContainer>
+            <StyledAttendingContainer>
+              <BsCheckCircleFill fill="green" />
+              <span className="attending-meeting">참석 예정</span>
+            </StyledAttendingContainer>
+            <StyledBottomButtonsContainer>
+              <FiShare className="share-icon" stroke-width="1" />
+              <CiBookmark className="bookmark-off-icon" stroke-width="0" />
+            </StyledBottomButtonsContainer>
+          </StyledButtonsContainer>
+        </StyledContentsContainer>
+      </StyledCardContainer>
+    );
+  }
+);
 
 interface StyledCardContainerProps {
   readonly $isSelected: boolean;

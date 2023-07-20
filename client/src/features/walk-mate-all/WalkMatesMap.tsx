@@ -1,8 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useContext } from 'react';
 import {
   mapMarkerIconGreenPath,
   mapMarkerIconRedPath,
 } from '../../constants/imageSrcPath';
+import { WalkMateAllContext } from './WalkMateAll';
+
+const markerIdMap = new Map<kakao.maps.Marker, number>();
 
 const latitude = 37.58251737488069;
 const longitude = 126.98517705739235;
@@ -34,6 +37,9 @@ const positions = [
 const WalkMatesMap = () => {
   const mapRef = useRef<HTMLDivElement>(null);
 
+  const context = useContext(WalkMateAllContext);
+  console.log(context);
+
   useEffect(() => {
     const container = mapRef.current;
 
@@ -64,6 +70,9 @@ const WalkMatesMap = () => {
     const imageSrc = mapMarkerIconRedPath;
 
     // 여러개의 마커 생성하기
+    // data map 돌리는걸로 바꿔야함
+    // articleId를 markerIDMap.set(marker, articleId) 로 지정해야함
+
     for (let i = 0; i < positions.length; i++) {
       // 마커 이미지의 이미지 크기 입니다
       const imageSize = new kakao.maps.Size(24, 35);
@@ -78,6 +87,8 @@ const WalkMatesMap = () => {
         title: positions[i].location, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
         image: markerImage, // 마커 이미지
       });
+
+      markerIdMap.set(marker, i);
 
       // const iwRemoveable = true;
       // 마커에 표시할 인포윈도우를 생성합니다
@@ -102,6 +113,9 @@ const WalkMatesMap = () => {
 
       // 테스트
       kakao.maps.event.addListener(marker, 'click', function () {
+        // Get the corresponding ID from the markerIdMap
+        const markerId = markerIdMap.get(marker);
+
         // 마커 위에 인포윈도우를 표시합니다
         marker.setImage(
           new kakao.maps.MarkerImage(
@@ -113,7 +127,7 @@ const WalkMatesMap = () => {
 
         // 스크롤을 해당 카드로 이동시킵니다
         // window.scrollTo(0, 100);
-        const testId = window.document.getElementById('1');
+        const testId = window.document.getElementById(`card-${markerId}`);
         testId?.scrollIntoView({ behavior: 'smooth' });
         // testId?.setAttribute('$isSelected', "true");
       });
