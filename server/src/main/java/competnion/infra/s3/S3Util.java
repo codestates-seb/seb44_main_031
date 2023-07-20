@@ -105,9 +105,19 @@ public class S3Util {
         amazonS3Client.deleteObject(bucket, key);
     }
 
-    public void isFileAnImageOrThrow(final MultipartFile image) {
-        String fileExtension = FilenameUtils.getExtension(requireNonNull(image.getOriginalFilename()).toLowerCase());
-        if (!fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
+    public void isFileAnImageOrThrow(final List<MultipartFile> images) {
+        images.stream()
+                .map(image -> FilenameUtils.getExtension(
+                        requireNonNull(image.getOriginalFilename()).toLowerCase()))
+                .filter(fileExtension ->
+                        !fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
+                .forEach(fileExtension -> {
             throw new BusinessLogicException(INVALID_IMAGE_EXTENSION);
+        });
+    }
+
+    public void checkImageCount(final List<MultipartFile> images) {
+        long count = images.size();
+        if (count > 3) throw new BusinessLogicException(OVER_THE_IMAGE_MAX_LIST);
     }
 }

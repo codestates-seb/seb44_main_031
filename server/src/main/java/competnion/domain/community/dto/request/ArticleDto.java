@@ -17,7 +17,6 @@ import java.util.List;
 public class ArticleDto {
 
     @Getter
-    @Builder
     public static class ArticlePostRequest {
         @Length(min = 15, max = 100)
         @NotBlank

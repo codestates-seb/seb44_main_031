@@ -9,7 +9,6 @@ import competnion.domain.pet.repository.BreedRepository;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,21 +33,21 @@ public class PetService {
 
     public PetResponse registerPet(
             final User user,
-            final RegisterPetRequest registerPetRequest,
+            final RegisterPetRequest request,
             final MultipartFile image
     ) {
         checkSpaceForRegisterPetOrThrow(user.getId());
-        s3Util.isFileAnImageOrThrow(image);
+        s3Util.isFileAnImageOrThrow(List.of(image));
         String imgUrl = s3Util.uploadImage(image);
 
-        Breed breed = returnExistsBreedOrThrow(registerPetRequest.getBreedId());
-        Pet pet = savePet(user, registerPetRequest, imgUrl, breed);
+        Breed breed = returnExistsBreedOrThrow(request.getBreedId());
+        Pet pet = savePet(user, request, imgUrl, breed);
         user.addPet(pet);
         return PetResponse.of(pet);
     }
 
     public String updatePetImage(final User user, final Long petId, final MultipartFile image) {
-        s3Util.isFileAnImageOrThrow(image);
+        s3Util.isFileAnImageOrThrow(List.of(image));
         Pet pet = returnExistsPetOrThrow(petId);
         checkPetMatchUser(user, pet);
 
@@ -56,16 +55,19 @@ public class PetService {
         String imgUrl = s3Util.uploadImage(image);
         pet.updateImgUrl(imgUrl);
         return imgUrl;
-
     }
 
-    public Pet updatePetInfo(final User user, final Long petId, UpdatePetInfoRequest updatePetInfoRequest) {
+    public void updatePetInfo(final User user, final Long petId, UpdatePetInfoRequest request) {
         Pet pet = returnExistsPetOrThrow(petId);
+        Breed breed = returnExistsBreedOrThrow(request.getBreedId());
         checkPetMatchUser(user, pet);
-        ofNullable(updatePetInfoRequest.getName()).ifPresent(pet::updateName);
-        ofNullable(updatePetInfoRequest.getBirth()).ifPresent(pet::updateBirth);
-        ofNullable(updatePetInfoRequest.getNeutralization()).ifPresent(pet::updateNeutralization);
-        return pet;
+
+        ofNullable(request.getName()).ifPresent(pet::updateName);
+        ofNullable(request.getBirth()).ifPresent(pet::updateBirth);
+        ofNullable(request.getGender()).ifPresent(pet::updateGender);
+        ofNullable(request.getNeutralization()).ifPresent(pet::updateNeutralization);
+        ofNullable(breed).ifPresent(pet::updateBreed);
+        ofNullable(request.getMbti()).ifPresent(pet::updateMbti);
     }
 
     public void deletePet(User user, Long petId) {
