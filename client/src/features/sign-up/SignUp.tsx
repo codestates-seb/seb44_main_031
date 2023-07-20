@@ -1,11 +1,15 @@
 import { styled } from 'styled-components';
 import { useEffect, useCallback, useState } from 'react';
 import { useDaumPostcodePopup } from 'react-daum-postcode';
+import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { actionS } from './signUpSlice';
 // import { useDispatch } from 'react-redux';
 import { useAppDispatch } from '../../store/store';
+
+const ec2URL = 'ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -25,6 +29,16 @@ const Contents = styled.div`
   flex-direction: column;
   width: 30em;
 `;
+const Logo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  #logo {
+    width: 32px;
+    height: 37px;
+  }
+`;
 const SignUpForm = styled.div`
   display: flex;
   flex-direction: column;
@@ -34,6 +48,13 @@ const SignUpForm = styled.div`
   border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
+  ${StyledButtonPink3D} {
+    height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const InputUsername = styled.div`
   display: flex;
@@ -54,6 +75,14 @@ const InputUsername = styled.div`
     border-radius: 3px;
     padding: 0.6em 0.7em;
     color: #0c0d0e;
+  }
+  ${StyledButtonPink3D} {
+    height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
   }
 `;
 
@@ -109,7 +138,6 @@ const InputPW = styled.div`
 `;
 const InputAddress = styled.div`
   display: flex;
-  flex-direction: column;
   margin: 6px 0 6px;
 
   > div {
@@ -131,24 +159,26 @@ const InputAddress = styled.div`
 const EmailAuthForm = styled.div`
   display: flex;
   justify-content: space-between;
-  align-itme: center;
+  align-items: center;
 `;
 const IdCheckForm = styled.div`
   display: flex;
   justify-content: space-between;
-  align-itme: center;
+  align-items: center;
 `;
-const SignUp = () => {
+const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
   const [emailAuth, setEmailAuth] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [address, setAddress] = useState('');
   const [validId, setValidId] = useState('');
+  const [validCode, setValidCode] = useState('');
+  const [latitude, setLatitude] = useState(0);
+  const [longitude, setLongitude] = useState(0);
   const open = useDaumPostcodePopup(
     'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
   );
-  console.log(1);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const onChangeEamil = useCallback(
@@ -175,36 +205,57 @@ const SignUp = () => {
     },
     []
   );
-  // const goEmail =
+  //배포후 에러 처리 해보기
   const onSubmitJoin = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (validId !== username) {
+      if (validId === '') {
+        alert('중복확인을 하지 않았습니다');
+        return;
+      } else if (validId !== username) {
         alert('중복확인한 아이디와 일치하지 않습니다');
         return;
+      } else if (validCode !== emailAuth) {
+        alert(`인증번호 인증을 완료하지 않았습니다.`);
+      } else if (address === '') {
+        alert('서비스 이용 주소를 추가 하세요');
       }
-      console.log([username, email, emailAuth, password]);
-      dispatch(actionS({ username, email, emailAuth, password })).then(
-        (resultAction: any) => {
-          const { success } = resultAction.payload;
-          if (success === true) {
-            alert('회원가입 성공');
-            navigate('/users/sign-in');
-          } else {
-            alert('비밀번호 아이디 이메일 인증을 모두 수행하쇼');
-          }
+      console.log([username, email, password, latitude, longitude, address]);
+      dispatch(
+        actionS({ username, email, password, latitude, longitude, address })
+      ).then((resultAction: any) => {
+        const { success } = resultAction.payload;
+        console.log(resultAction.payload);
+        if (success === true) {
+          alert('회원가입 성공');
+          navigate('/users/sign-in');
+        } else {
+          alert('비밀번호 아이디 이메일 인증을 모두 수행하쇼');
         }
-      );
+      });
       // .catch((err) => console.log(err.message));
     },
-    [validId, username, email, emailAuth, password, dispatch, navigate]
+    [
+      validId,
+      username,
+      validCode,
+      emailAuth,
+      address,
+      email,
+      password,
+      latitude,
+      longitude,
+      dispatch,
+      navigate,
+    ]
   );
+  //배포후 에러 처리 해보기
   const goEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       axios
         .get(
-          `http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/emails?email=${email}`
+          `http://${ec2URL}/auth/sign-up/send-verification-email?email=${email}`
         )
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
@@ -217,17 +268,37 @@ const SignUp = () => {
     },
     [email]
   );
-  const goId = useCallback(
+  const checkEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       axios
         .get(
-          `http://ec2-52-79-240-48.ap-northeast-2.compute.amazonaws.com:8080/api/users/username?username=${username}`
+          `http://${ec2URL}/auth/verify-email?code=${emailAuth}&email=${email}`
         )
+        .then((response) => {
+          // 이메일 인증에 대한 로직을 추가해주세요
+          console.log(response);
+          setValidCode(emailAuth);
+        })
+        .catch((error) => {
+          console.error(error);
+          alert('인증번호가 틀렸습니다.');
+        });
+    },
+    [email, emailAuth]
+  );
+  //배포후 에러 처리 해보기
+  const goId = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      axios
+        .get(`http://${ec2URL}/auth/check-username?username=${username}`)
         .then((response) => {
           // 아이디 확인
           console.log(response);
+          console.log('id체크');
           setValidId(username);
+          alert('사용 가능한 닉네임 입니다');
         })
         .catch((error) => {
           console.error(error);
@@ -235,6 +306,7 @@ const SignUp = () => {
     },
     [username]
   );
+  //배포후 에러 처리 해보기
   const handleComplete = (data: any) => {
     console.log(1);
 
@@ -267,24 +339,6 @@ const SignUp = () => {
     //스크립트 읽기 완료 후 카카오맵 설정
     my_script.then(() => {
       console.log('script loaded!!!');
-      const kakao = (window as any)['kakao'];
-      kakao.maps.load(() => {
-        const mapContainer = document.getElementById('map');
-        const options = {
-          center: new kakao.maps.LatLng(37.56000302825312, 126.97540593203321), //좌표설정
-          level: 3,
-        };
-        const map = new kakao.maps.Map(mapContainer, options); //맵생성
-        //마커설정
-        const markerPosition = new kakao.maps.LatLng(
-          37.56000302825312,
-          126.97540593203321
-        );
-        const marker = new kakao.maps.Marker({
-          position: markerPosition,
-        });
-        marker.setMap(map);
-      });
     });
   }, []);
 
@@ -294,45 +348,24 @@ const SignUp = () => {
     if (address === '') {
       return;
     }
-    console.log('들어왔다');
-    console.log(address);
     console.log(2);
     const kakao = (window as any)['kakao'];
     kakao.maps.load(() => {
-      const mapContainer = document.getElementById('map');
-      const options = {
-        center: new kakao.maps.LatLng(37.55, 126.97540593203321), //좌표설정
-        level: 3,
-      };
-      const map = new kakao.maps.Map(mapContainer, options); //맵생성
-      //마커설정
       const geocoder = new kakao.maps.services.Geocoder();
       // 주소로 좌표를 검색합니다..
       //현재 새주소만 인정되는 문제가 있음
       geocoder.addressSearch(address, function (result: any[], status: any) {
         // 정상적으로 검색이 완료됐으면
         if (status === kakao.maps.services.Status.OK) {
-          const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
-          // 결과값으로 받은 위치를 마커로 표시합니다
-          const marker = new kakao.maps.Marker({
-            map: map,
-            position: coords,
-          });
-
-          // 인포윈도우로 장소에 대한 설명을 표시합니다
-          const infowindow = new kakao.maps.InfoWindow({
-            content:
-              '<div style="width:150px;color:red;text-align:center;padding:6px 0;">내가 썼지롱</div>',
-          });
-          infowindow.open(map, marker);
-
-          // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
-          map.setCenter(coords);
+          // const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+          setLatitude(result[0].y);
+          setLongitude(result[0].x);
+          console.log(latitude);
+          console.log(longitude);
         }
       });
     });
-  }, [address]);
+  }, [address, latitude, longitude]);
   useEffect(() => {
     goAddress();
   }, [goAddress]);
@@ -342,28 +375,41 @@ const SignUp = () => {
       <Contents>
         <form onSubmit={onSubmitJoin}>
           <SignUpForm>
+            <Logo>
+              <img src="/src/assets/petmily-logo-pink.png" alt="logo petmily" />
+            </Logo>
             <InputUsername>
               <div>닉네임</div>
               <IdCheckForm>
                 <input
-                  type="name"
+                  type="text"
                   id="signupusername"
                   placeholder="닉네임 만들기"
                   value={username}
                   onChange={onChangeDisplay}
+                  required
                 ></input>
-                <button onClick={goId}>중복 확인 발급</button>
+                <StyledButtonPink3D onClick={goId}>
+                  중복 확인 발급
+                </StyledButtonPink3D>
               </IdCheckForm>
             </InputUsername>
             <InputEmail>
               <div>E-mail</div>
-              <input
-                type="email"
-                id="loginEamil"
-                placeholder="이메일"
-                value={email}
-                onChange={onChangeEamil}
-              ></input>
+
+              <EmailAuthForm>
+                <input
+                  type="email"
+                  id="loginEamil"
+                  placeholder="이메일"
+                  value={email}
+                  onChange={onChangeEamil}
+                  required
+                ></input>
+                <StyledButtonPink3D onClick={goEmail}>
+                  인증번호 발급
+                </StyledButtonPink3D>
+              </EmailAuthForm>
               {/* <div onClick={goEmail}>이메일 인증</div> */}
             </InputEmail>
             <InputEmail>
@@ -375,8 +421,11 @@ const SignUp = () => {
                   placeholder="인증번호 입력"
                   value={emailAuth}
                   onChange={onChangeEamilAuth}
+                  required
                 ></input>
-                <button onClick={goEmail}>인증번호 발급</button>
+                <StyledButtonPink3D onClick={checkEmail}>
+                  인증번호 확인
+                </StyledButtonPink3D>
               </EmailAuthForm>
 
               {/* <div onClick={goEmail}>보내기</div> */}
@@ -389,6 +438,7 @@ const SignUp = () => {
                 placeholder="비밀번호"
                 value={password}
                 onChange={onChangePassword}
+                required
               ></input>
             </InputPW>
             <InputAddress>
@@ -401,14 +451,15 @@ const SignUp = () => {
                 placeholder="숭례문 도로명"
                 value={address}
                 readOnly
+                required
               ></input>
-              <button type="button" onClick={handleClick}>
+              <StyledButtonPink3D type="button" onClick={handleClick}>
                 Open
-              </button>
+              </StyledButtonPink3D>
             </InputAddress>
 
             <div>
-              <button>회원가입</button>
+              <StyledButtonPink3D>회원가입</StyledButtonPink3D>
             </div>
           </SignUpForm>
         </form>

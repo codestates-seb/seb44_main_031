@@ -7,6 +7,8 @@ import Footer from './components/Footer';
 import SignUp from './features/sign-up/SignUp';
 import SignIn from './features/sign-in/SignIn';
 import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
+import Mypage from './features/my-page/MyPage';
+import Form from './features/my-page/Form';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
         <Route path="users">
           <Route path="sign-up" element={<SignUp />} />
           <Route path="sign-in" element={<SignIn />} />
+          <Route path="mypage" element={<Mypage />} />
+          <Route path="test" element={<Form />} />
         </Route>
       </Routes>
       <Footer />
