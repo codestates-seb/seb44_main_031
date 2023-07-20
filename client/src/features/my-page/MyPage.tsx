@@ -19,7 +19,9 @@ interface PetData {
   birth: string;
   gender: boolean;
   neutralization: boolean;
+
   breedId: number;
+
   mbti: string;
   image: File | null;
 }
@@ -418,15 +420,7 @@ const Mypage = () => {
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
-    // if (e.currentTarget.files !== null) {
-    //   setPetData((prevData) => ({
-    //     ...prevData,
-    //     image: e.currentTarget?.files[0], // 이미지를 input에서 선택한 파일로 업데이트
-    //   }));
-    //   console.log(e.currentTarget.files[0]);
-    //   console.log('이미지바뀜');
 
-    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
@@ -436,6 +430,7 @@ const Mypage = () => {
       console.log(files[0]);
       console.log('이미지바뀜');
     }
+
   };
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -446,6 +441,7 @@ const Mypage = () => {
 
     if (type === 'checkbox') {
       inputValue = (event.target as HTMLInputElement).checked; // 타입 캐스팅
+
       if (name === 'neutralization') {
         inputValue = inputValue === true; // 서버에서 문자열로 반환되는 경우 'true'를 boolean 값으로 변환
       }
@@ -456,6 +452,7 @@ const Mypage = () => {
       } else if (value === 'female') {
         inputValue = false;
       }
+
     }
     setPetData((prevData) => ({
       ...prevData,
@@ -468,7 +465,9 @@ const Mypage = () => {
     event.persist;
     const formData = new FormData();
     formData.append('image', petData.image || '');
+
     console.log(petData.image);
+
     const requestData = {
       name: petData.name,
       birth: petData.birth,
@@ -476,6 +475,7 @@ const Mypage = () => {
       gender: petData.gender,
       neutralization: petData.neutralization,
       breedId: Number(petData.breedId),
+
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
       type: 'application/json',
@@ -497,6 +497,7 @@ const Mypage = () => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
         console.log(response.data);
         petData.petId = response.data.result.id;
+
         console.log(petData);
         setOpenAddPetModal(false);
       })
@@ -531,6 +532,7 @@ const Mypage = () => {
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.log(petId);
+
         console.error(error);
       });
   };
@@ -538,6 +540,7 @@ const Mypage = () => {
   const handleModifySubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.persist;
+
 
     // 서버로 formData 전송
     axios
@@ -551,6 +554,7 @@ const Mypage = () => {
           neutralization: petData.neutralization,
           breedId: Number(petData.breedId),
         },
+
         {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
@@ -558,7 +562,7 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        // 요청이 성공적으로 처리되었을 때 실행할 코드
+
         console.log(response.data);
       })
       .catch((error) => {
@@ -707,6 +711,7 @@ const Mypage = () => {
                     <StyledButtonPink3D>
                       선택한 이미지로 변경하기
                     </StyledButtonPink3D>
+
                   </label>
                   <input
                     type="file"
@@ -721,6 +726,7 @@ const Mypage = () => {
                   <p>견종 : {pet.breedName}</p>
                   <p>중성화 여부 : {pet.neutralization ? '했음' : '안했음'}</p>
                   <p>성별 : {pet.gender ? '남자' : '여자'}</p>
+
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>
@@ -731,12 +737,14 @@ const Mypage = () => {
                     >
                       변경
                     </StyledButtonPink3D>
+
                     <StyledButtonPink3D
                       data-petid={pet.id}
                       onClick={handleDeletePetClick}
                     >
                       삭제
                     </StyledButtonPink3D>
+
                   </div>
                 </PetSetting>
               </PetCard>
@@ -816,6 +824,7 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
+
                       <select
                         name="breedId"
                         id="breedId"
@@ -846,6 +855,7 @@ const Mypage = () => {
                         <option value="22">골든 리트리버</option>
                         <option value="23">진돗개</option>
                       </select>
+
                     </InputWrapper>
                   </InputContainer>
                 </div>
@@ -979,6 +989,7 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
+
                       <select
                         name="breedId"
                         id="breedId"

@@ -231,6 +231,7 @@ const SignUp: React.FC = () => {
           navigate('/users/sign-in');
         } else {
           console.log(resultAction);
+
           alert('비밀번호 아이디 이메일 인증을 모두 수행하쇼');
         }
       });
@@ -282,6 +283,7 @@ const SignUp: React.FC = () => {
           console.log(response);
           setValidCode(emailAuth);
           alert('인증에 성공하셨습니다');
+
         })
         .catch((error) => {
           console.error(error);
