@@ -45,16 +45,17 @@ public class PetController {
 
     // 펫 정보 수정(일괄)
     @PatchMapping("/information/{pet-id}")
-    public Response<?> updatePetInfo(
+    public Response<Void> updatePetInfo(
             @UserContext                      final User user,
             @Positive @PathVariable("pet-id") final Long petId,
             @Valid @RequestBody               final UpdatePetInfoRequest updatePetInfoRequest
     ) {
-        return Response.success(petService.updatePetInfo(user, petId, updatePetInfoRequest));
+        petService.updatePetInfo(user, petId, updatePetInfoRequest);
+        return Response.success();
     }
 
     // 펫 삭제
-    @DeleteMapping
+    @DeleteMapping("/{pet-id}")
     public Response<Void> deletePet(@UserContext final User user, @Positive @PathVariable("pet-id") final Long petId) {
         petService.deletePet(user, petId);
         return Response.success();

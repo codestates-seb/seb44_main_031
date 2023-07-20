@@ -88,6 +88,21 @@ public class Pet extends BaseEntity {
         this.article = article;
     }
 
+    public void updateGender(final Boolean gender) {
+        isInstanceOf(Boolean.class, gender, "Boolean expected");
+        this.gender = gender;
+    }
+
+    public void updateBreed(final Breed breed) {
+        notNull(breed, "breed must not be null");
+        this.breed = breed;
+    }
+
+    public void updateMbti(final String mbti) {
+        hasText(mbti, "mbti must not be empty");
+        this.mbti = mbti;
+    }
+
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
     private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final User user, final String mbti, final Breed breed) {
         hasText(name, "name must not be empty");

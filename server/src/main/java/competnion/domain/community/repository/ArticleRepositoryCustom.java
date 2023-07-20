@@ -23,6 +23,9 @@ public interface ArticleRepositoryCustom {
     List<ArticleQueryDto> findAllArticlesWrittenByUser(
             User user
     );
+    List<Article> findAllArticlesOpenWrittenByUser (
+            User user
+    );
 
     Page<Article> findArticlesByConditionsWithCursorPaging(
             Long cursorId,
