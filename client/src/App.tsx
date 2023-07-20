@@ -9,6 +9,10 @@ import SignIn from './features/sign-in/SignIn';
 import WalkMateDetail from './features/walk-mate-detail/WalkMateDetail';
 import Mypage from './features/my-page/MyPage';
 import Form from './features/my-page/Form';
+import Main from './components/Main';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
 
 function App() {
   return (
@@ -16,7 +20,7 @@ function App() {
       <GlobalStyle />
       <Header />
       <Routes>
-        <Route path="/" element={<p>초기화면 구현 테스트</p>} />
+        <Route path="/" element={<Main />} />
         <Route path="walk-mate">
           <Route path="all" element={<WalkMateAll />} />
           <Route path="create" element={<WalkMateCreate />} />
@@ -30,6 +34,7 @@ function App() {
         </Route>
       </Routes>
       <Footer />
+      <ToastContainer autoClose={AUTO_CLOSE_MS_TIME} />
     </div>
   );
 }
