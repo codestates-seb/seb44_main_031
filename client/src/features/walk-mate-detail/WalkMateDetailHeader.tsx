@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from 'styled-components';
-
+import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
 interface Owner {
   userId: number;
   username: string;
@@ -47,7 +47,12 @@ const WalkMateDetailHeader = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get<WalkMateData>(
-          'http://localhost:3001/articles/'
+          `${API_URL}/articles/${articleId}`,
+          {
+            headers: {
+              Authorization: AUTH_TOKEN,
+            },
+          }
         );
         setWalkMateData(response.data);
       } catch (error) {

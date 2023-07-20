@@ -1,45 +1,48 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { styled } from 'styled-components';
-
+import { useParams } from 'react-router-dom';
+import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
 interface Attendee {
-  userId: number;
+  id: number;
   username: string;
-  userimUrl: string;
+  imgUrl: string | null;
   pets: Pet[];
 }
 
 interface Pet {
-  petImUrl: string;
-  petName: string;
-  gender: string;
+  name: string;
+  gender: boolean;
 }
+
 interface AttendeeInfo {
   petname: string;
   petimgUrl: string;
   petId: number;
 }
+
 interface PetItemProps {
   readonly $isSelected: boolean;
 }
+
 const UserCard = () => {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo[]>([]);
+  const { articleId } = useParams<{ articleId: string }>();
 
-  //산책 상세페이지 get 요청
+  //산책 상세페이지 get 요청 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/articles');
+        const response = await axios.get(`${API_URL}/articles/${articleId}`, {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        });
 
-        const attendeesData = response.data.attendees;
-        if (attendeesData && attendeesData.length > 0) {
-          setAttendees(attendeesData);
-        } else {
-          console.error('받을 데이터가 존재하지 않습니다.', response.data);
-        }
+        setAttendees(response.data.attendees);
       } catch (error) {
         console.error('attendees 가져오는중 오류 발생:', error);
       }
@@ -47,18 +50,20 @@ const UserCard = () => {
 
     fetchData();
   }, []);
-  //참가하기 버튼을 눌렀을때 get 요청
+// 참가자 get 요청 
   useEffect(() => {
     const fetchAttendeeInfo = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/attendee-info');
+        const response = await axios.get<AttendeeInfo[]>(
+          `${API_URL}/articles/${articleId}`,
+          {
+            headers: {
+              Authorization: AUTH_TOKEN,
+            },
+          }
+        );
 
-        const attendeeInfoData = response.data;
-        if (attendeeInfoData && attendeeInfoData.length > 0) {
-          setAttendeeInfo(attendeeInfoData);
-        } else {
-          console.error('받을 데이터가 존재하지 않습니다.', response.data);
-        }
+        setAttendeeInfo(response.data);
       } catch (error) {
         console.error('attendee-info 가져오는 중 오류 발생:', error);
       }
@@ -82,12 +87,20 @@ const UserCard = () => {
       setSelectedPets([...selectedPets, petId]);
     }
   };
-
+// 강아지 데리고 갈 목록들 post
   const handleRegister = async () => {
     try {
-      await axios.post('http://localhost:3001/articles/attend', {
-        selectedPets,
-      });
+      await axios.post(
+        `${API_URL}/articles/attend/${articleId}`,
+        {
+          selectedPets,
+        },
+        {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        }
+      );
       console.log('등록이 완료되었습니다.');
 
       closeModal();
@@ -95,15 +108,13 @@ const UserCard = () => {
       console.error('등록 중 오류 발생:', error);
     }
   };
-  // api에서 gender에 따라 남여 이미지 다르게
-  const getPetImageUrl = (gender: string) => {
-    if (gender === 'boy') {
-      return '/src/assets/petmily-logo-white.png';
-    } else if (gender === 'girl') {
-      return '/src/assets/petmily-logo-pink.png';
-    }
 
-    return '/src/assets/petmily-logo-white.png';
+  const getPetImageUrl = (gender: boolean) => {
+    if (gender) {
+      return '/src/assets/petmily-logo-pink.png';
+    } else {
+      return '/src/assets/petmily-logo-white.png';
+    }
   };
 
   return (
@@ -112,7 +123,7 @@ const UserCard = () => {
         <UserCardRow>
           {attendees.map((attendee, index) => (
             <UserCardComponent key={index}>
-              <ProfileCard src={attendee.userimUrl} alt="프로필이미지" />
+              <ProfileCard src={attendee.imgUrl ?? undefined} alt="프로필이미지" />
               <Username>{attendee.username}</Username>
               <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
@@ -122,7 +133,7 @@ const UserCard = () => {
                       src={getPetImageUrl(pet.gender)}
                       alt="강아지 이미지"
                     />
-                    <PetName>{pet.petName}</PetName>
+                    <PetName>{pet.name}</PetName>
                   </PetInfo>
                 ))}
               </Tooltip>
@@ -292,6 +303,7 @@ const ButtonBox = styled.div`
     cursor: pointer;
   }
 `;
+
 const ModalContainer = styled.div`
   position: fixed;
   top: 0;

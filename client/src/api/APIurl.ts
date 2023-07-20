@@ -1,0 +1,2 @@
+export const API_URL = 'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
+export const AUTH_TOKEN = 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sInVzZXJJZCI6MSwidXNlcm5hbWUiOiJwYWxrajI1ODA0NzdAbmF2ZXIuY29tIiwic3ViIjoicGFsa2oyNTgwNDc3QG5hdmVyLmNvbSIsImlhdCI6MTY4OTc0NTAwNSwiZXhwIjoxNjkwMTA1MDA1fQ.uZXnevt48NxWaZfGv3ox3oyNEYB9coQs6aePS4V2zYY';

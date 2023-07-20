@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { styled } from 'styled-components';
+import { useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
+import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
 
 interface Comment {
   commentId: number;
@@ -9,15 +11,11 @@ interface Comment {
   username: string;
   commentContent: string;
   createdAt: string;
-}
-
-interface Owner {
-  userId: number;
-  username: string;
   userimUrl: string;
+  body:string
 }
 
-interface Post {
+interface Article {
   postId: number;
   title: string;
   body: string;
@@ -26,38 +24,34 @@ interface Post {
   createdAt: string;
   modifiedAt: string;
   comments: Comment[];
-}
-
-interface Attendee {
-  userId: number;
-  username: string;
-  userimUrl: string;
-}
-
-interface WalkMateDetailData {
-  owner: Owner;
-  post: Post;
-  attendees: Attendee[];
+  imageUrls: string[];
 }
 
 const WalkMateDetailBody = () => {
+  const { articleId } = useParams<{ articleId: string }>();
+
+  const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
 
   useEffect(() => {
-    fetchComments();
-  }, []);
-
-  const fetchComments = async () => {
-    try {
-      const response = await axios.get<Comment[]>(
-        'http://localhost:3001/articles'
-      );
-      setComments(response.data);
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    }
-  };
+    const fetchArticle = async () => {
+      try {
+        const response = await axios.get<Article>(
+          `${API_URL}/articles/${articleId}`,  {
+            headers: {
+              Authorization: AUTH_TOKEN,
+            },
+          }
+        );
+        setArticle(response.data.article);
+        setComments(response.data.comments || []);
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      }
+    };
+    fetchArticle();
+  }, []); 
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(e.target.value);
@@ -67,9 +61,14 @@ const WalkMateDetailBody = () => {
     if (newComment.trim() !== '') {
       try {
         const response = await axios.post<Comment>(
-          'http://localhost:3001/articles',
+          `${API_URL}/articles/${articleId}/comments`,
           {
             content: newComment,
+          },
+          {
+            headers: {
+              Authorization: AUTH_TOKEN,
+            },
           }
         );
         setComments([...comments, response.data]);
@@ -82,7 +81,14 @@ const WalkMateDetailBody = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3001/articles/${id}`);
+      await axios.delete(
+        `${API_URL}/articles/${articleId}/comments/${id}`,
+        {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        }
+      );
       const updatedComments = comments.filter(
         (comment) => comment.commentId !== id
       );
@@ -92,60 +98,27 @@ const WalkMateDetailBody = () => {
     }
   };
 
-  const walkMateDetailData: WalkMateDetailData = {
-    owner: {
-      userId: 1,
-      username: 'JohnDoe',
-      userimUrl: 'imageURL',
-    },
-    post: {
-      postId: 1,
-      title: '산책 장소 수정합니다',
-      body: '호수 공원에 1시간 정도 같이 산책 다녀오실 분 계신가요?',
-      location: '일산 호수 공원',
-      attendants: 3,
-      createdAt: '2023-07-11 15:00:00',
-      modifiedAt: '2023-07-11 15:00:00',
-      comments: [
-        {
-          commentId: 1,
-          userId: 2,
-          username: 'Kevin',
-          commentContent: '참여 눌렀습니다, 이따봐요!',
-          createdAt: '2023-07-11 15:00:00',
-        },
-      ],
-    },
-    attendees: [
-      {
-        userId: 1,
-        username: 'JohnDoe',
-        userimUrl: 'default',
-      },
-      {
-        userId: 2,
-        username: 'Kevin',
-        userimUrl: 'imageURL',
-      },
-    ],
-  };
-
   return (
     <BodyContainer>
       <WalkMateBodyContainer>
-        <WalkDogImage src="/src/assets/Walkdog.png" alt="강아지사진" />
-        <TextBox>
-          <div className="TextBoxTitle">{walkMateDetailData.post.title}</div>
-          <div className="TextBoxBody">{walkMateDetailData.post.body}</div>
-        </TextBox>
+        {article && (
+          <>
+            <WalkDogImage src={article.imageUrls[0]} alt="강아지사진" />
+            <TextBox>
+              <div className="TextBoxTitle">{article.title}</div>
+              <div className="TextBoxBody">{article.body}</div>
+            </TextBox>
+          </>
+        )}
         <UserCard />
 
-        {walkMateDetailData.post.comments.map((comment) => (
+        {article?.comments.map((comment) => (
           <Comment key={comment.commentId}>
-            <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
+            <UserProfileImage src={comment.userimUrl} alt="프로필 사진" />
+         
             <CommentContent>
               <CommentAuthor>{comment.username}</CommentAuthor>
-              <CommentText>{comment.commentContent}</CommentText>
+              <CommentText>{comment.body}</CommentText>
             </CommentContent>
             <CommentDeleteButton
               onClick={() => handleCommentDelete(comment.commentId)}
