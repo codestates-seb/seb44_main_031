@@ -75,6 +75,7 @@ public class PetService {
         checkPetMatchUser(user, pet);
         checkValidPetOrThrow(pet);
         petRepository.delete(pet);
+        user.getPets().remove(pet);
     }
 
     public Breed returnExistsBreedOrThrow(final Long breedId) {
