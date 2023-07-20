@@ -3,7 +3,6 @@ import { styled } from 'styled-components';
 import { useCallback, useState } from 'react';
 import { actionL } from './signInSlice';
 import { useAppDispatch } from '../../store/store';
-// import { userInfo } from '../slices/tokenSlice';
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -27,7 +26,7 @@ const Logo = styled.div`
     height: 37px;
   }
 `;
-const LoginForm = styled.div`
+const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
   background-color: white;
@@ -100,7 +99,7 @@ const Message = styled.div`
   }
 `;
 
-const SignIn: React.FC = () => {
+const SignIn = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const dispatch = useAppDispatch();
@@ -121,36 +120,33 @@ const SignIn: React.FC = () => {
   );
 
   const onSubmitJoin = useCallback(
-    (e: React.FormEvent) => {
+    async (e: React.FormEvent) => {
       e.preventDefault();
 
       console.log([email, password]);
-      dispatch(actionL({ email, password }))
-        .then((resultAction: any) => {
-          const { accessToken, userId, userMemberId } = resultAction.payload;
-
-          // Save the token and user ID
-          localStorage.setItem('Id', userId);
-          localStorage.setItem('Token', accessToken);
-          localStorage.setItem('MemberId', userMemberId);
-
-          navigate('/');
-        })
-        .catch((error: any) => {
-          console.log('로그인 에러:', error);
-          console.log(
-            '로그인에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.'
-          );
-        });
+      try {
+        const resultAction: any = await dispatch(actionL({ email, password }));
+        console.log(resultAction);
+        const { accessToken, userId } = resultAction.payload;
+        // Save the token and user ID
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('userId', userId);
+        navigate('/');
+      } catch (error: any) {
+        console.log('로그인 에러:', error);
+        console.log(
+          '로그인에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.'
+        );
+      }
     },
-    [dispatch, email, password, navigate]
+    [dispatch, email, navigate, password]
   );
 
   return (
     <Container>
       <Contents>
         <Logo>
-          <img src="/images/logo-simple.png" alt="logo stackflow" />
+          <img src="/src/assets/petmily-logo-pink.png" alt="logo petmily" />
         </Logo>
 
         <LoginForm onSubmit={onSubmitJoin}>
@@ -177,7 +173,7 @@ const SignIn: React.FC = () => {
             />
           </InputPassword>
           <div>
-            <button>로그인</button>
+            <button type="submit">로그인</button>
           </div>
         </LoginForm>
         <Message>

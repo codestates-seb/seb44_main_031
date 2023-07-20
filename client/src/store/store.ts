@@ -3,12 +3,16 @@ import counterReducer from './initSlice';
 import signUpReducer from '../features/sign-up/signUpSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import walkMateAllReducer from '../features/walk-mate-all/WalkMateAllSlice';
+import myPageReducer from '../features/my-page/myPageSlice';
+import signInReducer from '../features/sign-in/signInSlice';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const store = configureStore({
   reducer: {
     counter: counterReducer,
     signup: signUpReducer,
     walkMateAll: walkMateAllReducer,
+    signin: signInReducer,
+    mypage: myPageReducer,
   },
 });
 // export type useAppDispatch = typeof store.dispatch;
