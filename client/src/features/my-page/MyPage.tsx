@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
-import userProfileImg from '/Users/jihoon/Desktop/메인/seb44_main_031/client/src/assets/Profile.png';
+import userProfileImg from '../../assets/Profile.png';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -247,6 +247,8 @@ const Mypage = () => {
     mbti: '',
     image: null,
   });
+
+  console.dir(`petData ${petData.image}`);
   const navigate = useNavigate();
 
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
@@ -418,15 +420,25 @@ const Mypage = () => {
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.currentTarget.files !== null) {
-      setPetData((prevData) => ({
-        ...prevData,
-        image: e.currentTarget?.files[0], // 이미지를 input에서 선택한 파일로 업데이트
-      }));
-      console.log(e.currentTarget.files[0]);
+    // if (e.currentTarget.files !== null) {
+    //   setPetData((prevData) => {
+    //     console.log('setPetData 실행됨');
+    //     return { ...prevData, image: e.currentTarget?.files[0] }; // 이미지를 input에서 선택한 파일로 업데이트
+    //   });
+    //   console.log(e.currentTarget.files[0]);
+    //   console.log('이미지바뀜');
+    // }
+    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
+
+    const files = e.currentTarget.files;
+    if (files !== null && files.length > 0) {
+      setPetData((prevData) => {
+        console.log('setPetData 실행됨');
+        return { ...prevData, image: files[0] };
+      });
+      console.log(files[0]);
       console.log('이미지바뀜');
     }
-    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
   };
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -452,6 +464,7 @@ const Mypage = () => {
     event.persist;
     const formData = new FormData();
     formData.append('image', petData.image || '');
+    console.log(`petData.image: ${petData.image}`);
     const requestData = {
       name: petData.name,
       birth: petData.birth,

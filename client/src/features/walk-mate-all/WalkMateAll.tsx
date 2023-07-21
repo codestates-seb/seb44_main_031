@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { styled } from 'styled-components';
 import WalkMatesMap from './WalkMatesMap';
-import WalkMateFilters from './WalkMateFilters';
+import WalkMatesFilters from './WalkMatesFilters';
 import WalkMatesHeader from './WalkMatesHeader';
 import { createContext, useRef, useCallback } from 'react';
 import { IoIosArrowDropupCircle } from 'react-icons/io';
-import { axiosInstance, getArticlesUrl } from '../../api/walkMateAxios';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import WalkMateCard from './WalkMateCard';
+import WalkMatesCard from './WalkMatesCard';
+import { fetchWalkMates } from '../../api/walkMateAxios';
+import { toast } from 'react-toastify';
 
 export const WalkMateAllContext = createContext<any>(null);
 
@@ -26,21 +27,27 @@ export type Article = {
   isViewerJoining: boolean;
 };
 
-// fetch data
-const fetchWalkMates = async (
-  pageParam = 1,
-  size = 10,
-  selectedFilter: string
-) => {
-  const response = await axiosInstance.get(
-    getArticlesUrl(pageParam, size, selectedFilter)
-  );
-  return response.data;
+const pageSize = 5;
+
+export type SelectedFilter = {
+  period: { value: string; label: string };
+  viewOrder: {
+    value: string;
+    label: string;
+  };
 };
 
 // component
 const WalkMateAll = () => {
-  const [selectedFilter, setSelectedFilter] = useState<string>('');
+  const [selectedFilter, setSelectedFilter] = useState<SelectedFilter>({
+    period: { value: 'whole-period', label: '전체 기간' },
+    viewOrder: {
+      value: 'close-to-deadline',
+      label: '마감 임박순',
+    },
+  });
+
+  const [selectedCard, setSelectedCard] = useState<number | null>(null);
 
   const handleScrollIconClick = () => {
     window.scrollTo(0, 0);
@@ -52,16 +59,21 @@ const WalkMateAll = () => {
     hasNextPage,
     fetchNextPage,
     isLoading,
+    isError,
     isFetchingNextPage,
-    status,
   } = useInfiniteQuery({
     queryKey: ['articles', selectedFilter],
     queryFn: ({ pageParam = 1 }) =>
-      fetchWalkMates(pageParam, 10, selectedFilter),
+      fetchWalkMates(pageParam, pageSize, selectedFilter),
     getNextPageParam: (lastPage, pages) => {
-      return lastPage?.length ? pages.length + 1 : undefined;
+      // console.log(lastPage);
+      // console.log(pages);
+      // 서버와 연결되면 pageSize 조건문 수정하면됨
+      return lastPage?.data.length === pageSize ? pages.length + 1 : undefined;
     },
   });
+
+  console.log(data);
 
   const intObserver = useRef<IntersectionObserver | null>(null);
   const lastArticleRef = useCallback(
@@ -82,26 +94,48 @@ const WalkMateAll = () => {
     [isFetchingNextPage, fetchNextPage, hasNextPage]
   );
 
-  if (status === 'error') {
+  if (isError) {
+    toast.error(`Error: ${(error as any).message}`);
+
     // Check if error.message exists and use it, otherwise provide a fallback error message
-    const errorMessage = (error as any)?.message || 'An error occurred';
+    const errorMessage =
+      (error as any)?.message || '네트워크 에러가 발생했습니다';
 
     return <p>Error: {errorMessage}</p>;
   }
-  if (isLoading) return <p>로딩중 입니다</p>;
+  if (isLoading) {
+    return (
+      <StyledWalkMateAllContainer>
+        <img
+          src="/src/assets/loading-spinner-dog-1.gif"
+          alt="dog-loading-spinner"
+        />
+      </StyledWalkMateAllContainer>
+    );
+  }
+  // if (isFetchingNextPage) {
+  //   toast('Loading more data...', { toastId: 'loading' });
+  // }
 
   const content = data?.pages.map((page) => {
-    return page.map((article: Article, index: number) => {
-      if (page.length === index + 1) {
+    return page.data.map((article: Article, index: number) => {
+      if (page.data.length === index + 1) {
         return (
-          <WalkMateCard
+          <WalkMatesCard
             ref={lastArticleRef}
             key={article.articleId}
             article={article}
+            selectedCard={selectedCard}
           />
         );
       }
-      return <WalkMateCard key={article.articleId} article={article} />;
+      return (
+        <WalkMatesCard
+          key={article.articleId}
+          article={article}
+          selectedCard={selectedCard}
+        />
+      );
     });
   });
 
@@ -109,12 +143,16 @@ const WalkMateAll = () => {
     <WalkMateAllContext.Provider value={data}>
       <StyledWalkMateAllContainer>
         <WalkMatesHeader />
-        <WalkMateFilters setSelectedFilter={setSelectedFilter} />
+        <WalkMatesFilters
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+        />
         <StyeldMainContentContainer>
           <StyledWalkMatesListContainer>{content}</StyledWalkMatesListContainer>
-          {isFetchingNextPage && <p>Loading More Articles...</p>}
-          <WalkMatesMap />
+          {/* {isFetchingNextPage && <p>Loading More Articles...</p>} */}
+          <WalkMatesMap setSelectedCard={setSelectedCard} />
         </StyeldMainContentContainer>
+        {!hasNextPage && <p>( 더 이상 개설된 모임이 없습니다 )</p>}
         <IoIosArrowDropupCircle
           className="scroll-to-top-icon"
           onClick={handleScrollIconClick}
@@ -157,6 +195,6 @@ export default WalkMateAll;
 const StyledWalkMatesListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  width: 60%;
+  gap: 20px;
+  width: 55%;
 `;

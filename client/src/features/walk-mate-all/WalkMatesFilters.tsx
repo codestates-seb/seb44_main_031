@@ -5,6 +5,7 @@ import { myPageUrl } from '../../api/reactRouterUrl';
 import { TbCurrentLocation } from 'react-icons/tb';
 import Select from 'react-select';
 import { useState } from 'react';
+import { SelectedFilter } from './WalkMateAll';
 
 interface Option {
   value: string;
@@ -14,7 +15,7 @@ interface Option {
 const optionPeriod = [
   { value: 'whole-period', label: '전체 기간' },
   { value: 'tomorrow', label: '내일' },
-  { value: 'this-week', label: '이번주' },
+  { value: '7', label: '1주일내' },
 ];
 const optionViewOrder = [
   { value: 'close-to-deadline', label: '마감 임박순' },
@@ -22,7 +23,7 @@ const optionViewOrder = [
 ];
 const optionDistance = [{ value: 'within-3km-radius', label: '반경 3km 이내' }];
 
-const customTheme = (theme: any) => {
+const customTheme = (theme: any): any => {
   return {
     ...theme,
     colors: {
@@ -48,20 +49,17 @@ const customStyles = {
   }),
 };
 
-interface WalkMateFiltersProps {
-  setSelectedFilter: React.Dispatch<React.SetStateAction<string>>;
+interface WalkMatesFiltersProps {
+  selectedFilter: SelectedFilter;
+  setSelectedFilter: React.Dispatch<React.SetStateAction<SelectedFilter>>;
   // Add other prop types as needed
 }
 
-const WalkMateFilters = ({ setSelectedFilter }: WalkMateFiltersProps) => {
-  const [period, setPeriod] = useState<Option | null>({
-    value: 'whole-period',
-    label: '전체 기간',
-  });
-  const [viewOrder, setViewOrder] = useState<Option | null>({
-    value: 'close-to-deadline',
-    label: '마감 임박순',
-  });
+const WalkMatesFilters = ({
+  selectedFilter,
+  setSelectedFilter,
+}: WalkMatesFiltersProps) => {
+  // 서비스에 거리 단위 필터 기능이 추가되면 WalkMateAll 의 selectedFilter state에 distance state를 병합시키고 삭제하면 됩니다.
   const [distance, setDistance] = useState<Option | null>({
     value: 'within-3km-radius',
     label: '반경 3km 이내',
@@ -76,11 +74,19 @@ const WalkMateFilters = ({ setSelectedFilter }: WalkMateFiltersProps) => {
         theme={customTheme}
         styles={customStyles}
         isSearchable={false}
+        defaultValue={selectedFilter.period}
         onChange={(selectedOption) => {
-          setSelectedFilter(selectedOption?.value || '');
-          setPeriod(selectedOption);
+          console.log(selectedOption);
+          setSelectedFilter((prev) => {
+            return {
+              ...prev,
+              period: selectedOption as { value: string; label: string },
+            };
+          });
         }}
-        defaultValue={period}
+        // setPeriod(selectedOption);
+        // selectedOption?.value || ''
+        // value={period}
       />
       <Select
         className="select-view-order"
@@ -88,8 +94,18 @@ const WalkMateFilters = ({ setSelectedFilter }: WalkMateFiltersProps) => {
         theme={customTheme}
         styles={customStyles}
         isSearchable={false}
-        onChange={setViewOrder}
-        defaultValue={viewOrder}
+        // onChange={setViewOrder}
+        // defaultValue={viewOrder}
+        defaultValue={selectedFilter.viewOrder}
+        onChange={(selectedOption) => {
+          console.log(selectedOption);
+          setSelectedFilter((prev) => {
+            return {
+              ...prev,
+              viewOrder: selectedOption as { value: string; label: string },
+            };
+          });
+        }}
       />
       <Select
         className="select-distance"
@@ -152,4 +168,4 @@ const StyledFilterContainer = styled.div`
   }
 `;
 
-export default WalkMateFilters;
+export default WalkMatesFilters;

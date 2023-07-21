@@ -8,52 +8,40 @@ import { Article } from './WalkMateAll';
 
 type ArticleProps = {
   article: Article;
+  selectedCard: number | null;
 };
 
-const WalkMateCard = React.forwardRef<HTMLElement, ArticleProps>(
-  ({ article }, ref: React.ForwardedRef<any>) => {
-    // const content = ref ? (
-    //   <StyledCardContainer
-    //     id={`${article.articleId}`}
-    //     to={`/walk-mate/${article.articleId}`}
-    //     $isSelected={false}
-    //     ref={ref}
-    //   ></StyledCardContainer>
-    // ) : (
-    //   <StyledCardContainer
-    //     id={`${article.articleId}`}
-    //     to={`/walk-mate/${article.articleId}`}
-    //     $isSelected={false}
-    //   ></StyledCardContainer>
-    // );
-
+const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
+  ({ article, selectedCard }, ref: React.ForwardedRef<any>) => {
     return (
       <StyledCardContainer
-        id={`${article.articleId}`}
+        id={`card-${article.articleId}`}
         to={`/walk-mate/${article.articleId}`}
-        $isSelected={false}
+        $isSelected={selectedCard === article.articleId}
         ref={ref}
       >
         <div className="article-image-container">
           <img src="/src/assets/Walkdog.png" alt="" className="article-image" />
         </div>
         <StyledContentsContainer>
-          <p className="content-date">SUN, JUL 2 13:00 KST</p>
-          <p className="content-title">
-            북촌 한옥 마을 돌면서 강아시 산책하실분 구해요~
-          </p>
-          <p className="content-summary">
-            오후 1시에 미니스탑 편의점에서 만나서 애기들 산책하실...
-          </p>
+          <p className="content-date">{article.startDate}</p>
+          <p className="content-title">{article.title}</p>
+          <p className="content-summary">{article.body} </p>
           <StyledAttendInfoContainer>
-            <span className="attendees">2 참석자</span>
-            <span className="left-attendants">2 자리 남음</span>
+            <span className="attendees">
+              총 참석 가능수 {article.attendant} 명
+            </span>
+            <span className="left-attendants">{article.lefts} 자리 남음</span>
           </StyledAttendInfoContainer>
           <StyledButtonsContainer>
-            <StyledAttendingContainer>
-              <BsCheckCircleFill fill="green" />
-              <span className="attending-meeting">참석 예정</span>
-            </StyledAttendingContainer>
+            {article.isViewerJoining ? (
+              <StyledAttendingContainer>
+                <BsCheckCircleFill fill="green" />
+                <span className="attending-meeting">참석 예정</span>
+              </StyledAttendingContainer>
+            ) : (
+              <div />
+            )}
             <StyledBottomButtonsContainer>
               <FiShare className="share-icon" stroke-width="1" />
               <CiBookmark className="bookmark-off-icon" stroke-width="0" />
@@ -108,6 +96,7 @@ const StyledContentsContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  width: 100%;
 
   gap: 10px;
 
@@ -141,7 +130,6 @@ const StyledAttendInfoContainer = styled.div`
 `;
 
 const StyledButtonsContainer = styled.div`
-  width: 100%;
   display: flex;
   justify-content: space-between;
   margin-top: 6px;
@@ -184,4 +172,4 @@ const StyledBottomButtonsContainer = styled.div`
   }
 `;
 
-export default WalkMateCard;
+export default WalkMatesCard;

@@ -137,13 +137,6 @@ const WalkMateCreate = () => {
           // Handle other types of errors (e.g., network error)
           toast.error('An error occurred. Please try again later.');
         }
-        // if (err instanceof Error) {
-        //   toast.error(err.message);
-        //   return;
-        // }
-        // if (isAxiosError(err)) {
-        //   toast.error(err.message);
-        // }
       } finally {
         // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
         await setTimeout(() => {
