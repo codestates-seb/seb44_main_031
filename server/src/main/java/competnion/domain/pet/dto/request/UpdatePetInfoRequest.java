@@ -12,5 +12,6 @@ public class UpdatePetInfoRequest {
     private LocalDate birth;
     private Boolean gender;
     private Boolean neutralization;
-    private String vaccine;
+    private Long breedId;
+    private String mbti;
 }

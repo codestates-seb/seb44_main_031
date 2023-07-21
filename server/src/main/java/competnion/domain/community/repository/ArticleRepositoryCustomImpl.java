@@ -105,6 +105,17 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 .fetch();
     }
 
+    @Override
+    public List<Article> findAllArticlesOpenWrittenByUser(User userEntity) {
+        return jpaQueryFactory
+                .selectFrom(article)
+                .join(article.user, user)
+                .where(
+                        article.articleStatus.eq(OPEN)
+                )
+                .fetch();
+    }
+
 
     @Override
     public void findDuplicateMeetingDate(User userEntity, LocalDateTime starDate, LocalDateTime endDate) {

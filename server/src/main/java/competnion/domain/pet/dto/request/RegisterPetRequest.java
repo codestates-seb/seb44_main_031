@@ -14,5 +14,4 @@ public class RegisterPetRequest {
     private Boolean neutralization;
     private String mbti;
     private Long breedId;
-    private String vaccine;
 }

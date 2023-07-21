@@ -81,7 +81,7 @@ public class UserService {
     }
 
     public String uploadProfileImage(final User user, final MultipartFile image) {
-        s3Util.isFileAnImageOrThrow(image);
+        s3Util.isFileAnImageOrThrow(List.of(image));
 
         if (user.getImgUrl() != null) s3Util.deleteImage(user.getImgUrl());
 
@@ -90,17 +90,17 @@ public class UserService {
         return imgUrl;
     }
 
-    public User returnExistsUserByIdOrThrow(final Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
-    }
-
     public List<ArticleQueryDto> findAllArticlesWrittenByUser(final User user) {
         return articleRepository.findAllArticlesWrittenByUser(user);
     }
 
     public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
         return attendRepository.findAllArticlesUserAttended(user);
+    }
+
+    public User returnExistsUserByIdOrThrow(final Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
     }
 
     public Boolean checkExistsUserByUsername(final String username) {
@@ -115,7 +115,7 @@ public class UserService {
         return user.getEmail().equals(email);
     }
 
-    private void checkMatchPassword(final String password, final String encodePassword) {
+    public void checkMatchPassword(final String password, final String encodePassword) {
         boolean matches = passwordEncoder.matches(password, encodePassword);
         if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
     }
@@ -134,6 +134,7 @@ public class UserService {
                 .point(point)
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
+                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/dog.png")
                 .roles(roles)
                 .build());
     }

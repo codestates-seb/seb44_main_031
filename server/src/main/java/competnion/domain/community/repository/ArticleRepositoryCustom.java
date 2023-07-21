@@ -23,6 +23,9 @@ public interface ArticleRepositoryCustom {
     List<ArticleQueryDto> findAllArticlesWrittenByUser(
             User user
     );
+    List<Article> findAllArticlesOpenWrittenByUser (
+            User user
+    );
 
     void findDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);
     List<Article> findArticlesOpen();

@@ -3,6 +3,7 @@ package competnion.domain.community.service;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
+import competnion.domain.community.dto.request.UpdateArticleRequest;
 import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
@@ -20,7 +21,9 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
+import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +36,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static competnion.domain.community.entity.ArticleStatus.CLOSED;
 import static competnion.domain.community.entity.QArticle.article;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.Arrays.stream;
+import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
+
 
 @Service
 @Transactional
@@ -53,6 +61,7 @@ public class CommunityService {
 
     private final S3Util s3Util;
     private final PetService petService;
+    private final UserService userService;
     private final CoordinateUtil coordinateUtil;
 
     private final ArticleMapper mapper;
@@ -77,10 +86,11 @@ public class CommunityService {
             final ArticlePostRequest request,
             final List<MultipartFile> images
     ) {
+        s3Util.checkImageCount(images);
         checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
         checkPet(user, request.getPetIds());
         checkValidMeetingDate(request);
-        checkDuplicateOwnersMeetingDate(user, request);
+        checkDuplicateOwnersMeetingDate(user, request.getStartDate(), request.getEndDate());
 
         final List<String> imageUrlList = s3Util.uploadImageList(images);
 
@@ -104,12 +114,7 @@ public class CommunityService {
         saveAttends(user, article, request.getPetIds());
     }
 
-    /**
-     * TODO : 1. 자 산책완료 버튼...
-     *        2. startDate 기준 30분부터 버튼 클릭가능(호스트만)
-     *        3. 호스트가 버튼을 안누를것을 대비하여 종료시간이 되면 30분 단위로 산책완료(스케줄러)
-     *        4. attend 테이블은 지우지말고 유저 참여 검증할때 closed된 아티클은 제외하면 될듯?...모르겠다.
-     */
+    // 산책 완료
     public void close(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
         if (LocalDateTime.now().isBefore(article.getStartDate().plusMinutes(30)))
@@ -131,12 +136,72 @@ public class CommunityService {
         }
     }
 
-    public void cancelAttend(User user, Long articleId) {
-        /**
-         * TODO : 1. 한번 취소하면 재참여 불가능
-         2. 취소할때 산책 모임 20분전에는 취소 불가능
-         3.
-         */
+    public void updateArticle(
+            final User user,
+            final Long articleId,
+            final UpdateArticleRequest request,
+            final List<MultipartFile> images
+    ) {
+        long count = attendRepository.countByArticleId(articleId);
+        if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+
+        s3Util.checkImageCount(images);
+
+        Article findArticle = getArticleByIdOrThrow(articleId);
+        List<Article> articles = articleRepository.findAllArticlesOpenWrittenByUser(user);
+
+        articles.remove(findArticle);
+        articles.forEach(article -> {
+            LocalDateTime requestStart = request.getStartDate();
+            LocalDateTime requestEnd = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
+            LocalDateTime articleStart = article.getStartDate();
+            LocalDateTime articleEnd = article.getEndDate();
+            if (requestStart.isAfter(article.getStartDate()) || requestStart.equals(articleStart)
+                    || requestEnd.isBefore(article.getEndDate()) || requestEnd.equals(articleEnd))
+                throw new BusinessLogicException(DUPLICATE_MEETING_DATE);
+        });
+
+        s3Util.isFileAnImageOrThrow(images);
+
+        List<ArticleImage> articleImages = findArticle.getImages();
+        articleImageRepository.deleteAll(articleImages);
+        findArticle.getImages().clear();
+
+        final List<String> imageUrlList = s3Util.uploadImageList(images);
+        saveImages(imageUrlList, findArticle);
+
+        LocalDateTime endDate = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
+        ofNullable(request.getTitle()).ifPresent(findArticle::updateTitle);
+        ofNullable(request.getBody()).ifPresent(findArticle::updateBody);
+        ofNullable(request.getStartDate()).ifPresent(findArticle::updateStartDate);
+        of(endDate).ifPresent(findArticle::updateEndDate);
+    }
+
+    // 참여 취소
+    public void cancelAttend(final User user, final Long articleId) {
+         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
+
+        // 2. 취소할때 산책 모임 20분전에는 취소 불가능 (참여할 때 프론트에서 알림 창)
+        Article article = getArticleByIdOrThrow(articleId);
+        if (article.getStartDate().minusMinutes(20).isBefore(LocalDateTime.now()))
+            throw new BusinessLogicException(CAN_NOT_CANCEL);
+
+        Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId)
+                .orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
+
+        attendRepository.delete(attend);
+    }
+
+    // 게시글 삭제
+    public void deleteArticle(final User user, final Long articleId) {
+        // 1. 참여자가 있으면 삭제 불가능.
+        long count = attendRepository.countByArticleId(articleId);
+        if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+
+        Article article = getArticleByIdOrThrow(articleId);
+        articleRepository.delete(article);
+
+        // TODO : 2. 삭제할 때 비밀번호로 인증.
     }
 
     // 게시글 상세 조회
@@ -220,9 +285,9 @@ public class CommunityService {
             throw new BusinessLogicException(USER_ALREADY_ATTENDED);
     }
 
-    private void checkDuplicateOwnersMeetingDate(User user, ArticlePostRequest request) {
+    private void checkDuplicateOwnersMeetingDate(User user, LocalDateTime startDate, String endDate) {
         articleRepository.findDuplicateMeetingDate(
-                user, request.getStartDate(), request.getStartDate().plusMinutes(parseInt(request.getEndDate())));
+                user, startDate, startDate.plusMinutes(parseLong(endDate)));
     }
 
     private void checkDuplicateAttendeeMeetingDate(User user, LocalDateTime startDate, String endDate) {
@@ -312,5 +377,4 @@ public class CommunityService {
     private int countLefts (Article article) {
         return  article.getAttendant() - extractUsersFromAttend(article.getId()).size();
     }
-
 }

@@ -18,7 +18,6 @@ import java.util.List;
 
 import static competnion.domain.community.entity.ArticleStatus.OPEN;
 import static javax.persistence.EnumType.STRING;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -87,30 +86,23 @@ public class Article extends BaseEntity {
         this.articleStatus = OPEN;
     }
 
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateBody(String body) {
+        this.body = body;
+    }
+
+    public void updateStartDate(LocalDateTime startDate) {
+        this.startDate = startDate;
+    }
+
+    public void updateEndDate(LocalDateTime endDate) {
+        this.endDate = endDate;
+    }
+
     public void updateStatus(ArticleStatus articleStatus) {
         this.articleStatus = articleStatus;
-    }
-
-    /** 게시글 수정 */
-    public void updateInfo(Article updatedArticle) {
-        if (updatedArticle.getTitle() != null) {
-            this.title = updatedArticle.getTitle();
-        }
-        if (updatedArticle.getBody() != null) {
-            this.body = updatedArticle.getBody();
-        }
-        if (updatedArticle.getLocation() != null) {
-            this.location = updatedArticle.getLocation();
-        }
-        if (updatedArticle.getStartDate() != null) {
-            this.startDate = updatedArticle.getStartDate();
-        }
-        if (updatedArticle.getAttendant() != 0) {
-            this.attendant = updatedArticle.getAttendant();
-        }
-    }
-
-    public void attend() {
-        this.attendant--;
     }
 }

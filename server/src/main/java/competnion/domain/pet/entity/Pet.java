@@ -51,9 +51,6 @@ public class Pet extends BaseEntity {
     private String imgUrl;
     @Column(nullable = false)
     @NotBlank
-    private String vaccine;
-    @Column(nullable = false)
-    @NotBlank
     private String mbti;
 
     @ManyToOne(fetch = LAZY)
@@ -86,24 +83,32 @@ public class Pet extends BaseEntity {
         this.neutralization = neutralization;
     }
 
-    public void updateVaccine(final String vaccine) {
-        hasText(vaccine, "vaccine must not be empty");
-        this.vaccine = vaccine;
-    }
-
     public void updateArticle(final Article article) {
         notNull(article, "article must not be null");
         this.article = article;
     }
 
+    public void updateGender(final Boolean gender) {
+        isInstanceOf(Boolean.class, gender, "Boolean expected");
+        this.gender = gender;
+    }
+
+    public void updateBreed(final Breed breed) {
+        notNull(breed, "breed must not be null");
+        this.breed = breed;
+    }
+
+    public void updateMbti(final String mbti) {
+        hasText(mbti, "mbti must not be empty");
+        this.mbti = mbti;
+    }
+
     @Builder(builderClassName = "RegisterPet", builderMethodName = "RegisterPet")
-    private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final String vaccine, final User user, final String mbti, final Breed breed) {
+    private Pet(final String name, final LocalDate birth ,final Boolean gender, final Boolean neutralization, final String imgUrl, final User user, final String mbti, final Breed breed) {
         hasText(name, "name must not be empty");
         notNull(birth, "birth must not be null");
         isInstanceOf(Boolean.class, gender, "Boolean expected");
         isInstanceOf(Boolean.class, neutralization, "Boolean expected");
-        hasText(imgUrl, "imgUrl must not be empty");
-        hasText(vaccine, "inoculated must not be empty");
         notNull(user, "user must not be null");
         hasText(mbti, "mbti must not be empty");
         notNull(breed, "breed must not be null");
@@ -112,7 +117,6 @@ public class Pet extends BaseEntity {
         this.gender = gender;
         this.neutralization = neutralization;
         this.imgUrl = imgUrl;
-        this.vaccine = vaccine;
         this.user = user;
         this.mbti = mbti;
         this.breed = breed;
