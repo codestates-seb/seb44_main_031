@@ -23,7 +23,7 @@ public class CoordinateUtil {
         if (latitude == null || longitude == null) {
             throw new BusinessLogicException(INVALID_COORDINATES);
         } else {
-            Coordinate coordinate = new Coordinate(latitude, latitude);
+            Coordinate coordinate = new Coordinate(longitude, latitude);
             return geometryFactory.createPoint(coordinate);
         }
     }

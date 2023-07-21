@@ -1,6 +1,7 @@
 package competnion.domain.community.repository;
 
 import competnion.domain.community.dto.ArticleQueryDto;
+import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.entity.Article;
 import competnion.domain.user.entity.User;
 import org.locationtech.jts.geom.Point;
@@ -11,24 +12,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ArticleRepositoryCustom {
-    List<ArticleQueryDto> findAllByKeywordAndDistanceAndDays(
+    Page<Article> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
             int days,
             Double distance,
-//            String orderBy,
-            long offset,
-            int limit);
+            Pageable pageable
+    );
 
     List<ArticleQueryDto> findAllArticlesWrittenByUser(
             User user
-    );
-
-    Page<Article> findArticlesByConditionsWithCursorPaging(
-            Long cursorId,
-            Point userPoint,
-            Double distance,
-            Pageable pageable
     );
 
     void findDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);

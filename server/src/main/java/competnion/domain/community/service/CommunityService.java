@@ -4,6 +4,7 @@ import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.response.ArticleResponse;
+import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.entity.ArticleImage;
@@ -12,6 +13,7 @@ import competnion.domain.community.mapper.ArticleMapper;
 import competnion.domain.community.repository.ArticleImageRepository;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
+import competnion.domain.community.response.MultiArticleResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.entity.Pet;
@@ -22,6 +24,7 @@ import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +36,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static competnion.domain.community.entity.ArticleStatus.CLOSED;
+import static competnion.domain.community.entity.QArticle.article;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.lang.Integer.parseInt;
 import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.Arrays.stream;
 
 @Service
 @Transactional
@@ -140,29 +145,44 @@ public class CommunityService {
 
         final List<String> images = getImgUrlsFromArticle(article);
 
-        final List<User> attendees = extractUserFromAttend(articleId);
+        final List<User> attendees = extractUsersFromAttend(articleId);
 
         return mapper.articleToSingleArticleResponse(images,article,attendees);
     }
 
     @Transactional(readOnly = true)
-    public List<ArticleResponse> getAll(
+    public MultiArticleResponse getAll(
             final User user,
             final String keyword,
-            final int days,
+            final Integer days,
             final Pageable pageable
     ) {
-        final List<ArticleQueryDto> articles = articleRepository.findAllByKeywordAndDistanceAndDays(
-                user.getPoint(),
-                keyword,
-                days,
-                3000.0,
-                pageable.getPageNumber(),
-                pageable.getPageSize());
 
-        return articles.stream()
-                .map(ArticleResponse::of)
-                .collect(Collectors.toList());
+
+
+         Page<Article> articles = articleRepository.findAllByKeywordAndDistanceAndDays(
+                                                                                user.getPoint(),
+                                                                                keyword,
+                                                                                days,
+                                                                                3000.0,
+                                                                                pageable
+        );
+
+
+
+//         article은 Qarticle 로 잡혀서 stream 안쪽은 post로 해둠
+      Page<ArticleResponseDto.OfMultiResponse> responses =
+              articles.map(post -> ArticleResponseDto.OfMultiResponse.getResponse
+                                (getImgUrlsFromArticle(post),
+                                post,
+                                countLefts(post),
+                                checkParticipation(post,user.getId()))
+              );
+
+
+      return mapper.articleToMultiArticleResponses(responses.getContent(),user,responses);
+
+
     }
 
     private void checkNotArticleOwner(final User user, final Article article) {
@@ -221,7 +241,7 @@ public class CommunityService {
             throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
     }
 
-    private List<User> extractUserFromAttend(final long articleId) {
+    private List<User> extractUsersFromAttend(final long articleId) {
         return attendRepository.findUsersFromAttendByArticleId(articleId);
     }
 
@@ -279,8 +299,18 @@ public class CommunityService {
         }
     }
 
-    private List<Pet> extractJoiningPets(final Long userId, final Long articleId) {
-        return petRepository.findParticipatingPetsByUserIdAndArticleId(userId,articleId);
+    private Boolean checkParticipation (Article article,long userId) {
+
+        List<User> attendees =  extractUsersFromAttend(article.getId());
+
+       return attendees.stream()
+                        .map(attendee -> attendee.getId())
+                        .anyMatch(attendee -> attendee.equals(userId));
+
+    }
+
+    private int countLefts (Article article) {
+        return  article.getAttendant() - extractUsersFromAttend(article.getId()).size();
     }
 
 }

@@ -7,6 +7,7 @@ import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
@@ -44,6 +45,9 @@ public class Article extends BaseEntity {
     private LocalDateTime endDate;
     @Column(nullable = false)
     private int attendant;
+
+
+
     @Enumerated(STRING)
     private ArticleStatus articleStatus;
     @ManyToOne(fetch = FetchType.EAGER)

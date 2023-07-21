@@ -1,5 +1,6 @@
 package competnion.domain.user.dto.response;
 
+import com.querydsl.core.annotations.QueryProjection;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.entity.User;
 import lombok.AllArgsConstructor;
