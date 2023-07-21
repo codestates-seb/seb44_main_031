@@ -1,10 +1,11 @@
 import React from 'react';
 import { styled } from 'styled-components';
-import { CiBookmark } from 'react-icons/ci';
-import { FiShare } from 'react-icons/fi';
 import { BsCheckCircleFill } from 'react-icons/bs';
-import { Link } from 'react-router-dom';
 import { Article } from './WalkMateAll';
+import BookmarkIcon from './BookmarkIcon';
+import { useNavigate } from 'react-router-dom';
+import CopyIcon from './CopyIcon';
+import { FE_BASE_URL } from '../../api/reactRouterUrl';
 
 type ArticleProps = {
   article: Article;
@@ -13,12 +14,19 @@ type ArticleProps = {
 
 const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
   ({ article, selectedCard }, ref: React.ForwardedRef<any>) => {
+    const navigate = useNavigate();
+
+    const articleDetailPageUrl = `${FE_BASE_URL}/walk-mate/${article.articleId}`;
+    const handleCardClick = () => {
+      navigate(articleDetailPageUrl);
+    };
+
     return (
       <StyledCardContainer
         id={`card-${article.articleId}`}
-        to={`/walk-mate/${article.articleId}`}
         $isSelected={selectedCard === article.articleId}
         ref={ref}
+        onClick={handleCardClick}
       >
         <div className="article-image-container">
           <img src="/src/assets/Walkdog.png" alt="" className="article-image" />
@@ -43,8 +51,8 @@ const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
               <div />
             )}
             <StyledBottomButtonsContainer>
-              <FiShare className="share-icon" stroke-width="1" />
-              <CiBookmark className="bookmark-off-icon" stroke-width="0" />
+              <CopyIcon textToCopy={articleDetailPageUrl} />
+              <BookmarkIcon />
             </StyledBottomButtonsContainer>
           </StyledButtonsContainer>
         </StyledContentsContainer>
@@ -57,7 +65,7 @@ interface StyledCardContainerProps {
   readonly $isSelected: boolean;
 }
 
-const StyledCardContainer = styled(Link)<StyledCardContainerProps>`
+const StyledCardContainer = styled.div<StyledCardContainerProps>`
   display: flex;
   border: ${({ $isSelected }) =>
     $isSelected ? '1.5px solid var(--pink-400)' : '1px solid var(--black-600)'};
@@ -160,16 +168,12 @@ const StyledBottomButtonsContainer = styled.div`
   align-items: center;
   gap: 10px;
 
-  .share-icon {
+  /* .share-icon {
     width: 16px;
     height: 16px;
-    color: var(--black-800);
-  }
-  .bookmark-off-icon {
-    width: 16px;
-    height: 16px;
-    color: var(--black-800);
-  }
+    color: var(--black-900);
+    stroke-width: 1;
+  } */
 `;
 
 export default WalkMatesCard;

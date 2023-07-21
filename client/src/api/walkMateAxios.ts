@@ -11,8 +11,8 @@ import { toast } from 'react-toastify';
 const Token = localStorage.getItem('accessToken');
 
 // JSON_SERVER
-const BASE_URL = 'http://localhost:3001';
-// const BASE_URL =
+export const BASE_URL = 'http://localhost:3001';
+// export const BASE_URL =
 //   'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
 // URL PATH
@@ -59,7 +59,7 @@ export const fetchWalkMates = async (
   );
   console.log('get request success!');
 
-  toast('새로운 모임 받아오기 성공!', {
+  toast.success('새로운 모임 받아오기 성공!', {
     toastId: 'success',
     autoClose: 1500,
   });

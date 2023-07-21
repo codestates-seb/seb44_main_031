@@ -43,8 +43,8 @@ const customStyles = {
     ...provided,
     backgroundColor: 'rgba(250, 244, 229, 1)',
     border: 'none',
-    'border-radius': '12px',
-    'font-size': '14px',
+    bordeRadius: '12px',
+    fontSize: '14px',
     height: '40px',
   }),
 };
