@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
-import userProfileImg from '/Users/jihoon/Desktop/메인/seb44_main_031/client/src/assets/Profile.png';
+import userProfileImg from '/src/assets/Profile.png';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';

@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
 interface Attendee {
   id: number;
-  username: string;
+  nickname: string;
   imgUrl: string | null;
   pets: Pet[];
 }
@@ -16,13 +16,19 @@ interface Pet {
 }
 
 interface AttendeeInfo {
-  petname: string;
-  petimgUrl: string;
-  petId: number;
+  name: string;
+  imgUrl: string;
+  id: number;
 }
 
 interface PetItemProps {
   readonly $isSelected: boolean;
+}
+interface ArticleData {
+  startDate: string;
+  endDate: string;
+  attendant: number;
+  
 }
 
 const UserCard = () => {
@@ -31,7 +37,8 @@ const UserCard = () => {
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo[]>([]);
   const { articleId } = useParams<{ articleId: string }>();
-
+  const [articleData, setArticleData] = useState<ArticleData | null>(null);
+  
   //산책 상세페이지 get 요청 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,6 +50,8 @@ const UserCard = () => {
         });
 
         setAttendees(response.data.attendees);
+        setArticleData(response.data.article);
+        console.log(response.data.article)
       } catch (error) {
         console.error('attendees 가져오는중 오류 발생:', error);
       }
@@ -50,20 +59,21 @@ const UserCard = () => {
 
     fetchData();
   }, []);
-// 참가자 get 요청 
+// 참가하기 버튼 눌렀을때  
   useEffect(() => {
     const fetchAttendeeInfo = async () => {
       try {
         const response = await axios.get<AttendeeInfo[]>(
-          `${API_URL}/articles/${articleId}`,
+          `${API_URL}/articles/attendee-info/${articleId}`,
           {
             headers: {
               Authorization: AUTH_TOKEN,
             },
           }
         );
-
-        setAttendeeInfo(response.data);
+        setAttendeeInfo(response.data.result); 
+      
+      
       } catch (error) {
         console.error('attendee-info 가져오는 중 오류 발생:', error);
       }
@@ -88,26 +98,41 @@ const UserCard = () => {
     }
   };
 // 강아지 데리고 갈 목록들 post
-  const handleRegister = async () => {
-    try {
-      await axios.post(
-        `${API_URL}/articles/attend/${articleId}`,
-        {
-          selectedPets,
-        },
-        {
-          headers: {
-            Authorization: AUTH_TOKEN,
-          },
-        }
-      );
-      console.log('등록이 완료되었습니다.');
+const handleRegister = async () => {
+  // 만약 articleData가 null이라면 API로부터 데이터를 가져오지 못한 상태이므로 등록을 막고 에러 처리를 해줄 수 있습니다.
+  if (!articleData) {
+    console.error('articleData가 유효하지 않습니다.');
+    return;
+  }
 
-      closeModal();
-    } catch (error) {
-      console.error('등록 중 오류 발생:', error);
-    }
+  const { startDate, endDate, attendant } = articleData; // API로부터 받아온 데이터에서 startDate, endDate, attendant를 가져옴
+
+  // 선택된 강아지들의 ID를 배열 형태로 저장합니다.
+  const selectedPetIds = selectedPets.map((petId) => petId);
+
+  // 위에서 정의한 데이터 포맷을 만들어줍니다.
+  const postData = {
+    petIds: selectedPetIds,
+    articleId: parseInt(articleId),
+    startDate,
+    endDate,
+    attendant,
   };
+
+  try {
+    // POST 요청을 보냅니다.
+    await axios.post(`${API_URL}/articles/attend`, postData, {
+      headers: {
+        Authorization: AUTH_TOKEN,
+      },
+    });
+
+    console.log('등록이 완료되었습니다.');
+    closeModal();
+  } catch (error) {
+    console.error('등록 중 오류 발생:', error);
+  }
+};
 
   const getPetImageUrl = (gender: boolean) => {
     if (gender) {
@@ -116,7 +141,7 @@ const UserCard = () => {
       return '/src/assets/petmily-logo-white.png';
     }
   };
-
+  console.log('attendeeInfo:', attendeeInfo);
   return (
     <>
       <UserCardContainer>
@@ -124,7 +149,7 @@ const UserCard = () => {
           {attendees.map((attendee, index) => (
             <UserCardComponent key={index}>
               <ProfileCard src={attendee.imgUrl ?? undefined} alt="프로필이미지" />
-              <Username>{attendee.username}</Username>
+              <Username>{attendee.nickname}</Username>
               <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
                 {attendee.pets.map((pet, index) => (
@@ -150,15 +175,15 @@ const UserCard = () => {
           <ModalContent>
             <h2>산책에 데려갈 강아지 선택</h2>
             <PetList>
-              {attendeeInfo.map((pets, index) => (
+              {attendeeInfo !== null && attendeeInfo.map((pets, index) => (
                 <PetItem
                   key={index}
-                  onClick={() => handlePetSelect(pets.petId)}
-                  $isSelected={selectedPets.includes(pets.petId)}
+                  onClick={() => handlePetSelect(pets.id)}
+                  $isSelected={selectedPets.includes(pets.id)}
                 >
-                  <PetImage src={pets.petimgUrl} alt="강아지 이미지" />
-                  <PetName>{pets.petname}</PetName>
-                  {selectedPets.includes(pets.petId) && (
+                  <PetImage src={pets.imgUrl} alt="강아지 이미지" />
+                  <PetName>{pets.name}</PetName>
+                  {selectedPets.includes(pets.id) && (
                     <PetCheckIcon>&#10003;</PetCheckIcon>
                   )}
                 </PetItem>
@@ -191,11 +216,12 @@ const UserCardContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const UserCardRow = styled.div`
   display: flex;
+  margin-left: 10px;
 `;
 
 const UserCardComponent = styled.div`

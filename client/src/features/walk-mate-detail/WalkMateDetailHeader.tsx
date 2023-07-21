@@ -5,7 +5,7 @@ import { styled } from 'styled-components';
 import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
 interface Owner {
   userId: number;
-  username: string;
+  nickname: string;
   userimUrl: string;
   pets: Pet[];
 }
@@ -76,7 +76,7 @@ const WalkMateDetailHeader = () => {
           <ProfileImage src={owner.userimUrl} alt="프로필이미지" />
           <DetailTextBox>
             <div className="uptext">Hosted By</div>
-            <div className="profilename">{owner.username}</div>
+            <div className="profilename">{owner.nickname}</div>
           </DetailTextBox>
         </DetailHeaderBox>
       </WalkMateDetailHeaderBox>
