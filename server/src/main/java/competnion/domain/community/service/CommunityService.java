@@ -1,10 +1,8 @@
 package competnion.domain.community.service;
 
-import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.request.UpdateArticleRequest;
-import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
@@ -23,7 +21,6 @@ import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
@@ -36,16 +33,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static competnion.domain.community.entity.ArticleStatus.CLOSED;
-import static competnion.domain.community.entity.QArticle.article;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.util.Arrays.stream;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
@@ -132,7 +126,7 @@ public class CommunityService {
         articles.forEach(article -> article.updateStatus(CLOSED));
 
         for (Article article : articles) {
-            article.getPets().forEach(pet -> pet.deleteArticle());
+            article.getPets().forEach(Pet::deleteArticle);
             article.getPets().clear();
         }
     }
