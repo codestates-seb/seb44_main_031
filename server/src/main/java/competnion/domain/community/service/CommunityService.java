@@ -87,7 +87,8 @@ public class CommunityService {
             final List<MultipartFile> images
     ) {
         s3Util.checkImageCount(images);
-        checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
+        checkDuplicateAttendeeMeetingDate(user, request.getStartDate(),
+                request.getStartDate().plusMinutes(parseLong(request.getEndDate())));
         checkPet(user, request.getPetIds());
         checkValidMeetingDate(request);
         checkDuplicateOwnersMeetingDate(user, request.getStartDate(), request.getEndDate());
@@ -104,12 +105,12 @@ public class CommunityService {
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
+        checkSpaceForAttend(request);
         checkUserAlreadyAttended(user, article);
         checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
         checkMeetingTimeClosed(request);
         checkNotArticleOwner(user, article);
         checkPet(user, request.getPetIds());
-        checkSpaceForAttend(request);
 
         saveAttends(user, article, request.getPetIds());
     }
@@ -122,7 +123,7 @@ public class CommunityService {
         article.updateStatus(CLOSED);
 
         List<Pet> pets = petRepository.findAllByArticleId(articleId);
-        pets.forEach(pet -> pet.updateArticle(null));
+        pets.forEach(Pet::deleteArticle);
         article.getPets().clear();
     }
 
@@ -131,7 +132,7 @@ public class CommunityService {
         articles.forEach(article -> article.updateStatus(CLOSED));
 
         for (Article article : articles) {
-            article.getPets().forEach(pet -> pet.updateArticle(null));
+            article.getPets().forEach(pet -> pet.deleteArticle());
             article.getPets().clear();
         }
     }
@@ -257,7 +258,7 @@ public class CommunityService {
     private void checkMeetingTimeClosed(final AttendRequest request) {
         final LocalDateTime now = LocalDateTime.now();
         final long minutes = MINUTES.between(now, request.getStartDate());
-        if (now.isAfter(request.getStartDate().plusMinutes(parseInt(request.getEndDate()))) || minutes <= 30)
+        if (now.isAfter(request.getEndDate()) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
@@ -290,9 +291,9 @@ public class CommunityService {
                 user, startDate, startDate.plusMinutes(parseLong(endDate)));
     }
 
-    private void checkDuplicateAttendeeMeetingDate(User user, LocalDateTime startDate, String endDate) {
+    private void checkDuplicateAttendeeMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate) {
         attendRepository.findAttendeeDuplicateMeetingDate(
-                user, startDate, startDate.plusMinutes(parseInt(endDate)));
+                user, startDate, endDate);
     }
 
     private void checkValidMeetingDate(ArticlePostRequest request) {

@@ -89,11 +89,7 @@ public class PetService {
     }
 
     public List<Pet> returnExistsPetsOrThrow(final List<Long> petIds) {
-        final List<Pet> pets = new ArrayList<>();
-        for (Long petId : petIds) {
-            pets.add(returnExistsPetOrThrow(petId));
-        }
-        return pets;
+        return petRepository.findAllById(petIds);
     }
 
     public void checkValidPetOrThrow(final Pet pet) {

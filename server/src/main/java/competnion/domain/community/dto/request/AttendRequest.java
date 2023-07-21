@@ -13,7 +13,7 @@ public class AttendRequest {
     private Long articleId;
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime startDate;
-    @Pattern(regexp = "^(30|60|90|120|150|180)$")
-    private String endDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    private LocalDateTime endDate;
     private int attendant;
 }

@@ -9,17 +9,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface PetRepository extends JpaRepository<Pet, Long> {
-    List<Pet> findAllByUserId(Long userId);
+public interface PetRepository extends JpaRepository<Pet, Long>, PetRepositoryCustom {
+
+    List<Pet> findAllById(List<Long> petIds);
     Integer countByUserId(Long userId);
-
     List<Pet> findAllByArticleId(Long articleId);
-
-    @Query (value = "select p from Pet p "
-                  + "where p.user.id = :userId "
-                  + "and p.article.id = :articleId")
-    List<Pet> findParticipatingPetsByUserIdAndArticleId (
-            @Param("userId") Long userId,
-            @Param("articleId") Long articleId
-    );
 }

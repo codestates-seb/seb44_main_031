@@ -15,5 +15,4 @@ public interface AttendRepositoryCustom {
             User user
     );
     void findAttendeeDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);
-
 }

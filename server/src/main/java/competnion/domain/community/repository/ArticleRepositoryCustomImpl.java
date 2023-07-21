@@ -135,12 +135,12 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     @Override
     public List<Article> findArticlesOpen() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneHourPassed = now.minusHours(1);
+        LocalDateTime passed = now.minusMinutes(30);
         return jpaQueryFactory
                 .selectFrom(article)
                 .where(
                         article.articleStatus.eq(OPEN),
-                        article.endDate.before(oneHourPassed)
+                        article.endDate.before(passed)
                 )
                 .fetch();
     }

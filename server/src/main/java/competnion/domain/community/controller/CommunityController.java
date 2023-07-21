@@ -98,7 +98,6 @@ public class CommunityController {
     }
 
     @Scheduled(cron = "0 0/30 6-23 * * *", zone = "Asia/Seoul")
-    @GetMapping("/scheduled-close")
     public void close() {
         communityService.closeScheduled();
     }

@@ -88,6 +88,10 @@ public class Pet extends BaseEntity {
         this.article = article;
     }
 
+    public void deleteArticle() {
+        this.article = null;
+    }
+
     public void updateGender(final Boolean gender) {
         isInstanceOf(Boolean.class, gender, "Boolean expected");
         this.gender = gender;

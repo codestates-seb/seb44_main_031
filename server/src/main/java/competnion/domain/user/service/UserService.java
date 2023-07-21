@@ -48,11 +48,10 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
         User existsUser = returnExistsUserByIdOrThrow(userId);
-        List<PetResponse> pets = petRepository.findAllByUserId(userId)
-                .stream()
+        List<PetResponse> petResponses = existsUser.getPets().stream()
                 .map(PetResponse::of)
                 .collect(Collectors.toList());
-        return UserResponse.of(existsUser, pets);
+        return UserResponse.of(existsUser, petResponses);
     }
 
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
