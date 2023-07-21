@@ -1,5 +1,12 @@
 import { styled } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import {
+  walkMateAllUrl,
+  myPageUrl,
+  signUpUrl,
+  signInUrl,
+} from '../api/reactRouterUrl';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -9,10 +16,10 @@ const Header = () => {
     window.location.reload();
   };
   const handleSignUpClick = () => {
-    navigate('/users/sign-up');
+    navigate(signUpUrl);
   };
   const handleLogin = () => {
-    navigate('/users/sign-in');
+    navigate(signInUrl);
   };
   return (
     <HeaderContainer>
@@ -21,10 +28,10 @@ const Header = () => {
         <LogoText>PetMily</LogoText>
       </LogoContainer>
       <NavigationContainer>
-        <NavLink>산책모임</NavLink>
-        <NavLink>애견용품 중고거래</NavLink>
-        <NavLink>우리동네 애견샵</NavLink>
-        <NavLink>마이페이지</NavLink>
+        <StyledNavLink to={walkMateAllUrl}>산책모임</StyledNavLink>
+        <StyledNavLink to={'/init'}>애견용품 중고거래</StyledNavLink>
+        <StyledNavLink to={'/init2'}>우리동네 애견샵</StyledNavLink>
+        <StyledNavLink to={myPageUrl}>마이페이지</StyledNavLink>
       </NavigationContainer>
       <AuthContainer>
         <LoginButton onClick={handleLogin}>Login</LoginButton>
@@ -74,7 +81,7 @@ const NavigationContainer = styled.div`
   gap: 80px;
 `;
 
-const NavLink = styled.a`
+const StyledNavLink = styled(NavLink)`
   font-size: 18px;
   font-weight: bold;
   color: var(--black-900);
@@ -82,14 +89,14 @@ const NavLink = styled.a`
   cursor: pointer;
   position: relative;
 
-  &:before {
+  &:not(.active)::before {
     content: '';
     position: absolute;
     bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
     width: 0;
-    height: 4px;
+    height: 3px;
     border-radius: 30px;
     background-color: var(--pink-400);
     transition: width 0.3s ease-out;
@@ -97,6 +104,17 @@ const NavLink = styled.a`
 
   &:hover:before {
     width: 100%;
+  }
+
+  &.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px; /* Adjust this value to control the distance of the underline from the text */
+    left: 0;
+    width: 100%; /* This will make the underline span the entire width of the NavLink */
+    height: 3px; /* Adjust this value to control the thickness of the underline */
+    border-radius: 30px;
+    background-color: var(--pink-400); /* Set the color of the underline */
   }
 `;
 
