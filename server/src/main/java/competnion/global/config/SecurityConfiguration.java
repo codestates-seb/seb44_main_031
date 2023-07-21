@@ -98,10 +98,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.PATCH,"/users/username/{user-id}").hasRole("USER")
                                 .antMatchers(HttpMethod.PATCH,"/users/image/{user-id}").hasRole("USER")
 
-                                .antMatchers(HttpMethod.POST,"/pets/register/").hasRole("USER")
+                                .antMatchers(HttpMethod.POST,"/pets/**").hasRole("USER")
 
 
                                 .antMatchers(HttpMethod.POST,"/articles/**").hasRole("USER")
+                                .antMatchers(HttpMethod.GET,"/articles/**").hasRole("USER")
                                 .antMatchers(HttpMethod.DELETE,"/articles/**").hasRole("USER")
 
                                 .anyRequest().permitAll()

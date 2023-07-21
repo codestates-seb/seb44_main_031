@@ -5,6 +5,7 @@ import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.request.UpdateArticleRequest;
 import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.WriterResponse;
+import competnion.domain.community.response.MultiArticleResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
@@ -109,19 +110,20 @@ public class CommunityController {
     }
 
     /** 전체 조회 **/
-    @GetMapping("/all")
-    public Response<List<ArticleResponse>> getAllArticles(
+    @GetMapping
+    public ResponseEntity<MultiArticleResponse> getAllArticles(
             @UserContext final User user,
             @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
-            @RequestParam(value = "days",       required = false, defaultValue = "30") final int days,
-            @RequestParam(value = "pageNumber", required = false, defaultValue = "1")  final int pageNumber,
-            @RequestParam(value = "pageSize",   required = false, defaultValue = "10") final int pageSize
+            @RequestParam(value = "days",       required = false, defaultValue = "30") final Integer days,
+            @RequestParam(value = "page", required = false, defaultValue = "1")  final int page,
+            @RequestParam(value = "size",   required = false, defaultValue = "10") final int size
     ) {
-        PageRequest pageable = PageRequest.of(pageNumber - 1, pageSize);
-        List<ArticleResponse> articles = communityService.getAll(user, keyword, days, pageable);
-        return Response.success(articles);
-    }
+        PageRequest pageable = PageRequest.of(page - 1, size);
 
+
+        return new ResponseEntity<>(communityService.getAll(user, keyword, days, pageable),HttpStatus.OK);
+
+    }
     // 게시글 삭제
     @DeleteMapping("/{article-id}")
     public Response<Void> deleteArticle(
@@ -131,5 +133,6 @@ public class CommunityController {
         communityService.deleteArticle(user, articleId);
         return Response.success();
     }
+
 }
 

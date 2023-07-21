@@ -11,10 +11,9 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -26,10 +25,7 @@ public interface ArticleMapper {
         User user = article.getUser(); // 작성자
 
 
-        List<Pet> dogs = user.getPets().stream()
-                .filter(pet -> pet.getArticle() != null)
-                .filter(pet -> pet.getArticle().getId().equals(article.getId()))
-                .collect(Collectors.toList());
+        List<Pet> dogs = selectJoiningPets(article,user);
 
 
         UserResponse.InArticleResponse owner = UserResponse.InArticleResponse.getResponse(user, petsToPetSimpleNameResponse(dogs));
@@ -38,10 +34,7 @@ public interface ArticleMapper {
         ArticleResponseDto.OfSingleResponse articles = ArticleResponseDto.OfSingleResponse.getSingleResponse(imgUrl,article,commentsToCommentResponses(article.getComments()));
 
         List<UserResponse.InArticleResponse> attendees = users.stream()
-                .map(attendee -> UserResponse.InArticleResponse.getResponse(attendee,petsToPetSimpleNameResponse(attendee.getPets().stream()
-                        .filter(pet -> pet.getArticle() != null)
-                        .filter(pet -> pet.getArticle().getId().equals(article.getId()))
-                        .collect(Collectors.toList()))))
+                .map(attendee -> UserResponse.InArticleResponse.getResponse(attendee,petsToPetSimpleNameResponse(selectJoiningPets(article,attendee))))
                 .collect(Collectors.toList());
 
 
@@ -49,16 +42,18 @@ public interface ArticleMapper {
     }
 
 
-//    default MultiArticleResponse articleToMultiArticleResponses(List<String> imgUrl, List<Article> articles, User user) {
-//
-//        List<ArticleResponseDto.OfMultiResponse> articlesInfo = articles.stream()
-//                .map(article -> ArticleResponseDto.getResponse(articles))
-//
-//        UserResponse.OfMultiArticleResponse userinfo = UserResponse.OfMultiArticleResponse.getResponse(user);
-//
-//
-//        return new MultiArticleResponse(,userinfo);
-//    }
+    default MultiArticleResponse articleToMultiArticleResponses(List<ArticleResponseDto.OfMultiResponse> responses,
+                                                                User user,
+                                                                Page page) {
+
+
+        UserResponse.OfMultiArticleResponse userinfo = UserResponse.OfMultiArticleResponse.getResponse(user);
+
+
+
+
+        return new MultiArticleResponse(responses,userinfo,page);
+    }
 
     default List<PetResponse.ForArticleResponse> petsToPetSimpleNameResponse (List<Pet> pets) {
         return pets.stream()
@@ -76,5 +71,13 @@ public interface ArticleMapper {
                                 comment.getBody(),
                                 comment.getCreatedAt()))
                         .collect(Collectors.toList());
+    }
+
+    default List<Pet> selectJoiningPets (Article article,User user) {
+
+        return user.getPets().stream()
+                .filter(pet -> pet.getArticle() != null)
+                .filter(pet -> pet.getArticle().getId().equals(article.getId()))
+                .collect(Collectors.toList());
     }
 }

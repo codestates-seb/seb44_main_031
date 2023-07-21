@@ -6,12 +6,12 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.QArticleQueryDto;
 import competnion.domain.community.entity.Article;
-import competnion.domain.community.entity.ArticleStatus;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -32,7 +32,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
     private BooleanExpression all(
             String keyword,
-            int days
+            Integer days
     ) {
         return days(days).and(keyword(keyword));
     }
@@ -41,27 +41,23 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
         return keyword != null && !keyword.isEmpty() ? article.title.contains(keyword) : null;
     }
 
-    private BooleanExpression days(int days) {
-        return days == 7 ? article.startDate.between(LocalDateTime.now(), LocalDateTime.now().plusDays(7)) : null;
+    private BooleanExpression days(Integer days) {
+
+        return days != null ? article.startDate.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days)) : null;
+
     }
 
-    private BooleanExpression cursorId(Long cursorId) {
-        return cursorId == null ? null : article.id.gt(cursorId);
-    }
 
     @Override
-    public List<ArticleQueryDto> findAllByKeywordAndDistanceAndDays(
+    public Page<Article> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
             int days,
             Double distance,
-//            String orderBy,
-            long offset,
-            int limit
+            Pageable pageable
     ) {
-        return jpaQueryFactory
-                .select(new QArticleQueryDto(article.title, article.startDate))
-                .from(article)
+        List<Article> content = jpaQueryFactory
+                .selectFrom(article)
                 .where(
                         all(keyword, days),
 
@@ -73,11 +69,27 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                         article.articleStatus.eq(OPEN),
                         article.startDate.after(LocalDateTime.now())
                 )
-//                .orderBy(order(orderBy))
-                .orderBy(article.startDate.desc())
-                .offset(offset)
-                .limit(limit)
+                .orderBy(article.startDate.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        // 카운트 쿼리 (전체 자료 갯수 구하기)
+        long total = jpaQueryFactory
+                    .selectFrom(article)
+                .where(all(keyword, days),
+
+                        Expressions.numberTemplate(
+                                Double.class,
+                                "ST_Distance_Sphere({0}, {1})", userPoint, article.point
+                        ).loe(distance),
+
+                        article.articleStatus.eq(OPEN),
+                        article.startDate.after(LocalDateTime.now())
+                )
+                .fetchCount();
+
+        return new PageImpl<>(content,pageable,total);
     }
 
     @Override
@@ -104,33 +116,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 .fetch();
     }
 
-
-    @Override
-    public Page<Article> findArticlesByConditionsWithCursorPaging(
-            Long cursorId,
-            Point userPoint,
-            Double distance,
-            Pageable pageable) {
-
-        List<Article> articles = jpaQueryFactory
-                .select(article)
-                .from(article)
-                .where(
-
-                        cursorId(cursorId),
-
-                        Expressions.numberTemplate(
-                                Double.class,
-                                "ST_Distance_Sphere({0}, {1})", userPoint, article.point
-                        ).loe(distance),
-
-                        article.startDate.after(LocalDateTime.now())
-                )
-
-                .limit(pageable.getPageSize())
-                .fetch();
-        return null;
-    }
 
     @Override
     public void findDuplicateMeetingDate(User userEntity, LocalDateTime starDate, LocalDateTime endDate) {

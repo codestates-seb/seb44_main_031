@@ -12,8 +12,18 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class MultiArticleResponse {
-//    private List <ArticleResponseDto.OfMultiResponse> article;
+    private List <ArticleResponseDto.OfMultiResponse> articles;
     private UserResponse.OfMultiArticleResponse userInfo;
+    private Pageinfo pageinfo;
 
+    public MultiArticleResponse(
+            List<ArticleResponseDto.OfMultiResponse> articles,
+            UserResponse.OfMultiArticleResponse userInfo,
+            Page page) {
+
+        this.articles = articles;
+        this.userInfo = userInfo;
+        this.pageinfo = new Pageinfo(page.getNumber()+1,page.getTotalPages());
+    }
 
 }
