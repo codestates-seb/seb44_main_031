@@ -1,14 +1,14 @@
 cloud:
   aws:
     s3:
-      bucket: mybucketforpetmily
+      bucket: ${BUCKET_NAME}
     region:
       static: ap-northeast-2
     stack:
       auto: false # CloudFormation 구성을 사용하지 않도록 설정
     credentials:
-      accessKey:
-      secretKey:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
 
 Spring:
 
@@ -18,10 +18,10 @@ Spring:
       max-request-size: 3MB
 
   mail:
-    host: smtp.gmail.com # gmail SMTP 서버
-    port: 587 # gmail SMTP 서버
-    username: dlawjdals02182@gmail.com
-    password:
+    host: ${MAIL_HOST} # gmail SMTP 서버
+    port: ${MAIL_PORT} # gmail SMTP 서버
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties: # 추가 속성
       mail:
         smtp:
@@ -33,33 +33,33 @@ Spring:
             required: true
 
   redis:
-    host: 127.0.0.1
-    port: 6379
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
 
-#  h2:
-#    console:
-#      enabled: true
-#      path: /h2-console
-#  profiles:
-#    active: local
-#  datasource:
-#    url: jdbc:h2:mem:test
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    hibernate:
-#      ddl-auto: create-drop
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
+  #  h2:
+  #    console:
+  #      enabled: true
+  #      path: /h2-console
+  #  profiles:
+  #    active: local
+  #  datasource:
+  #    url: jdbc:h2:mem:test
+  #    username: sa
+  #    password:
+  #    driver-class-name: org.h2.Driver
+  #  jpa:
+  #    database-platform: org.hibernate.dialect.H2Dialect
+  #    hibernate:
+  #      ddl-auto: create-drop
+  #    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        format_sql: true
 
   datasource:
-    url: jdbc:mysql://localhost:3307/yyyy?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
-    username: root
-    password:
+    url: ${RDS_URL}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -81,8 +81,8 @@ Spring:
       mode: always
 
 jwt:
-  key: fasdfdasfasdfdsfasdfasdfasdfasdfasdf
-  access-token-expiration-minutes: 60
+  key: ${JWT_KEY}
+  access-token-expiration-minutes: 6000
   refresh-token-expiration-minutes: 20160
 
 logging.level:
