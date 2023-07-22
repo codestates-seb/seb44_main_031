@@ -12,8 +12,8 @@ cloud:
 config.domain: http://mybucketforpetmily.s3-website.ap-northeast-2.amazonaws.com
 
 Spring:
-  jackson:
-    time-zone: Asia/Seoul
+#  jackson:
+#    time-zone: Asia/Seoul
 
   servlet:
     multipart:
