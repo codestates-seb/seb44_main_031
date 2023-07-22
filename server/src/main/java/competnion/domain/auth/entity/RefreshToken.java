@@ -1,4 +1,4 @@
-package competnion.global.auth.entity;
+package competnion.domain.auth.entity;
 
 import lombok.*;
 

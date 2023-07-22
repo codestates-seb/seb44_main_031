@@ -1,21 +1,22 @@
-package competnion.global.auth.service;
+package competnion.domain.auth.service;
 
+import competnion.domain.auth.event.AuthEmailEvent;
+import competnion.domain.auth.repository.RefreshTokenRepository;
+import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
-import competnion.domain.user.service.UserService;
-import competnion.global.auth.repository.RefreshTokenRepository;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.security.interceptor.JwtParseInterceptor;
 import competnion.global.security.jwt.JwtTokenizer;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.CustomAuthorityUtils;
 import competnion.global.util.JwtUtils;
-import competnion.infra.mail.util.EmailUtil;
 import competnion.infra.redis.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Point;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,14 +38,13 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     private final JwtUtils jwtUtils;
-    private final EmailUtil emailUtil;
     private final RedisUtil redisUtil;
-    private final UserService userService;
     private final CoordinateUtil coordinateUtil;
     private final CustomAuthorityUtils authorityUtils;
 
     private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void logout(HttpServletRequest request) {
         log.info("AuthService - logout");
@@ -120,28 +120,18 @@ public class AuthService {
         checkDuplicatedUsername(request.getUsername());
         checkDuplicatedEmail(request.getEmail());
 
-        Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
-        List<String> roles = authorityUtils.createRoles(request.getEmail());
-        String encode = passwordEncoder.encode(request.getPassword());
+        final Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        final List<String> roles = authorityUtils.createRoles(request.getEmail());
+        final String encode = passwordEncoder.encode(request.getPassword());
 
-        userService.saveUser(point, request, encode, roles);
+        saveUser(point, encode, roles, request);
         redisUtil.deleteData(request.getEmail());
     }
 
     @Transactional(readOnly = true)
-    public void checkDuplicateEmailAndSendVerificationEmail(final String email) {
+    public void sendVerificationEmail(final String email) {
         checkDuplicatedEmail(email);
-        sendEmail(email);
-    }
-
-    @Transactional(readOnly = true)
-    public void checkValidateEmailAndSendEmail(final User user, final String email) {
-        checkEmailValidate(user, email);
-        sendEmail(email);
-    }
-
-    public void deleteUser(final User user) {
-        userRepository.delete(user);
+        eventPublisher.publishEvent(new AuthEmailEvent(email));
     }
 
     public void verifyEmailCode(final String code, final String email) {
@@ -149,24 +139,57 @@ public class AuthService {
             throw new BusinessLogicException(INVALID_EMAIL_CODE);
     }
 
+    @Transactional(readOnly = true)
+    public void checkValidateEmailAndSendEmail(final User user, final String email) {
+        checkEmailValidate(user, email);
+        eventPublisher.publishEvent(new AuthEmailEvent(email));
+    }
+
+    public void deleteUser(final User user) {
+        List<Pet> pets = user.getPets();
+        for (Pet pet : pets)
+            if (pet.getArticle() != null)
+                throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+
+        userRepository.delete(user);
+    }
+
     public void checkEmailValidate(final User user, final String email) {
-        if (!userService.checkEmailValidate(user, email))
+        if (user.getEmail().equals(email))
             throw new BusinessLogicException(INVALID_EMAIL);
     }
 
-    public void checkDuplicatedUsername(final String username) {
-        if (!userService.checkExistsUserByUsername(username))
-            throw new BusinessLogicException(DUPLICATE_USERNAME);
+    public void checkDuplicatedUsername(final String nickname) {
+        if (userRepository.findByNickname(nickname).isPresent())
+            throw new BusinessLogicException(DUPLICATE_NICKNAME);
     }
 
     public void checkDuplicatedEmail(final String email) {
-        if (!userService.checkExistsUserByEmail(email))
+        if (userRepository.findByEmail(email).isPresent())
             throw new BusinessLogicException(DUPLICATE_EMAIL);
     }
 
-    public void sendEmail(String email) {
-        String code = emailUtil.generateRandomCode();
-        redisUtil.setDataAndExpire(email, code, 600000L);
-        emailUtil.sendVerificationEmail(email, code);
+    public void checkMatchPassword(final String password, final String encodePassword) {
+        final boolean matches = passwordEncoder.matches(password, encodePassword);
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+    }
+
+    public void saveUser(
+            final Point point,
+            final String encode,
+            final List<String> roles,
+            final SignUpRequest request
+    ) {
+        userRepository.save(User.signUp()
+                .email(request.getEmail())
+                .nickname(request.getUsername())
+                .password(encode)
+                .address(request.getAddress())
+                .point(point)
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
+                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/dog.png")
+                .roles(roles)
+                .build());
     }
 }

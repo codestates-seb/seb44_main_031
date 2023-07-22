@@ -1,6 +1,6 @@
-package competnion.global.auth.repository;
+package competnion.domain.auth.repository;
 
-import competnion.global.auth.entity.RefreshToken;
+import competnion.domain.auth.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

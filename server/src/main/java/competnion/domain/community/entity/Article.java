@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static competnion.domain.community.entity.ArticleStatus.OPEN;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.EnumType.STRING;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -44,34 +46,21 @@ public class Article extends BaseEntity {
     private LocalDateTime endDate;
     @Column(nullable = false)
     private int attendant;
-
-
-
     @Enumerated(STRING)
     private ArticleStatus articleStatus;
-    @ManyToOne(fetch = FetchType.EAGER)
+
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(name = "user_id")
     private User user;
+
     @OneToMany(mappedBy = "article")
     private List<ArticleImage> images = new ArrayList<>();
     @OneToMany(mappedBy = "article")
     private List<Pet> pets = new ArrayList<>();
-
-//    @OnDelete(action= OnDeleteAction.CASCADE)
-    @OneToMany(mappedBy = "article", cascade = {CascadeType.REMOVE})
+    @OneToMany(mappedBy = "article", cascade = REMOVE)
     private List<Comment> comments = new ArrayList<>();
-//    private Duration timeDifference;
-//
-//    public Article(LocalDateTime date) {
-//        this.date = date;
-//        this.timeDifference = calculateTimeDifference(date);
-//    }
-//
-//    // 게시글의 date 필드와 현재 시간 간의 차이 계산 메소드
-//    private Duration calculateTimeDifference(LocalDateTime date) {
-//        LocalDateTime now = LocalDateTime.now();
-//        return Duration.between(date, now);
-//    }
+    @OneToMany(mappedBy = "article")
+    private List<Attend> attends = new ArrayList<>();
 
     @Builder(builderMethodName = "createArticle")
     private Article(User user, String title, String body, String location, int attendant, LocalDateTime startDate, LocalDateTime endDate, Point point) {

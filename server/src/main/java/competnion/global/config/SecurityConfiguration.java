@@ -9,7 +9,7 @@ import competnion.global.security.handler.UserAccessDeniedHandler;
 import competnion.global.security.handler.UserAuthenticationEntryPoint;
 import competnion.global.security.interceptor.JwtParseInterceptor;
 import competnion.global.security.jwt.JwtTokenizer;
-import competnion.global.auth.repository.RefreshTokenRepository;
+import competnion.domain.auth.repository.RefreshTokenRepository;
 import competnion.global.util.CustomAuthorityUtils;
 import competnion.global.util.JwtUtils;
 import competnion.infra.redis.util.RedisUtil;
@@ -22,7 +22,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
