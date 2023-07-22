@@ -5,7 +5,10 @@ import { styled } from 'styled-components';
 import useWalkMateForm from './hooks/useWalkMateForm';
 import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
 import { nowDateAfterSomeMinutes } from '../../utils/date-utils';
-import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
+import {
+  LoadingSpinner,
+  SibaLoadingSpinner,
+} from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
 import {
   axiosInstance,
@@ -115,7 +118,7 @@ const WalkMateCreate = () => {
           formData
         );
 
-        toast.success('산책 모집 글 등록 성공!');
+        toast.success('산책 모집 글 등록 성공!', { position: 'bottom-right' });
         navigate(`/walk-mate/${response.data.result}`);
       } catch (error: unknown | Error | AxiosError) {
         console.log(error);
@@ -147,20 +150,13 @@ const WalkMateCreate = () => {
   };
 
   if (isPageLoading) {
-    return (
-      <FormDivContainer>
-        <img
-          src="/src/assets/loading-spinner-dog-1.gif"
-          alt="dog-loading-spinner"
-        />
-      </FormDivContainer>
-    );
+    return <SibaLoadingSpinner />;
   }
 
   if (error) {
     return (
       <FormDivContainer>
-        <p>{error}</p>
+        <StyledErrorMessage>{error}</StyledErrorMessage>
       </FormDivContainer>
     );
   }
@@ -517,4 +513,9 @@ const StyledForm = styled.form`
       border: 2px solid var(--pink-400);
     }
   }
+`;
+
+const StyledErrorMessage = styled.p`
+  padding: 100px 50px;
+  text-align: center;
 `;

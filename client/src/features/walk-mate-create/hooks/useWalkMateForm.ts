@@ -126,8 +126,8 @@ const useWalkMateForm = () => {
             // setError(error.message);
           } else {
             // Handle other types of errors (e.g., network error)
-            toast.error('An error occurred. Please try again later.');
-            setError('An error occurred. Please try again later.');
+            toast.error(`${error.message}`);
+            setError(`${error.message}`);
           }
         } else {
           // Handle other types of errors (e.g., network error)

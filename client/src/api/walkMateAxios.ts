@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { SelectedFilter } from '../features/walk-mate-all/WalkMateAll';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 // import { useNavigate, useLocation } from 'react-router-dom';
 
 // NOTE: 개발 상황에 따라 baseURL, Token 값을 설정해서 쓰면 됩니다 (영탁)
@@ -8,12 +8,15 @@ import { toast } from 'react-toastify';
 
 // const Token =
 //   'Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlcyI6WyJVU0VSIl0sInVzZXJJZCI6NCwidXNlcm5hbWUiOiJkbGF3amRhbHMwMjE4M0BnbWFpbC5jb20iLCJzdWIiOiJkbGF3amRhbHMwMjE4M0BnbWFpbC5jb20iLCJpYXQiOjE2ODk3MzE2OTgsImV4cCI6MTY5MDA5MTY5OH0.Z1igUATtCdo_nOw2rzenKwcElXbAgPVCMjxPgOndbp4';
-const Token = localStorage.getItem('accessToken');
+// const Token = localStorage.getItem('accessToken');
+export const getTokenFromLocalStorage = () => {
+  return localStorage.getItem('accessToken');
+};
 
 // JSON_SERVER
-export const BASE_URL = 'http://localhost:3001';
-// export const BASE_URL =
-//   'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
+// export const BASE_URL = 'http://localhost:3001';
+export const BASE_URL =
+  'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
 // URL PATH
 export const signInUrl = '/users/sign-in';
@@ -26,43 +29,59 @@ export const postCreateArticleUrl = 'articles';
 export const axiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
-    Authorization: Token,
+    Authorization: getTokenFromLocalStorage(),
   },
 });
 
-export const getArticlesUrl = (
-  page: number,
-  size = 4,
-  selectedFilter: string
-) => {
-  console.log(selectedFilter);
-  return `articles?page=${page}&size=${size}`;
-};
-
 export const getArticlesUrlJsonServer = (
   page: number,
-  size = 4,
-  selectedFilter: SelectedFilter
+  size = 5,
+  selectedFilter: SelectedFilter,
+  searchQuery: string
 ) => {
-  console.log(`articles?_page=${page}&_limit=${size}`, selectedFilter);
+  console.log(
+    `articles?_page=${page}&_limit=${size}`,
+    selectedFilter,
+    searchQuery
+  );
   return `articles?_page=${page}&_limit=${size}`;
+};
+
+export const getArticlesUrl = (
+  page: number,
+  size: number,
+  selectedFilter: SelectedFilter,
+  searchQuery: string
+) => {
+  // console.log(
+  //   `articles?page=${page}&size=${size}days=${30}`,
+  //   selectedFilter,
+  //   searchQuery
+  // );
+  if (searchQuery === '') {
+    return `articles?page=${page}&size=${size}&days=${selectedFilter.period.value}&sort=${selectedFilter.viewOrder.value}`;
+  }
+  return `articles?page=${page}&size=${size}&days=${selectedFilter.period.value}&sort=${selectedFilter.viewOrder.value}&keyword=${searchQuery}`;
 };
 
 // fetch data
 export const fetchWalkMates = async (
-  pageParam = 1,
-  size = 10,
-  selectedFilter: SelectedFilter
+  pageParam: number,
+  size: number,
+  selectedFilter: SelectedFilter,
+  searchQuery: string
 ) => {
   const response = await axiosInstance.get(
-    getArticlesUrlJsonServer(pageParam, size, selectedFilter)
+    // getArticlesUrlJsonServer(pageParam, size, selectedFilter, searchQuery)
+    getArticlesUrl(pageParam, size, selectedFilter, searchQuery)
   );
   console.log('get request success!');
 
-  toast.success('새로운 모임 받아오기 성공!', {
-    toastId: 'success',
-    autoClose: 1500,
-  });
+  // toast.success('새로운 모임 글 받아오기 성공!', {
+  //   toastId: 'success',
+  //   autoClose: 1500,
+  //   position: 'bottom-left',
+  // });
 
   return response;
 };

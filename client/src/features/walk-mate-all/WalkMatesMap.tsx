@@ -5,10 +5,8 @@ import {
 } from '../../constants/imageSrcPath';
 import { Article, WalkMateAllContext } from './WalkMateAll';
 
-const markerIdMap = new Map<kakao.maps.Marker, number>();
-
-const latitude = 37.58251737488069;
-const longitude = 126.98517705739235;
+// const latitude = 37.58251737488069;
+// const longitude = 126.98517705739235;
 
 interface WalkMatesMapProps {
   setSelectedCard: React.Dispatch<React.SetStateAction<number | null>>;
@@ -18,9 +16,15 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
   const queryData = useContext(WalkMateAllContext);
-  console.log(queryData);
+  console.log('WalkMatesMap rendered');
 
   useEffect(() => {
+    console.log('WalkMatesMap useEffect rendered');
+    const latitude = queryData?.pages[0].data.userInfo.latitude;
+    const longitude = queryData?.pages[0].data.userInfo.longitude;
+
+    const markerIdMap = new Map<kakao.maps.Marker, number>();
+
     const container = mapRef.current;
 
     const options = {
@@ -51,7 +55,7 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
 
     // 여러개의 마커 생성하기
     queryData?.pages.map((page: any) => {
-      return page.data.map((article: Article) => {
+      return page.data.articles.map((article: Article) => {
         // 마커 이미지의 이미지 크기 입니다
         const imageSize = new kakao.maps.Size(24, 35);
 
@@ -114,14 +118,7 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
             behavior: 'smooth',
             block: 'center',
           });
-          // testId?.setAttribute('$isSelected', "true");
         });
-
-        // 각 산책카드의 div 에 id 를 설정하고
-        // getElementById 로 해당 div 요소를 선택한다음 -> 해당 id 인지 어떻게 알지? id랑 articleId 를 같게 설정해야되겠다 article1. article2 이런식으로
-        // div.scrollIntoView({ behavior: "smooth"}) 하면 될거같은데?
-        // 선택된 articleId 를 상태값으로 들고 있어도 될듯
-        //
       });
     });
 
@@ -147,7 +144,8 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
         width: '450px',
         height: '600px',
         position: 'sticky',
-        top: '100px',
+        top: '160px',
+        borderRadius: '25px',
       }}
       ref={mapRef}
     />

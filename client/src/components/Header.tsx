@@ -6,6 +6,8 @@ import {
   myPageUrl,
   signUpUrl,
   signInUrl,
+  secondHandUrl,
+  petShopUrl,
 } from '../api/reactRouterUrl';
 
 const Header = () => {
@@ -29,8 +31,8 @@ const Header = () => {
       </LogoContainer>
       <NavigationContainer>
         <StyledNavLink to={walkMateAllUrl}>산책모임</StyledNavLink>
-        <StyledNavLink to={'/init'}>애견용품 중고거래</StyledNavLink>
-        <StyledNavLink to={'/init2'}>우리동네 애견샵</StyledNavLink>
+        <StyledNavLink to={secondHandUrl}>애견용품 중고거래</StyledNavLink>
+        <StyledNavLink to={petShopUrl}>우리동네 애견샵</StyledNavLink>
         <StyledNavLink to={myPageUrl}>마이페이지</StyledNavLink>
       </NavigationContainer>
       <AuthContainer>

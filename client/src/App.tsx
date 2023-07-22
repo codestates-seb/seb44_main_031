@@ -15,6 +15,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import GuidePage from './components/GuidePage';
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,8 @@ function App() {
             <Route path="mypage" element={<Mypage />} />
             <Route path="test" element={<Form />} />
           </Route>
+          <Route path="/second-hand-item" element={<GuidePage />} />
+          <Route path="/pet-shop" element={<GuidePage />} />
         </Routes>
         <Footer />
         <ToastContainer autoClose={AUTO_CLOSE_MS_TIME} />

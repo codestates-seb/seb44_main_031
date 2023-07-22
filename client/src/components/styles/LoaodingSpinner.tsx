@@ -1,5 +1,38 @@
 import { styled } from 'styled-components';
 
+export const SibaLoadingSpinner = () => {
+  return (
+    <StyledLoadingSpinnerContainer>
+      {/* <img
+        src="/src/assets/loading-spinner-dog-1.gif"
+        alt="dog-loading-spinner"
+        className="dog-loading-spinner"
+      /> */}
+      <StyledSibaLoadingSpinnerImageTag
+        src="/src/assets/loading-spinner-dog-1.gif"
+        alt="dog-loading-spinner"
+      />
+    </StyledLoadingSpinnerContainer>
+  );
+};
+
+const StyledLoadingSpinnerContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 900px;
+
+  /* .dog-loading-spinner {
+    width: 30%;
+    border-radius: 100px;
+  } */
+`;
+
+export const StyledSibaLoadingSpinnerImageTag = styled.img`
+  width: 30%;
+  border-radius: 120px;
+`;
+
 export const LoadingSpinner = styled.span`
   width: 30px;
   height: 30px;

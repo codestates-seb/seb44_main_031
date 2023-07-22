@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { styled } from 'styled-components';
-import WalkMatesMap from './WalkMatesMap';
-import WalkMatesFilters from './WalkMatesFilters';
-import WalkMatesHeader from './WalkMatesHeader';
 import { createContext, useRef, useCallback } from 'react';
 import { IoIosArrowDropupCircle } from 'react-icons/io';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import WalkMatesCard from './WalkMatesCard';
 import { fetchWalkMates } from '../../api/walkMateAxios';
 import { toast } from 'react-toastify';
+import WalkMatesHeader from './WalkMatesHeader';
+import WalkMatesSerchBar from './WalkMatesSerchBar';
+import WalkMatesFilters from './WalkMatesFilters';
+import WalkMatesCard from './WalkMatesCard';
+import WalkMatesMap from './WalkMatesMap';
+import { SibaLoadingSpinner } from '../../components/styles/LoaodingSpinner';
 
 export const WalkMateAllContext = createContext<any>(null);
 
 export type Article = {
   articleId: number;
-  imgUrl: string;
+  imageUrls: string[];
   startDate: string;
   endDate: number;
   title: string;
@@ -27,7 +29,7 @@ export type Article = {
   isViewerJoining: boolean;
 };
 
-const pageSize = 5;
+const pageSize = 4;
 
 export type SelectedFilter = {
   period: { value: string; label: string };
@@ -39,13 +41,16 @@ export type SelectedFilter = {
 
 // component
 const WalkMateAll = () => {
+  console.log('WalkMateAll rendered');
+
   const [selectedFilter, setSelectedFilter] = useState<SelectedFilter>({
-    period: { value: 'whole-period', label: '전체 기간' },
+    period: { value: '30', label: '30일 이내' },
     viewOrder: {
-      value: 'close-to-deadline',
-      label: '마감 임박순',
+      value: 'asc',
+      label: '모임 가까운순',
     },
   });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
 
@@ -62,15 +67,22 @@ const WalkMateAll = () => {
     isError,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['articles', selectedFilter],
+    queryKey: ['articles', selectedFilter, searchQuery],
     queryFn: ({ pageParam = 1 }) =>
-      fetchWalkMates(pageParam, pageSize, selectedFilter),
-    getNextPageParam: (lastPage, pages) => {
-      // console.log(lastPage);
-      // console.log(pages);
-      // 서버와 연결되면 pageSize 조건문 수정하면됨
-      return lastPage?.data.length === pageSize ? pages.length + 1 : undefined;
+      fetchWalkMates(pageParam, pageSize, selectedFilter, searchQuery),
+    // getNextPageParam: (lastPage, pages) => {
+    //   return lastPage?.data.articles.length === pageSize
+    //     ? pages.length + 1
+    //     : undefined;
+    // },
+    getNextPageParam: (lastPage) => {
+      return lastPage?.data.pageinfo.currentPage ===
+        lastPage?.data.pageinfo.totalPage
+        ? undefined
+        : lastPage?.data.pageinfo.currentPage + 1;
     },
+    // cacheTime: 0,
+    // keepPreviousData: true,
   });
 
   console.log(data);
@@ -95,31 +107,37 @@ const WalkMateAll = () => {
   );
 
   if (isError) {
-    toast.error(`Error: ${(error as any).message}`);
+    let errorMessage = '';
+    console.log(error);
 
-    // Check if error.message exists and use it, otherwise provide a fallback error message
-    const errorMessage =
-      (error as any)?.message || '네트워크 에러가 발생했습니다';
+    if ((error as any)?.response) {
+      errorMessage =
+        `${(error as any)?.response.data.status}: ${
+          (error as any)?.response.data.message
+        }` || '네트워크 에러가 발생했습니다';
+    } else {
+      errorMessage = `${(error as any)?.message}`;
+    }
 
-    return <p>Error: {errorMessage}</p>;
-  }
-  if (isLoading) {
+    toast.error(errorMessage);
+
     return (
       <StyledWalkMateAllContainer>
-        <img
-          src="/src/assets/loading-spinner-dog-1.gif"
-          alt="dog-loading-spinner"
-        />
+        <p>{errorMessage}</p>
       </StyledWalkMateAllContainer>
     );
   }
-  // if (isFetchingNextPage) {
-  //   toast('Loading more data...', { toastId: 'loading' });
-  // }
+
+  if (isLoading) {
+    return <SibaLoadingSpinner />;
+  }
+
+  // Filter 에 내려줄 유저 주소
+  const userAddress = data?.pages[0].data.userInfo.address;
 
   const content = data?.pages.map((page) => {
-    return page.data.map((article: Article, index: number) => {
-      if (page.data.length === index + 1) {
+    return page.data.articles.map((article: Article, index: number) => {
+      if (page.data.articles.length === index + 1) {
         return (
           <WalkMatesCard
             ref={lastArticleRef}
@@ -143,15 +161,38 @@ const WalkMateAll = () => {
     <WalkMateAllContext.Provider value={data}>
       <StyledWalkMateAllContainer>
         <WalkMatesHeader />
+        <WalkMatesSerchBar
+          setSearchQuery={setSearchQuery}
+          isLoading={isLoading}
+        />
         <WalkMatesFilters
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
+          searchQuery={searchQuery}
+          userAddress={userAddress}
+          isLoading={isLoading}
         />
         <StyeldMainContentContainer>
-          <StyledWalkMatesListContainer>{content}</StyledWalkMatesListContainer>
-          {/* {isFetchingNextPage && <p>Loading More Articles...</p>} */}
+          <StyledWalkMatesListContainer>
+            {isLoading ? (
+              <img
+                src="/src/assets/loading-spinner-dog-1.gif"
+                alt="dog-loading-spinner"
+                className="dog-loading-spinner"
+              />
+            ) : (
+              content
+            )}
+          </StyledWalkMatesListContainer>
           <WalkMatesMap setSelectedCard={setSelectedCard} />
         </StyeldMainContentContainer>
+        {isFetchingNextPage && (
+          <img
+            src="/src/assets/loading-spinner-dog-1.gif"
+            alt="dog-loading-spinner"
+            className="dog-loading-spinner"
+          />
+        )}
         {!hasNextPage && <p>( 더 이상 개설된 모임이 없습니다 )</p>}
         <IoIosArrowDropupCircle
           className="scroll-to-top-icon"
@@ -161,6 +202,8 @@ const WalkMateAll = () => {
     </WalkMateAllContext.Provider>
   );
 };
+
+export default WalkMateAll;
 
 const StyledWalkMateAllContainer = styled.div`
   width: 1000px;
@@ -181,6 +224,12 @@ const StyledWalkMateAllContainer = styled.div`
     height: 60px;
     cursor: pointer;
   }
+
+  .dog-loading-spinner {
+    width: 300px;
+    align-self: center;
+    border-radius: 90px;
+  }
 `;
 
 const StyeldMainContentContainer = styled.div`
@@ -189,8 +238,6 @@ const StyeldMainContentContainer = styled.div`
   justify-content: space-between;
   gap: 25px;
 `;
-
-export default WalkMateAll;
 
 const StyledWalkMatesListContainer = styled.div`
   display: flex;
