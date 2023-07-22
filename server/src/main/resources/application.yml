@@ -9,7 +9,7 @@ cloud:
     credentials:
       accessKey: ${AWS_ACCESS_KEY}
       secretKey: ${AWS_SECRET_KEY}
-
+config.domain: http://mybucketforpetmily.s3-website.ap-northeast-2.amazonaws.com
 
 Spring:
   jackson:
