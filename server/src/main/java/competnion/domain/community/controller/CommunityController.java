@@ -13,6 +13,7 @@ import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
+import competnion.infra.redis.lock.AttendLockFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,8 @@ import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.OK;
+
 @Slf4j
 @Validated
 @RestController
@@ -36,6 +39,7 @@ import java.util.List;
 @RequestMapping("/articles")
 public class CommunityController {
     private final CommunityService communityService;
+    private final AttendLockFacade attendLockFacade;
 
     @GetMapping("/writer-info")
     public Response<WriterResponse> getWriterInfo(@UserContext final User user) {
@@ -63,9 +67,9 @@ public class CommunityController {
     // 게시글 수정
     @PatchMapping("/{article-id}")
     public Response<Void> updateArticle(
-            @UserContext final User user,
-            @Positive @PathVariable("article-id") final Long articleId,
-            @Valid @RequestPart("request") final UpdateArticleRequest request,
+            @UserContext                                    final User user,
+            @Valid @RequestPart("request")                  final UpdateArticleRequest request,
+            @Positive @PathVariable("article-id")           final Long articleId,
             @RequestPart(value = "image", required = false) final List<MultipartFile> images
     ) {
         communityService.updateArticle(user, articleId, request, images);
@@ -74,8 +78,8 @@ public class CommunityController {
 
     // 게시글 참여
     @PostMapping("/attend")
-    public Response<Void> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest attendRequest) {
-        communityService.attend(user, attendRequest);
+    public Response<Void> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest request) {
+        attendLockFacade.attend(user, request);
         return Response.success();
     }
 
@@ -107,12 +111,13 @@ public class CommunityController {
     // 게시글 상세 조회
     @GetMapping("/{article-id}")
     public ResponseEntity<SingleArticleResponseDto> getArticle(@PathVariable("article-id") @Positive Long articleId){
-        return new ResponseEntity<>(communityService.findArticle(articleId), HttpStatus.OK);
+        return new ResponseEntity<>(communityService.findArticle(articleId), OK);
     }
 
     /** 전체 조회 **/
     @GetMapping
     public ResponseEntity<MultiArticleResponse> getAllArticles(
+
             @UserContext final User user,
             @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
             @RequestParam(value = "days",       required = true)                       final Integer days,

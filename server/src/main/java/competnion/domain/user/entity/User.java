@@ -79,7 +79,7 @@ public class User extends BaseEntity {
         this.imgUrl = imgUrl;
     }
 
-    public void updateUsername(final String nickname) {
+    public void updateNickname(final String nickname) {
         hasText(nickname, "nickname must not be empty");
         this.nickname = nickname;
     }

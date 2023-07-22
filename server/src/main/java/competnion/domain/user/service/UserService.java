@@ -1,5 +1,6 @@
 package competnion.domain.user.service;
 
+import competnion.domain.auth.service.AuthService;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
@@ -34,38 +35,36 @@ import static competnion.global.exception.ExceptionCode.*;
 @Transactional
 @RequiredArgsConstructor
 public class UserService {
-
-    private final PetRepository petRepository;
     private final UserRepository userRepository;
     private final AttendRepository attendRepository;
     private final ArticleRepository articleRepository;
 
     private final S3Util s3Util;
+    private final AuthService authService;
     private final CoordinateUtil coordinateUtil;
     
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponse getProfile(final Long userId) {
-        User existsUser = returnExistsUserByIdOrThrow(userId);
-        List<PetResponse> petResponses = existsUser.getPets().stream()
+        final User existsUser = returnExistsUserByIdOrThrow(userId);
+        final List<PetResponse> petResponses = existsUser.getPets().stream()
                 .map(PetResponse::of)
                 .collect(Collectors.toList());
         return UserResponse.of(existsUser, petResponses);
     }
 
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
-        checkMatchPassword(request.getPassword(), user.getPassword());
+        authService.checkMatchPassword(request.getPassword(), user.getPassword());
 
-        if (userRepository.findByNickname(request.getNewNickname()).isPresent())
-            throw new BusinessLogicException((DUPLICATE_USERNAME));
+        authService.checkDuplicatedUsername(request.getNewNickname());
 
-        user.updateUsername(request.getNewNickname());
+        user.updateNickname(request.getNewNickname());
         return UpdateUsernameResponse.of(user.getNickname());
     }
 
     public void resetPassword(final User user, final ResetPasswordRequest request) {
-        checkMatchPassword(request.getPassword(), user.getPassword());
+        authService.checkMatchPassword(request.getPassword(), user.getPassword());
 
         if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
             throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
@@ -74,7 +73,7 @@ public class UserService {
     }
 
     public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
-        Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        final Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
         user.updateAddressAndCoordinates(request.getAddress(), point);
         return UpdateAddressResponse.of(request);
     }
@@ -100,41 +99,5 @@ public class UserService {
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
-    }
-
-    public Boolean checkExistsUserByUsername(final String username) {
-        return userRepository.findByNickname(username).isEmpty();
-    }
-
-    public Boolean checkExistsUserByEmail(final String email) {
-        return userRepository.findByEmail(email).isEmpty();
-    }
-
-    public Boolean checkEmailValidate(final User user, final String email) {
-        return user.getEmail().equals(email);
-    }
-
-    public void checkMatchPassword(final String password, final String encodePassword) {
-        boolean matches = passwordEncoder.matches(password, encodePassword);
-        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
-    }
-
-    public void saveUser(
-            final Point point,
-            final SignUpRequest request,
-            final String encode,
-            final List<String> roles
-    ) {
-        userRepository.save(User.signUp()
-                .email(request.getEmail())
-                .nickname(request.getUsername())
-                .password(encode)
-                .address(request.getAddress())
-                .point(point)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
-                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/dog.png")
-                .roles(roles)
-                .build());
     }
 }

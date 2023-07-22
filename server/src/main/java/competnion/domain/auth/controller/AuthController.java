@@ -1,12 +1,11 @@
-package competnion.global.auth.controller;
+package competnion.domain.auth.controller;
 
 import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.annotation.ValidUsername;
-import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
-import competnion.global.auth.service.AuthService;
+import competnion.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +42,7 @@ public class AuthController { // VerificationFilter 이후의 처리
     // 회원가입 이메일 중복체크 & 인증 코드 전송
     @GetMapping("/sign-up/send-verification-email")
     public Response<Void> checkDuplicateEmailAndSendVerificationEmail(@Email @RequestParam("email") final String email) {
-        authService.checkDuplicateEmailAndSendVerificationEmail(email);
+        authService.sendVerificationEmail(email);
         return Response.success();
     }
 
@@ -87,7 +86,6 @@ public class AuthController { // VerificationFilter 이후의 처리
         return Response.success();
     }
 
-    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/logout")
     public Response<Void> deleteLogout(HttpServletRequest request) {
         authService.logout(request);

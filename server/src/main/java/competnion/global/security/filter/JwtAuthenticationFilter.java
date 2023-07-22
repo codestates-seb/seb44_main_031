@@ -2,10 +2,10 @@ package competnion.global.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import competnion.domain.user.entity.User;
-import competnion.global.auth.dto.LoginDto;
-import competnion.global.auth.entity.RefreshToken;
+import competnion.domain.auth.dto.LoginDto;
+import competnion.domain.auth.entity.RefreshToken;
 import competnion.global.security.jwt.JwtTokenizer;
-import competnion.global.auth.repository.RefreshTokenRepository;
+import competnion.domain.auth.repository.RefreshTokenRepository;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;

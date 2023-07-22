@@ -112,8 +112,8 @@ public class S3Util {
                 .filter(fileExtension ->
                         !fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
                 .forEach(fileExtension -> {
-            throw new BusinessLogicException(INVALID_IMAGE_EXTENSION);
-        });
+                    throw new BusinessLogicException(INVALID_IMAGE_EXTENSION);
+                });
     }
 
     public void checkImageCount(final List<MultipartFile> images) {
