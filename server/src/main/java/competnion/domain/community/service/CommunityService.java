@@ -21,9 +21,11 @@ import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
+import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -137,10 +139,6 @@ public class CommunityService {
             final UpdateArticleRequest request,
             final List<MultipartFile> images
     ) {
-        Article article1 = getArticleByIdOrThrow(articleId);
-        article1.getAttends().size();
-
-
         long count = attendRepository.countByArticleId(articleId);
         if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
 
@@ -178,9 +176,7 @@ public class CommunityService {
 
     // 참여 취소
     public void cancelAttend(final User user, final Long articleId) {
-         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
-
-        // 2. 취소할때 산책 모임 20분전에는 취소 불가능 (참여할 때 프론트에서 알림 창)
+        // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
         Article article = getArticleByIdOrThrow(articleId);
         if (article.getStartDate().minusMinutes(20).isBefore(LocalDateTime.now()))
             throw new BusinessLogicException(CAN_NOT_CANCEL);
@@ -197,18 +193,16 @@ public class CommunityService {
 
     // 게시글 삭제
     public void deleteArticle(final User user, final Long articleId) {
-        // 1. 참여자가 있으면 삭제 불가능.
         long count = attendRepository.countByArticleId(articleId);
         if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
 
-        Article article = getArticleByIdOrThrow(articleId);
-        articleRepository.delete(article);
-
+        Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId).orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
         List<Pet> pets = petRepository.findAllByArticleId(articleId);
-        pets.forEach(Pet::deleteArticle);
-        article.getPets().clear();
+        Article article = getArticleByIdOrThrow(articleId);
 
-        // TODO : 2. 삭제할 때 비밀번호로 인증.
+        attendRepository.delete(attend);
+        pets.forEach(Pet::deleteArticle);
+        articleRepository.delete(article);
     }
 
     // 게시글 상세 조회
@@ -334,12 +328,13 @@ public class CommunityService {
     }
 
     private Article saveArticle(final User user, final ArticlePostRequest request) {
+        Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         return articleRepository.save(Article.createArticle()
                 .user(user)
                 .title(request.getTitle())
                 .body(request.getBody())
                 .location(request.getLocation())
-                .point(coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude()))
+                .point(point)
                 .attendant(request.getAttendant())
                 .startDate(request.getStartDate())
                 .endDate(request.getStartDate().plusMinutes(parseInt(request.getEndDate())))

@@ -120,7 +120,7 @@ public class AuthService {
         checkDuplicatedUsername(request.getUsername());
         checkDuplicatedEmail(request.getEmail());
 
-        final Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
+        final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         final List<String> roles = authorityUtils.createRoles(request.getEmail());
         final String encode = passwordEncoder.encode(request.getPassword());
 

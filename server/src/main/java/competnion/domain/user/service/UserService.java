@@ -73,8 +73,8 @@ public class UserService {
     }
 
     public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
-        final Point point = coordinateUtil.coordinateToPoint(request.getLatitude(), request.getLongitude());
-        user.updateAddressAndCoordinates(request.getAddress(), point);
+        final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
+        user.updateAddressAndCoordinates(request.getAddress(), point, request.getLatitude(), request.getLongitude());
         return UpdateAddressResponse.of(request);
     }
 

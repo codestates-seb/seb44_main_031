@@ -8,12 +8,15 @@ import competnion.domain.user.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
+
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @Validated
 @RestController
@@ -55,6 +58,7 @@ public class PetController {
     }
 
     // 펫 삭제
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{pet-id}")
     public Response<Void> deletePet(@UserContext final User user, @Positive @PathVariable("pet-id") final Long petId) {
         petService.deletePet(user, petId);

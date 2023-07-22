@@ -67,11 +67,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private List<Attend> attends = new ArrayList<>();
 
-    public void updateAddressAndCoordinates(final String address, final Point point) {
+    public void updateAddressAndCoordinates(final String address, final Point point, final Double latitude, final Double longitude) {
         hasText(address, "address must not be empty");
         notNull(point, "point must not be null");
+
         this.address = address;
         this.point = point;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public void updateImgUrl(final String imgUrl) {

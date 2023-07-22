@@ -30,6 +30,7 @@ import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
 @Slf4j
@@ -103,7 +104,7 @@ public class CommunityController {
         return Response.success();
     }
 
-    @Scheduled(cron = "0 0/30 6-23 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0/10 6-23 * * *", zone = "Asia/Seoul")
     public void close() {
         communityService.closeScheduled();
     }
@@ -133,6 +134,7 @@ public class CommunityController {
             return new ResponseEntity<>(communityService.getAll(user, keyword, days, pageable), HttpStatus.OK);
     }
     // 게시글 삭제
+    @ResponseStatus(NO_CONTENT)
     @DeleteMapping("/{article-id}")
     public Response<Void> deleteArticle(
             @UserContext                          final User user,
