@@ -3,15 +3,15 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
-import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
-
+import { API_URL, AUTH_TOKEN,TOKEN_USERID } from '../../api/APIurl';
+import { toast } from 'react-toastify';
 interface Comment {
   commentId: number;
   userId: number;
   username: string;
   commentContent: string;
   createdAt: string;
-  userimUrl: string;
+  imgurl: string;
   body:string
 }
 
@@ -25,6 +25,7 @@ interface Article {
   modifiedAt: string;
   comments: Comment[];
   imageUrls: string[];
+  article: any;
 }
 
 const WalkMateDetailBody = () => {
@@ -45,6 +46,7 @@ const WalkMateDetailBody = () => {
           }
         );
         setArticle(response.data.article);
+       
         setComments(response.data.comments || []);
       } catch (error) {
         console.error('Failed to fetch comments:', error);
@@ -63,7 +65,7 @@ const WalkMateDetailBody = () => {
         const response = await axios.post<Comment>(
           `${API_URL}/articles/${articleId}/comments`,
           {
-            content: newComment,
+            body: newComment,
           },
           {
             headers: {
@@ -73,6 +75,7 @@ const WalkMateDetailBody = () => {
         );
         setComments([...comments, response.data]);
         setNewComment('');
+        window.location.reload();
       } catch (error) {
         console.error('Failed to submit comment:', error);
       }
@@ -93,10 +96,13 @@ const WalkMateDetailBody = () => {
         (comment) => comment.commentId !== id
       );
       setComments(updatedComments);
+      toast.success('댓글 삭제 완료되었습니다.')
+      window.location.reload();
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
   };
+
 
   return (
     <BodyContainer>
@@ -113,20 +119,19 @@ const WalkMateDetailBody = () => {
         <UserCard />
 
         {article?.comments.map((comment) => (
-          <Comment key={comment.commentId}>
-            <UserProfileImage src={comment.userimUrl} alt="프로필 사진" />
-         
-            <CommentContent>
-              <CommentAuthor>{comment.username}</CommentAuthor>
-              <CommentText>{comment.body}</CommentText>
-            </CommentContent>
-            <CommentDeleteButton
-              onClick={() => handleCommentDelete(comment.commentId)}
-            >
-              삭제
-            </CommentDeleteButton>
-          </Comment>
-        ))}
+  <Comment key={comment.commentId}>
+    <UserProfileImage src={comment.imgurl} alt="프로필 사진" />
+    <CommentContent>
+      <CommentAuthor>{comment.username}</CommentAuthor>
+      <CommentText>{comment.body}</CommentText>
+    </CommentContent>
+    {comment.userId === (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
+      <CommentDeleteButton onClick={() => handleCommentDelete(comment.commentId)}>
+        삭제
+      </CommentDeleteButton>
+    )}
+  </Comment>
+))}
 
         <CommentBox>
           <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
@@ -185,9 +190,13 @@ const TextBox = styled.div`
 const CommentBox = styled.div`
   margin-top: 20px;
   margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f7eaf3;
   display: flex;
   align-items: center;
   width: 580px;
+  border-radius: 5px;
+  
 `;
 
 const UserProfileImage = styled.img`
@@ -219,11 +228,11 @@ const Comment = styled.div`
   display: flex;
   align-items: center;
   margin-top: 10px;
-  background-color: #f0f0f0;
+  background-color: #f7eaf3;
   padding: 10px;
   border-radius: 5px;
+  width: 600px;
 
-  /* 추가된 스타일 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 
@@ -235,17 +244,18 @@ const Comment = styled.div`
 const CommentContent = styled.div`
   flex: 1;
   width: 580px;
+ 
 `;
 
 const CommentText = styled.div`
   margin-bottom: 5px;
   font-size: 14px;
-  color: #333333;
+  color:  var(--black-900);
 `;
 
 const CommentAuthor = styled.div`
   font-weight: bold;
-  color: #555555;
+  color: var(--black-900);
   margin-bottom: 3px;
 `;
 
@@ -253,7 +263,7 @@ const CommentDeleteButton = styled.button`
   padding: 5px 10px;
   border: none;
   background-color: transparent;
-  color: #333333;
+  color: var(--black-900);
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
