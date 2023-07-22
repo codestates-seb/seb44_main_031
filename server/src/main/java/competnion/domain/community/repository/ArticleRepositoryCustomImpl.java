@@ -1,5 +1,7 @@
 package competnion.domain.community.repository;
 
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,8 +15,10 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -42,9 +46,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     }
 
     private BooleanExpression days(Integer days) {
-
-        return days != null ? article.startDate.between(LocalDateTime.now(), LocalDateTime.now().plusDays(days)) : null;
-
+        return days != null ? article.startDate.before(LocalDateTime.now().plusDays(days)) : null;
     }
 
 
@@ -52,7 +54,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     public Page<Article> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
-            int days,
+            Integer days,
             Double distance,
             Pageable pageable
     ) {
@@ -69,9 +71,9 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                         article.articleStatus.eq(OPEN),
                         article.startDate.after(LocalDateTime.now())
                 )
-                .orderBy(article.startDate.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .orderBy(sortArticleList(pageable))
                 .fetch();
 
         // 카운트 쿼리 (전체 자료 갯수 구하기)
@@ -143,5 +145,22 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                         article.endDate.before(passed)
                 )
                 .fetch();
+    }
+
+    private OrderSpecifier<?> sortArticleList(Pageable pageable) {
+
+        if (!pageable.getSort().isEmpty()) {
+
+            for (Sort.Order order : pageable.getSort()) {
+                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+
+                switch (order.getProperty()) {
+                    case "startDate" :
+                        return new  OrderSpecifier<>(direction, article.startDate);
+                }
+            }
+        }
+
+        return null; // default 정렬
     }
 }

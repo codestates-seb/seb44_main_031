@@ -90,22 +90,11 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.GET,"/auth/sign-up/send-verification-email").permitAll()
                                 .antMatchers(HttpMethod.GET,"/auth/verify-email").permitAll()
                                 .antMatchers(HttpMethod.GET,"/auth/check-username").permitAll()
-                                .antMatchers(HttpMethod.POST,"/auth/delete/send-verification-email").hasRole("USER")
                                 .antMatchers(HttpMethod.POST,"/auth/reissue").permitAll()
-                                .antMatchers(HttpMethod.DELETE, "/auth/logout").hasRole("USER")
-
-                                .antMatchers(HttpMethod.PATCH,"/users/address/{user-id}").hasRole("USER")
-                                .antMatchers(HttpMethod.PATCH,"/users/username/{user-id}").hasRole("USER")
-                                .antMatchers(HttpMethod.PATCH,"/users/image/{user-id}").hasRole("USER")
-
-                                .antMatchers(HttpMethod.POST,"/pets/**").hasRole("USER")
 
 
-                                .antMatchers(HttpMethod.POST,"/articles/**").hasRole("USER")
-                                .antMatchers(HttpMethod.GET,"/articles/**").hasRole("USER")
-                                .antMatchers(HttpMethod.DELETE,"/articles/**").hasRole("USER")
 
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                 );
 
         return http.build();

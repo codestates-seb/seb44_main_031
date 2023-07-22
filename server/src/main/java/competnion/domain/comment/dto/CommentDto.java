@@ -25,9 +25,13 @@ public class CommentDto {
     @AllArgsConstructor
     public static class Response {
 
+
+
         private long commentId;
 
         private long userId;
+
+        private String imgurl;
 
         private String username;
 
