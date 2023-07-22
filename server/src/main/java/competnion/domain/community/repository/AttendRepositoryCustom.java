@@ -5,6 +5,7 @@ import competnion.domain.community.entity.Attend;
 import competnion.domain.user.entity.User;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface AttendRepositoryCustom {
@@ -14,5 +15,5 @@ public interface AttendRepositoryCustom {
     List<Attend> findAllArticlesUserAttendedExceptClosed(
             User user
     );
-    void findAttendeeDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);
+    void findAttendeeDuplicateMeetingDate(User user, ZonedDateTime startDate, ZonedDateTime endDate);
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static competnion.domain.community.entity.ArticleStatus.OPEN;
@@ -50,7 +51,7 @@ public class AttendRepositoryCustomImpl implements AttendRepositoryCustom{
                 .fetch();
     }
     @Override
-    public void findAttendeeDuplicateMeetingDate(User userEntity, LocalDateTime startDate, LocalDateTime endDate) {
+    public void findAttendeeDuplicateMeetingDate(User userEntity, ZonedDateTime startDate, ZonedDateTime endDate) {
         List<Attend> attends = jpaQueryFactory
                 .selectFrom(attend)
                 .join(attend.article, article)

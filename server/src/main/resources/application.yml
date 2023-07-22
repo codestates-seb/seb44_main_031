@@ -10,7 +10,10 @@ cloud:
       accessKey: ${AWS_ACCESS_KEY}
       secretKey: ${AWS_SECRET_KEY}
 
+
 Spring:
+  jackson:
+    time-zone: Asia/Seoul
 
   servlet:
     multipart:

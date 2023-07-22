@@ -1,17 +1,12 @@
 package competnion.domain.community.dto.response;
 
-import com.querydsl.core.annotations.QueryProjection;
 import competnion.domain.comment.dto.CommentDto;
 import competnion.domain.community.entity.Article;
-import competnion.domain.community.service.CommunityService;
-import competnion.domain.user.dto.response.UserResponse;
-import competnion.domain.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.data.domain.Pageable;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -23,16 +18,12 @@ public class ArticleResponseDto {
         private String username;
         private String title;
         private String body;
-        private LocalDateTime startDate;
-        private LocalDateTime endDate;
+        private ZonedDateTime startDate;
+        private ZonedDateTime endDate;
         private String location;
         private int attendant;
         private List<String> imageUrls;
         private List<CommentDto.Response> comments;
-
-
-
-
 
         // ArticleResponseDto of
         public ArticleResponseDto(Long articleId, String username, String title, String body, List<String> imageUrls) {
@@ -42,7 +33,6 @@ public class ArticleResponseDto {
                 this.body = body;
                 this.imageUrls = imageUrls;
         }
-
 
         public static ArticleResponseDto of(Article article, List<String> imageUrls) {
                 return new ArticleResponseDto(
@@ -63,13 +53,11 @@ public class ArticleResponseDto {
                 private String username;
                 private String title;
                 private String body;
-                private LocalDateTime startDate;
-                private LocalDateTime endDate;
+                private ZonedDateTime startDate;
+                private ZonedDateTime endDate;
                 private String location;
                 private int attendant;
                 private List<CommentDto.Response> comments;
-
-
 
                 public static ArticleResponseDto.OfSingleResponse getSingleResponse (List<String> imageUrls,
                                                                                      Article article,
@@ -87,17 +75,13 @@ public class ArticleResponseDto {
                                 comments
                         );
                 }
-
-
-
         }
 
         @Getter
         public static class OfMultiResponse {
-
                 private List<String> imageUrls;
                 private Long articleId;
-                private LocalDateTime startDate;
+                private ZonedDateTime startDate;
                 private long endDate;
                 private String title;
                 private String body;
@@ -108,8 +92,7 @@ public class ArticleResponseDto {
                 private int lefts;
                 private Boolean isViewerJoining;
 
-
-                public OfMultiResponse(List<String> imageUrls, Long articleId, LocalDateTime startDate, long endDate, String title, String body, String location, Double latitude, Double longitude, int attendant, int lefts, Boolean isViewerJoining) {
+                public OfMultiResponse(List<String> imageUrls, Long articleId, ZonedDateTime startDate, long endDate, String title, String body, String location, Double latitude, Double longitude, int attendant, int lefts, Boolean isViewerJoining) {
                         this.imageUrls = imageUrls;
                         this.articleId = articleId;
                         this.startDate = startDate;

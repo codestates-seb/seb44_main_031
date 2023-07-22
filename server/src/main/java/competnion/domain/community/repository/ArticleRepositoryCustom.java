@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface ArticleRepositoryCustom {
@@ -27,7 +28,7 @@ public interface ArticleRepositoryCustom {
             User user
     );
 
-    void findDuplicateMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate);
+    void findDuplicateMeetingDate(User user, ZonedDateTime startDate, ZonedDateTime endDate);
     List<Article> findArticlesOpen();
 
 }
