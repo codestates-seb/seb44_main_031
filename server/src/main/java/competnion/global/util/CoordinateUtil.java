@@ -16,15 +16,11 @@ import static competnion.global.exception.ExceptionCode.*;
 public class CoordinateUtil {
     GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-    public Point coordinateToPoint(
-            final Double latitude,
-            final Double longitude
-    ) {
+    public Point coordinateToPoint(final Double latitude, final Double longitude) {
         if (latitude == null || longitude == null) {
             throw new BusinessLogicException(INVALID_COORDINATES);
         } else {
-            Coordinate coordinate = new Coordinate(longitude, longitude);
-            return geometryFactory.createPoint(coordinate);
+            return geometryFactory.createPoint(new Coordinate(longitude, longitude));
         }
     }
 }

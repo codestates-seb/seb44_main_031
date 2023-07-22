@@ -43,7 +43,6 @@ import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
-
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -55,7 +54,6 @@ public class CommunityService {
 
     private final S3Util s3Util;
     private final PetService petService;
-    private final UserService userService;
     private final CoordinateUtil coordinateUtil;
 
     private final ArticleMapper mapper;
@@ -66,14 +64,6 @@ public class CommunityService {
         return WriterResponse.of(user, petResponseList);
     }
 
-    @Transactional(readOnly = true)
-    public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
-        final Article article = getArticleByIdOrThrow(articleId);
-        checkNotArticleOwner(user, article);
-        checkUserAlreadyAttended(user, article);
-        return getPetResponses(user);
-    }
-    
     // 산책 갈래요 작성
     public Long createArticle(
             final User user,
@@ -83,6 +73,7 @@ public class CommunityService {
         s3Util.checkImageCount(images);
         checkDuplicateAttendeeMeetingDate(user, request.getStartDate(),
                 request.getStartDate().plusMinutes(parseLong(request.getEndDate())));
+
         checkPet(user, request.getPetIds());
         checkValidMeetingDate(request);
         checkDuplicateOwnersMeetingDate(user, request.getStartDate(), request.getEndDate());
@@ -95,14 +86,23 @@ public class CommunityService {
         return article.getId();
     }
 
+    @Transactional(readOnly = true)
+    public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
+        final Article article = getArticleByIdOrThrow(articleId);
+
+        checkSpaceForAttend(article.getId(), article.getAttendant());
+        checkNotArticleOwner(user, article);
+        checkUserAlreadyAttended(user, article);
+        return getPetResponses(user);
+    }
+
     // 산책 갈래요 참여
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
-        checkSpaceForAttend(request);
+        checkSpaceForAttend(article.getId(), article.getAttendant());
         checkUserAlreadyAttended(user, article);
-        checkDuplicateAttendeeMeetingDate(user, request.getStartDate(), request.getEndDate());
-        checkMeetingTimeClosed(request);
+        checkMeetingTimeClosed(request.getStartDate(), request.getEndDate());
         checkNotArticleOwner(user, article);
         checkPet(user, request.getPetIds());
 
@@ -137,6 +137,10 @@ public class CommunityService {
             final UpdateArticleRequest request,
             final List<MultipartFile> images
     ) {
+        Article article1 = getArticleByIdOrThrow(articleId);
+        article1.getAttends().size();
+
+
         long count = attendRepository.countByArticleId(articleId);
         if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
 
@@ -185,6 +189,10 @@ public class CommunityService {
                 .orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
 
         attendRepository.delete(attend);
+
+        List<Pet> pets = petRepository.findAllByArticleIdAndUserId(articleId, user.getId());
+        pets.forEach(Pet::deleteArticle);
+        article.getPets().clear();
     }
 
     // 게시글 삭제
@@ -195,6 +203,10 @@ public class CommunityService {
 
         Article article = getArticleByIdOrThrow(articleId);
         articleRepository.delete(article);
+
+        List<Pet> pets = petRepository.findAllByArticleId(articleId);
+        pets.forEach(Pet::deleteArticle);
+        article.getPets().clear();
 
         // TODO : 2. 삭제할 때 비밀번호로 인증.
     }
@@ -210,6 +222,7 @@ public class CommunityService {
         return mapper.articleToSingleArticleResponse(images,article,attendees);
     }
 
+    // article 은 Qarticle 로 잡혀서 stream 안쪽은 post로 해둠
     @Transactional(readOnly = true)
     public MultiArticleResponse getAll(
             final User user,
@@ -217,49 +230,44 @@ public class CommunityService {
             final Integer days,
             final Pageable pageable
     ) {
-
-
-
-         Page<Article> articles = articleRepository.findAllByKeywordAndDistanceAndDays(
-                                                                                user.getPoint(),
-                                                                                keyword,
-                                                                                days,
-                                                                                3000.0,
-                                                                                pageable
+        Page<Article> articles =
+                 articleRepository.findAllByKeywordAndDistanceAndDays(
+                         user.getPoint(),
+                         keyword,
+                         days,
+                         3000.0,
+                         pageable
         );
 
-
-
-//         article은 Qarticle 로 잡혀서 stream 안쪽은 post로 해둠
-      Page<ArticleResponseDto.OfMultiResponse> responses =
-              articles.map(post -> ArticleResponseDto.OfMultiResponse.getResponse
-                                (getImgUrlsFromArticle(post),
-                                post,
-                                countLefts(post),
-                                checkParticipation(post,user.getId()))
-              );
-
+        Page<ArticleResponseDto.OfMultiResponse> responses =
+                articles.map(
+                        post -> ArticleResponseDto.OfMultiResponse
+                                .getResponse(
+                                        getImgUrlsFromArticle(post),
+                                        post,
+                                        countLefts(post),
+                                        checkParticipation(post,user.getId())
+                                )
+                );
 
       return mapper.articleToMultiArticleResponses(responses.getContent(),user,responses);
-
-
     }
 
     private void checkNotArticleOwner(final User user, final Article article) {
         if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
     }
 
-    private void checkMeetingTimeClosed(final AttendRequest request) {
+    private void checkMeetingTimeClosed(final LocalDateTime startDate, final LocalDateTime endDate) {
         final LocalDateTime now = LocalDateTime.now();
-        final long minutes = MINUTES.between(now, request.getStartDate());
-        if (now.isAfter(request.getEndDate()) || minutes <= 30)
+        final long minutes = MINUTES.between(now, startDate);
+        if (now.isAfter(endDate) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
     @Transactional(readOnly = true)
-    private void checkSpaceForAttend(final AttendRequest request) {
-        final long count = attendRepository.countByArticleId(request.getArticleId());
-        if (count >= request.getAttendant())
+    private void checkSpaceForAttend(final Long articleId, final int attendant) {
+        final long count = attendRepository.countByArticleId(articleId);
+        if (count >= attendant)
             throw new BusinessLogicException(NO_SPACE_FOR_ATTEND);
     }
 
@@ -291,8 +299,8 @@ public class CommunityService {
     }
 
     private void checkValidMeetingDate(ArticlePostRequest request) {
-        LocalDateTime startDate = request.getStartDate().plusMinutes(29);
-        int endDate = parseInt(request.getEndDate());
+        final LocalDateTime startDate = request.getStartDate().plusMinutes(29);
+        final int endDate = parseInt(request.getEndDate());
 
         if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(25)))
             throw new BusinessLogicException(NOT_VALID_START_DATE);
@@ -344,6 +352,7 @@ public class CommunityService {
                 .user(user)
                 .build();
         attendRepository.save(attend);
+        article.getAttends().add(attend);
 
         final List<Pet> pets = petRepository.findAllById(petIds);
 
@@ -360,16 +369,12 @@ public class CommunityService {
     }
 
     private Boolean checkParticipation (Article article,long userId) {
-
-        List<User> attendees =  extractUsersFromAttend(article.getId());
-
-       return attendees.stream()
-                        .map(attendee -> attendee.getId())
-                        .anyMatch(attendee -> attendee.equals(userId));
-
+        return extractUsersFromAttend(article.getId()).stream()
+                .map(User::getId)
+                .anyMatch(attendee -> attendee.equals(userId));
     }
 
     private int countLefts (Article article) {
-        return  article.getAttendant() - extractUsersFromAttend(article.getId()).size();
+        return article.getAttendant() - extractUsersFromAttend(article.getId()).size();
     }
 }

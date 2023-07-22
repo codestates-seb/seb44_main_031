@@ -1,15 +1,11 @@
 package competnion.domain.community.entity;
 
-import competnion.domain.pet.entity.Pet;
 import competnion.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -30,6 +26,7 @@ public class Attend {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
     @Builder(builderMethodName = "CreateAttend")
     private Attend(final Article article, final User user) {
         this.article = article;
