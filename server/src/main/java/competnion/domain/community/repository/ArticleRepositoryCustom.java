@@ -15,7 +15,7 @@ public interface ArticleRepositoryCustom {
     Page<Article> findAllByKeywordAndDistanceAndDays(
             Point userPoint,
             String keyword,
-            int days,
+            Integer days,
             Double distance,
             Pageable pageable
     );

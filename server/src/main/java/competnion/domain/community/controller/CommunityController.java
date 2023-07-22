@@ -1,5 +1,6 @@
 package competnion.domain.community.controller;
 
+import com.querydsl.core.types.Order;
 import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.request.UpdateArticleRequest;
@@ -16,6 +17,7 @@ import competnion.infra.redis.lock.AttendLockFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -115,14 +117,20 @@ public class CommunityController {
     /** 전체 조회 **/
     @GetMapping
     public ResponseEntity<MultiArticleResponse> getAllArticles(
-            @UserContext                                                            final User user,
-            @RequestParam(value = "keyword", required = false, defaultValue = "")   final String keyword,
-            @RequestParam(value = "days",    required = false, defaultValue = "30") final Integer days,
-            @RequestParam(value = "page",    required = false, defaultValue = "1")  final int page,
-            @RequestParam(value = "size",    required = false, defaultValue = "10") final int size
+
+            @UserContext final User user,
+            @RequestParam(value = "keyword",    required = false, defaultValue = "")   final String keyword,
+            @RequestParam(value = "days",       required = true)                       final Integer days,
+            @RequestParam(value = "sort", required = true)                             final String sort,
+            @RequestParam(value = "page", required = true)                             final int page,
+            @RequestParam(value = "size",   required = true)                           final int size
     ) {
-        PageRequest pageable = PageRequest.of(page - 1, size);
-        return new ResponseEntity<>(communityService.getAll(user, keyword, days, pageable), OK);
+
+        PageRequest pageable = sort.equals("asc")
+                                ? PageRequest.of(page - 1, size, Sort.by("startDate").ascending())
+                                : PageRequest.of(page - 1, size, Sort.by("startDate").descending());
+
+            return new ResponseEntity<>(communityService.getAll(user, keyword, days, pageable), HttpStatus.OK);
     }
     // 게시글 삭제
     @DeleteMapping("/{article-id}")
