@@ -10,6 +10,7 @@ import competnion.domain.community.dto.QArticleQueryDto;
 import competnion.domain.community.entity.Article;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
+import competnion.global.util.ZonedDateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
@@ -18,8 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static competnion.domain.community.entity.ArticleStatus.OPEN;
@@ -33,6 +35,7 @@ import static competnion.global.exception.ExceptionCode.NOT_VALID_MEETING_DATE;
 @RequiredArgsConstructor
 public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
+    private final ZonedDateTimeUtil dateUtil;
 
     private BooleanExpression all(
             String keyword,
@@ -46,7 +49,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     }
 
     private BooleanExpression days(Integer days) {
-        return days != null ? article.startDate.before(LocalDateTime.now().plusDays(days)) : null;
+        return days != null ? article.startDate.before(dateUtil.getNow().plusDays(days)) : null;
     }
 
 
@@ -69,7 +72,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                         ).loe(distance),
 
                         article.articleStatus.eq(OPEN),
-                        article.startDate.after(LocalDateTime.now())
+                        article.startDate.after(dateUtil.getNow())
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -87,7 +90,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                         ).loe(distance),
 
                         article.articleStatus.eq(OPEN),
-                        article.startDate.after(LocalDateTime.now())
+                        article.startDate.after(dateUtil.getNow())
                 )
                 .fetchCount();
 
@@ -120,7 +123,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
 
     @Override
-    public void findDuplicateMeetingDate(User userEntity, LocalDateTime starDate, LocalDateTime endDate) {
+    public void findDuplicateMeetingDate(User userEntity, ZonedDateTime starDate, ZonedDateTime endDate) {
         List<Article> articles = jpaQueryFactory
                 .selectFrom(article)
                 .join(article.user, user)
@@ -136,13 +139,12 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
     @Override
     public List<Article> findArticlesOpen() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime passed = now.minusMinutes(30);
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
         return jpaQueryFactory
                 .selectFrom(article)
                 .where(
                         article.articleStatus.eq(OPEN),
-                        article.endDate.before(passed)
+                        article.endDate.before(now)
                 )
                 .fetch();
     }

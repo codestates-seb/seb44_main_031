@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import static lombok.AccessLevel.PRIVATE;
 
@@ -12,7 +13,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 public class ArticleResponse {
     private String title;
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
 
     public static ArticleResponse of(ArticleQueryDto articleQueryDto) {
         return new ArticleResponse(articleQueryDto.getTitle(), articleQueryDto.getStartDate());

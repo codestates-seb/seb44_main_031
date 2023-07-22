@@ -10,7 +10,10 @@ cloud:
       accessKey:
       secretKey:
 
+
 Spring:
+  jackson:
+    time-zone: Asia/Seoul
 
   servlet:
     multipart:

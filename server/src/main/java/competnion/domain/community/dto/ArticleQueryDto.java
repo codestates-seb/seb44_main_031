@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
@@ -13,17 +14,17 @@ import java.time.LocalDateTime;
 public class ArticleQueryDto {
     private Long articleId;
     private String title;
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
     private LocalDateTime createdAt;
 
     @QueryProjection
-    public ArticleQueryDto(String title, LocalDateTime startDate) {
+    public ArticleQueryDto(String title, ZonedDateTime startDate) {
         this.title = title;
         this.startDate = startDate;
     }
 
     @QueryProjection
-    public ArticleQueryDto(Long articleId, String title, LocalDateTime startDate, LocalDateTime createdAt) {
+    public ArticleQueryDto(Long articleId, String title, ZonedDateTime startDate, LocalDateTime createdAt) {
         this.articleId = articleId;
         this.title = title;
         this.startDate = startDate;

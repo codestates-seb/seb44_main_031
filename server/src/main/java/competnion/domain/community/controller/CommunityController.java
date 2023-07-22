@@ -1,10 +1,8 @@
 package competnion.domain.community.controller;
 
-import com.querydsl.core.types.Order;
-import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
+import competnion.domain.community.dto.request.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.request.UpdateArticleRequest;
-import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.response.MultiArticleResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
@@ -27,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;

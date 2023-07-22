@@ -1,6 +1,6 @@
 package competnion.domain.community.service;
 
-import competnion.domain.community.dto.request.ArticleDto.ArticlePostRequest;
+import competnion.domain.community.dto.request.ArticlePostRequest;
 import competnion.domain.community.dto.request.AttendRequest;
 import competnion.domain.community.dto.request.UpdateArticleRequest;
 import competnion.domain.community.dto.response.ArticleResponseDto;
@@ -19,10 +19,9 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
-import competnion.domain.user.service.UserService;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
+import competnion.global.util.ZonedDateTimeUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +54,7 @@ public class CommunityService {
     private final ArticleImageRepository articleImageRepository;
 
     private final S3Util s3Util;
+    private final ZonedDateTimeUtil dateUtil;
     private final PetService petService;
     private final CoordinateUtil coordinateUtil;
 
@@ -114,7 +114,7 @@ public class CommunityService {
     // 산책 완료
     public void close(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
-        if (LocalDateTime.now().isBefore(article.getStartDate().plusMinutes(30)))
+        if (dateUtil.getNow().isBefore(article.getStartDate().plusMinutes(30)))
             throw new BusinessLogicException(CAN_NOT_CLOSE);
         article.updateStatus(CLOSED);
 
@@ -149,10 +149,11 @@ public class CommunityService {
 
         articles.remove(findArticle);
         articles.forEach(article -> {
-            LocalDateTime requestStart = request.getStartDate();
-            LocalDateTime requestEnd = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
-            LocalDateTime articleStart = article.getStartDate();
-            LocalDateTime articleEnd = article.getEndDate();
+            ZonedDateTime requestStart = request.getStartDate();
+            ZonedDateTime requestEnd = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
+            ZonedDateTime articleStart = article.getStartDate();
+            ZonedDateTime articleEnd = article.getEndDate();
+
             if (requestStart.isAfter(article.getStartDate()) || requestStart.equals(articleStart)
                     || requestEnd.isBefore(article.getEndDate()) || requestEnd.equals(articleEnd))
                 throw new BusinessLogicException(DUPLICATE_MEETING_DATE);
@@ -167,7 +168,7 @@ public class CommunityService {
         final List<String> imageUrlList = s3Util.uploadImageList(images);
         saveImages(imageUrlList, findArticle);
 
-        LocalDateTime endDate = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
+        ZonedDateTime endDate = request.getStartDate().plusMinutes(parseLong(request.getEndDate()));
         ofNullable(request.getTitle()).ifPresent(findArticle::updateTitle);
         ofNullable(request.getBody()).ifPresent(findArticle::updateBody);
         ofNullable(request.getStartDate()).ifPresent(findArticle::updateStartDate);
@@ -178,7 +179,7 @@ public class CommunityService {
     public void cancelAttend(final User user, final Long articleId) {
         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
         Article article = getArticleByIdOrThrow(articleId);
-        if (article.getStartDate().minusMinutes(20).isBefore(LocalDateTime.now()))
+        if (article.getStartDate().minusMinutes(20).isBefore(dateUtil.getNow()))
             throw new BusinessLogicException(CAN_NOT_CANCEL);
 
         Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId)
@@ -251,8 +252,8 @@ public class CommunityService {
         if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
     }
 
-    private void checkMeetingTimeClosed(final LocalDateTime startDate, final LocalDateTime endDate) {
-        final LocalDateTime now = LocalDateTime.now();
+    private void checkMeetingTimeClosed(final ZonedDateTime startDate, final ZonedDateTime endDate) {
+        ZonedDateTime now = dateUtil.getNow();
         final long minutes = MINUTES.between(now, startDate);
         if (now.isAfter(endDate) || minutes <= 30)
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
@@ -282,21 +283,21 @@ public class CommunityService {
             throw new BusinessLogicException(USER_ALREADY_ATTENDED);
     }
 
-    private void checkDuplicateOwnersMeetingDate(User user, LocalDateTime startDate, String endDate) {
+    private void checkDuplicateOwnersMeetingDate(User user, ZonedDateTime startDate, String endDate) {
         articleRepository.findDuplicateMeetingDate(
                 user, startDate, startDate.plusMinutes(parseLong(endDate)));
     }
 
-    private void checkDuplicateAttendeeMeetingDate(User user, LocalDateTime startDate, LocalDateTime endDate) {
+    private void checkDuplicateAttendeeMeetingDate(User user, ZonedDateTime startDate, ZonedDateTime endDate) {
         attendRepository.findAttendeeDuplicateMeetingDate(
                 user, startDate, endDate);
     }
 
     private void checkValidMeetingDate(ArticlePostRequest request) {
-        final LocalDateTime startDate = request.getStartDate().plusMinutes(29);
+        final ZonedDateTime startDate = request.getStartDate().plusMinutes(29);
         final int endDate = parseInt(request.getEndDate());
 
-        if (request.getStartDate().isBefore(LocalDateTime.now().plusMinutes(25)))
+        if (request.getStartDate().isBefore(dateUtil.getNow().plusMinutes(25)))
             throw new BusinessLogicException(NOT_VALID_START_DATE);
 
         if (startDate.isAfter(startDate.plusMinutes(endDate)) || startDate.equals(startDate.plusMinutes(endDate)))

@@ -13,6 +13,7 @@ import org.locationtech.jts.geom.Point;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +42,9 @@ public class Article extends BaseEntity {
     @NotNull
     private Point point;
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private ZonedDateTime startDate;
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private ZonedDateTime endDate;
     @Column(nullable = false)
     private int attendant;
     @Enumerated(STRING)
@@ -63,7 +64,7 @@ public class Article extends BaseEntity {
     private List<Attend> attends = new ArrayList<>();
 
     @Builder(builderMethodName = "createArticle")
-    private Article(User user, String title, String body, String location, int attendant, LocalDateTime startDate, LocalDateTime endDate, Point point) {
+    private Article(User user, String title, String body, String location, int attendant, ZonedDateTime startDate, ZonedDateTime endDate, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
@@ -83,11 +84,11 @@ public class Article extends BaseEntity {
         this.body = body;
     }
 
-    public void updateStartDate(LocalDateTime startDate) {
+    public void updateStartDate(ZonedDateTime startDate) {
         this.startDate = startDate;
     }
 
-    public void updateEndDate(LocalDateTime endDate) {
+    public void updateEndDate(ZonedDateTime endDate) {
         this.endDate = endDate;
     }
 
