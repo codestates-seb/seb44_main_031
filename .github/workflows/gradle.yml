@@ -67,6 +67,8 @@ jobs:
 #          cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
       - name: Set Environment Variables
         run: |
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> $GITHUB_ENV
           echo "SPRING_MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_ENV
           echo "SPRING_MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_ENV
           echo "SPRING_MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
