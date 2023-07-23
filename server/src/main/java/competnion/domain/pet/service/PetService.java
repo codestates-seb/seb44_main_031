@@ -108,7 +108,7 @@ public class PetService {
 
     private void checkSpaceForRegisterPetOrThrow (final Long userId) {
         final Integer count = petRepository.countByUserId(userId);
-        if (count >= 3) throw new BusinessLogicException(FORBIDDEN);
+        if (count >= 4) throw new BusinessLogicException(FORBIDDEN);
     }
 
     private Pet savePet(
