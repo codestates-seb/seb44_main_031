@@ -46,6 +46,7 @@ const UserCard = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
   const [isAttendeeInfoFetched, setIsAttendeeInfoFetched] = useState(false);
+  const [isUserAttending, setIsUserAttending] = useState(false);
   const navigate = useNavigate();
 
   //산책 상세페이지 get 요청
@@ -60,9 +61,12 @@ const UserCard = () => {
 
         setAttendees(response.data.attendees);
         setArticleData(response.data.article);
-        
+        const userIsAttending = response.data.attendees.some(
+          (attendee: Attendee) => attendee.userId === parseInt(TOKEN_USERID)
+        );
+        setIsUserAttending(userIsAttending);
       } catch (error) {
-        console.error('attendees 가져오는중 오류 발생:', error);
+        toast.error('attendees 가져오는중 오류 발생:', error);
       }
     };
 
@@ -84,7 +88,7 @@ const UserCard = () => {
       if (error.response && error.response.status === 409) {
         toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
       } else {
-        console.error('attendee-info 가져오는 중 오류 발생:', error);
+        toast.error('api 가져오는 중 오류 발생:', error);
       }
     }
   };
@@ -267,7 +271,7 @@ const handleRegister = async () => {
         </UserCardRow>
       </UserCardContainer>
       <ButtonBox>
-        <button onClick={openModal}>참가하기</button>
+      {!isUserAttending && <button onClick={openModal}>참가하기</button>}
         <button onClick={handleDeleteArticle}>글 삭제</button>
       </ButtonBox>
 
