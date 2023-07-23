@@ -31,7 +31,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  background-color: #f1f2f3;
+  background-color: white;
   font-size: 0.8rem;
    input {
     margin: 2px 0 2px;
@@ -46,11 +46,14 @@ const Container = styled.div`
   }
 `;
 const UserContainer = styled.div`
+margin-top: 50px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f1f2f3;
+  background-color: white;
   font-size: 0.8rem;
+  margin-bottom: 40px;
+  
 `;
 
 const UserPart = styled.div`
@@ -60,7 +63,7 @@ const UserPart = styled.div`
   height: 300px;
   justify-content: center;
   align-items: center;
-  background-color: #f1f2f3;
+  background-color: white;
   font-size: 0.8rem;
   margin-top: 10px;
 `;
@@ -68,6 +71,7 @@ const UserPart = styled.div`
 const UserTitle = styled.div`
   font-size: 24px;
   font-weight: 600;
+  margin-bottom: 20px;
 `;
 
 const UserCard = styled.div`
@@ -88,10 +92,10 @@ const UserPartButtons = styled.div`
 `;
 
 const UserImg = styled.img`
-  width: 180px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-  border: solid 1px red;
+margin-bottom: 25px;
 `;
 
 const UserImgRe = styled.div`
@@ -179,7 +183,7 @@ const MapPart = styled.div`
   height: 300px;
   justify-content: space-between;
   align-items: center;
-  background-color: #f1f2f3;
+  background-color: white;
   font-size: 0.8rem;
 `;
 
@@ -189,21 +193,61 @@ const DogPart = styled.div`
   width: 800px;
   justify-content: center;
   align-items: center;
-  background-color: #f1f2f3;
+  background-color: white;
   font-size: 0.8rem;
+
   .petAddForm {
     display: flex;
     width: 100%;
   }
+
+  .petgap {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+   
+   
+  }
+`;
+const SmallButton = styled.button`
+  border: none;
+  border-radius: 5px;
+  background-color: var(--pink-400);
+  color: white;
+  font-size: 12px;
+  padding: 8px 12px;
+  text-align: center;
+  text-transform: uppercase; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  transition: background-color 0.2s ease; 
+  cursor: pointer;
+
+
+  &:hover {
+    background-color: var(--pink-300);
+    
+  }
+
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pink-300);
+  }
+
+
+
 `;
 
+
 const PetCard = styled.div`
-  width: 600px;
+  width: 720px;
   height: 200px;
   display: flex;
-  border: 1px solid red;
   justify-content: space-around;
   align-items: center;
+  border-radius: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const PetImg = styled.img`
@@ -774,7 +818,7 @@ const Mypage = () => {
                 accept="image/*"
                 onChange={handleUserImgChange}
               />
-              <button>변경</button>
+              <SmallButton>변경</SmallButton>
             </form>
             </UserImgRe>
             <UserName>{profile.username}</UserName>
@@ -917,7 +961,7 @@ const Mypage = () => {
         </MapPart>
       </UserContainer>
       <DogPart>
-        <ul>
+        <ul className='petgap'>
           {profile.pets.map((pet) => (
             <li key={pet.id}>
               <PetCard>
@@ -946,7 +990,7 @@ const Mypage = () => {
                         accept="image/*"
                         onChange={handlePetImgChange}
                       />
-                      <button type='submit'> 변경 </button>
+                      <SmallButton type='submit'> 변경 </SmallButton>
                     </form>
                   </PetImgRe>
                 </PetProfile>
@@ -962,18 +1006,18 @@ const Mypage = () => {
                 </div>
                 <PetSetting>
                   <div>
-                    <button
+                    <SmallButton
                       data-petid={pet.id}
                       onClick={handleModifyPetClick}
                     >
                       변경
-                    </button>
-                    <button
+                    </SmallButton>
+                    <SmallButton
                       data-petid={pet.id}
                       onClick={handleDeletePetClick}
                     >
                       삭제
-                    </button>
+                    </SmallButton>
                   </div>
                 </PetSetting>
               </PetCard>

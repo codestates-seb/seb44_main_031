@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { FaRegClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
-import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
+import { API_URL} from '../../api/APIurl';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -50,7 +50,7 @@ const WalkMateDetailSide = () => {
       try {
         const response = await axios.get(`${API_URL}/articles/${articleId}`, {
           headers: {
-            Authorization: AUTH_TOKEN,
+            Authorization: localStorage.getItem('accessToken'),
           },
         });
 

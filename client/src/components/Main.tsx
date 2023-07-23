@@ -73,7 +73,7 @@ const Main = () => {
           </FlexContainer>
       
         </ThirdTitleContainer>
-          <View3 src={'/assets/view3.png'} alt="강아지사진" />
+          <View3 src={'/assets/iphone.png'} alt="강아지사진" />
       </ThirdSection>
     </MainContainer>
   );
@@ -249,8 +249,8 @@ const MainDog = styled.img`
 
 const View3 = styled.img`
 margin-left: 80px;
-  width: 350px;
-  height: 600px;
+  width: 500px;
+  height: 800px;
   border-radius: 20px;
 `;
 const ViewdogWrapper = styled.div`
