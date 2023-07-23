@@ -36,6 +36,8 @@ interface ArticleData {
   
 }
 
+
+
 const UserCard = () => {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -104,6 +106,11 @@ const openModal = async () => {
       setSelectedPets([...selectedPets, petId]);
     }
   };
+
+
+
+
+
 // 강아지 데리고 갈 목록들 post
 const handleRegister = async () => {
   if (!articleData) {

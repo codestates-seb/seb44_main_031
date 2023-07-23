@@ -6,7 +6,7 @@ import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
 interface Owner {
   userId: number;
   nickname: string;
-  userimUrl: string;
+  imgUrl: string;
   pets: Pet[];
 }
 
@@ -73,7 +73,7 @@ const WalkMateDetailHeader = () => {
       <WalkMateDetailHeaderBox>
         <div className="title">{article.title}</div>
         <DetailHeaderBox>
-          <ProfileImage src={owner.userimUrl} alt="프로필이미지" />
+          <ProfileImage src={owner.imgUrl} alt="프로필이미지" />
           <DetailTextBox>
             <div className="uptext">Hosted By</div>
             <div className="profilename">{owner.nickname}</div>
@@ -112,6 +112,8 @@ const DetailHeaderBox = styled.div`
 const ProfileImage = styled.img`
   width: 50px;
   height: 50px;
+  border-radius: 30px;
+  margin-right: 20px;
 `;
 const DetailTextBox = styled.div`
   margin-top: 10px;
