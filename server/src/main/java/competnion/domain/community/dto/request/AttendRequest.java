@@ -15,9 +15,9 @@ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 public class AttendRequest {
     private List<Long> petIds;
     private Long articleId;
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
     private ZonedDateTime startDate;
-    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+    @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Seoul")
     private ZonedDateTime endDate;
     private int attendant;
 }
