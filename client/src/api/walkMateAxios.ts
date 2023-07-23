@@ -69,11 +69,15 @@ export const fetchWalkMates = async (
 ) => {
   const response = await axiosInstance.get(
     // getArticlesUrlJsonServer(pageParam, size, selectedFilter, searchQuery)
-    getArticlesUrl(pageParam, size, selectedFilter, searchQuery)
+    getArticlesUrl(pageParam, size, selectedFilter, searchQuery),
+    {
+      headers: {
+        Authorization: localStorage.getItem('accessToken'),
+      },
+    }
   );
   return response;
 };
-
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse<any, any>) => response,
   (error: AxiosError) => {

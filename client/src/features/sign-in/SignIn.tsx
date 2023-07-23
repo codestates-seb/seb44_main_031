@@ -152,12 +152,14 @@ const SignIn = () => {
         localStorage.setItem('userId', userId);
         const params = new URLSearchParams(location.search);
         const path = params.get('path');
-        console.log(path);    
+        console.log(path);
+
         if(path===null || path==='users/sign-in'){
           navigate('/walk-mate/all');
         }else{
           navigate(`${path}`);
           console.log(path)
+
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);
