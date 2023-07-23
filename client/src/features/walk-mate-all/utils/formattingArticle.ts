@@ -1,5 +1,5 @@
-export const TITLE_LENGTH = 67;
-export const BODY_LENGTH = 120;
+export const TITLE_LENGTH = 60;
+export const BODY_LENGTH = 100;
 
 export const sliceContentLengthEndWithDots = (
   content: string,
