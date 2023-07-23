@@ -15,9 +15,9 @@ interface Option {
 }
 
 const optionPeriod = [
-  { value: '30', label: '30일 이내' },
-  { value: '7', label: '7일 이내' },
-  { value: '2', label: '2일 이내' },
+  { value: '29', label: '30일 이내' },
+  { value: '6', label: '7일 이내' },
+  { value: '1', label: '2일 이내' },
 ];
 const optionViewOrder = [
   { value: 'asc', label: '마감 임박순' },
