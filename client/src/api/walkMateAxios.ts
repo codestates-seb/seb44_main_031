@@ -34,12 +34,14 @@ export const axiosInstance = axios.create({
   },
 });
 
+// FEEDBACK: URL을 생성하는 함수라면 get...Url처럼 목적이 분명하게 드러나도록 작성하는게 좋습니다.
 export const getArticlesUrlJsonServer = (
   page: number,
   size = 5,
   selectedFilter: SelectedFilter,
   searchQuery: string
 ) => {
+  // FEEDBACK: console.log는 개발할 때만 사용하고, 배포할 때는 삭제하는게 좋습니다.
   console.log(
     `articles?_page=${page}&_limit=${size}`,
     selectedFilter,
@@ -60,6 +62,7 @@ export const getArticlesUrl = (
   return `articles?page=${page}&size=${size}&days=${selectedFilter.period.value}&sort=${selectedFilter.viewOrder.value}&keyword=${searchQuery}`;
 };
 
+// FEEDBACK: 불필요한 주석은 제거합니다.
 // fetch data
 export const fetchWalkMates = async (
   pageParam: number,
@@ -68,12 +71,15 @@ export const fetchWalkMates = async (
   searchQuery: string
 ) => {
   const response = await axiosInstance.get(
+    // FEEDBACK: 불필요한 주석은 제거합니다.
     // getArticlesUrlJsonServer(pageParam, size, selectedFilter, searchQuery)
     getArticlesUrl(pageParam, size, selectedFilter, searchQuery)
   );
   return response;
 };
 
+// FEEDBACK: 유틸 함수나 모듈을 export하는 파일에서 axios 인스턴스 설정은 어색하게 느껴집니다.
+// 이런 환경 설정은 다른 파일에서 하는게 더 좋아보입니다.
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse<any, any>) => response,
   (error: AxiosError) => {

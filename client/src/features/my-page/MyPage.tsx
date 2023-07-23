@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
-import userProfileImg from '../../assets/Profile.png';
+import userProfileImg from '../../assets/Profile.png'; // FEEDBACK: 사용하지 않는 모듈은 제거해주세요.
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -15,6 +15,10 @@ import ModifyPasswordModal from './ModifyPasswordModal';
 import { useNavigate } from 'react-router-dom';
 import UserWithdrawModal from './UserWithdraw';
 import { PiDogDuotone } from 'react-icons/pi';
+
+// FEEDBACK: 코드가 아무래도 긴데 스타일이 앞쪽에 위치해서 코드를 읽기가 힘듭니다.
+// FEEDBACK: 코드가 너무 깁니다. 일단 관련된 상태, 이벤트 핸들러, 훅, 스타일 등을 그룹화해서 분리해보는 건 어떨까요?
+
 interface PetData {
   petId: number;
   name: string;
@@ -269,7 +273,7 @@ const Mypage = () => {
     image: null,
   });
 
-  console.dir(`petData ${petData.image}`);
+  console.dir(`petData ${petData.image}`); // FEEDBACK: 불필요한 console.log는 지워주세요.
   const navigate = useNavigate();
 
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
@@ -278,7 +282,7 @@ const Mypage = () => {
     setOpenUsernameChangeModal(!isOpenUsernameChangeModal);
   }, [isOpenUsernameChangeModal]);
   const handleUsernameChangeClick = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.stopPropagation();
     onClickUsernameChangeToggleModal();
@@ -286,7 +290,7 @@ const Mypage = () => {
 
   const handleModifyAddress = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    navigate('/users/mapChange');
+    navigate('/users/mapChange'); // FEEDBACK: 하드코딩은 지양해주세요.
   };
   const [isOpenModifyPasswordModal, setOpenModifyPasswordModal] =
     useState<boolean>(false);
@@ -294,7 +298,7 @@ const Mypage = () => {
     setOpenModifyPasswordModal(!isOpenModifyPasswordModal);
   }, [isOpenModifyPasswordModal]);
   const handleModifyPasswordClick = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.stopPropagation();
     onClickPasswordChangeToggleModal();
@@ -307,42 +311,45 @@ const Mypage = () => {
   const [newPasswordCheck, setNewPasswordCheck] = useState<string>('');
   const [email, setEmail] = useState('');
   const [emailCheck, setEmailCheck] = useState<boolean>(false);
+
+  // FEEDBACK: 반복 로직은 별도 함수로 만들어서 사용해보는 건 어떨까요.
   const onChangeEamil = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEmail(e.target.value);
     },
-    []
+    [],
   );
   const onChangeDisplay = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setUsername(e.target.value);
     },
-    []
+    [],
   );
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
     },
-    []
+    [],
   );
   const onChangeNewPassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setNewPassword(e.target.value);
     },
-    []
+    [],
   );
   const onChangeNewPasswordCheck = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setNewPasswordCheck(e.target.value);
     },
-    []
+    [],
   );
   const goId = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
       axios
         .get(
-          `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/check-username?username=${username}`
+          // FEEDBACK: 하드코딩은 지양해주세요.
+          `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/check-username?username=${username}`,
         )
         .then((response) => {
           // 아이디 확인
@@ -366,7 +373,7 @@ const Mypage = () => {
           }
         });
     },
-    [username]
+    [username],
   );
   const goEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -378,7 +385,7 @@ const Mypage = () => {
             headers: {
               Authorization: localStorage.getItem('accessToken'),
             },
-          }
+          },
         )
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
@@ -394,7 +401,7 @@ const Mypage = () => {
           alert('다시 요청해주세요');
         });
     },
-    [email]
+    [email],
   );
   const onSubmitUserWithdraw = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -412,7 +419,7 @@ const Mypage = () => {
             headers: {
               Authorization: localStorage.getItem('accessToken'),
             },
-          }
+          },
         )
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
@@ -429,7 +436,7 @@ const Mypage = () => {
           console.log(emailCheck);
         });
     },
-    [validId, emailCheck, username, password, dispatch]
+    [validId, emailCheck, username, password, dispatch],
   );
   const onSubmitUsernameChange = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -448,7 +455,7 @@ const Mypage = () => {
       });
       // .catch((err) => console.log(err.message));
     },
-    [validId, username, password, dispatch]
+    [validId, username, password, dispatch],
   );
   const onSubmitPasswordChange = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -465,10 +472,10 @@ const Mypage = () => {
           alert('비밀번호 변경완료');
 
           window.location.reload();
-        }
+        },
       );
     },
-    [password, newPassword, newPasswordCheck, dispatch]
+    [password, newPassword, newPasswordCheck, dispatch],
   );
   const [isOpenAddPetModal, setOpenAddPetModal] = useState<boolean>(false);
   const handleAddPetClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -485,7 +492,7 @@ const Mypage = () => {
     setOpenUserWithdrawModal(!isOpenUserWithdrawModal);
   }, [isOpenUserWithdrawModal]);
   const handleUserWithdrawClick = (
-    event: React.MouseEvent<HTMLButtonElement>
+    event: React.MouseEvent<HTMLButtonElement>,
   ) => {
     event.stopPropagation();
     onClickUserWithdrawModal();
@@ -511,6 +518,7 @@ const Mypage = () => {
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
+    // FEEDBACK: 불필요한 주석은 제거해주세요.
     // if (e.currentTarget.files !== null) {
     //   setPetData((prevData) => {
     //     console.log('setPetData 실행됨');
@@ -556,7 +564,7 @@ const Mypage = () => {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
           },
-        }
+        },
       )
       .then((response) => {
         console.log(response.data);
@@ -591,7 +599,7 @@ const Mypage = () => {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
           },
-        }
+        },
       )
       .then((response) => {
         console.log(response.data);
@@ -603,7 +611,7 @@ const Mypage = () => {
       });
   };
   const handleInputChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value, type } = event.target as HTMLInputElement; // 타입 지정
 
@@ -660,7 +668,7 @@ const Mypage = () => {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
           },
-        }
+        },
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
@@ -692,7 +700,7 @@ const Mypage = () => {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
           },
-        }
+        },
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
@@ -728,7 +736,7 @@ const Mypage = () => {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
           },
-        }
+        },
       )
       .then((response) => {
         console.log(response.data);

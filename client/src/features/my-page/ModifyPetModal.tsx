@@ -15,7 +15,7 @@ function AddPetModal({
       <Backdrop
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          console.log(2);
+          console.log(2); // FEEDBACK: 불필요한 console.log는 지워주세요.
           if (onClickToggleModifyPetModal) {
             onClickToggleModifyPetModal();
             console.log(1);

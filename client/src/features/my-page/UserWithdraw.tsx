@@ -6,7 +6,7 @@ interface ModalDefaultType {
 }
 
 function UserWithdrawModal({
-    onClickUserWithdrawModal,
+  onClickUserWithdrawModal,
   children,
 }: PropsWithChildren<ModalDefaultType>) {
   return (

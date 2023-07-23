@@ -1,7 +1,6 @@
 import { styled, keyframes } from 'styled-components';
 import { StyledButtonPink3D } from './styles/StyledButtons';
 
-
 const Main = () => {
   return (
     <MainContainer>
@@ -10,18 +9,17 @@ const Main = () => {
           <Title>당신 근처의 소중한 이웃들과 함께</Title>
           <Subtitle>소중한 반려견들과 함께하는 즐거운 산책 시스템</Subtitle>
           <AnimatedText>
-            <Logo src="/src/assets/petmily-logo-pink.png"/>
+            <Logo src="/src/assets/petmily-logo-pink.png" />
             PetMily
-            </AnimatedText>
+          </AnimatedText>
         </TitleContainer>
         <AnimatedTextContainer>
           <MainDog src={'/src/assets/maindog.png'} alt="강아지사진" />
-          
         </AnimatedTextContainer>
       </FirstSection>
       <SecondSection>
         <SecondTitleContainer>
-        <SecondTitle>혼자 가기 외로운 산책</SecondTitle>
+          <SecondTitle>혼자 가기 외로운 산책</SecondTitle>
           <SecondSubtitle>동네 사람들과 같이 산책해요!</SecondSubtitle>
           <StyledButtonPink3D>게시글 보기</StyledButtonPink3D>
         </SecondTitleContainer>
@@ -32,7 +30,9 @@ const Main = () => {
       <ThirdSection>
         <ThirdTitleContainer>
           <ThirdTitle>이웃과 함께 하는 동네생활 </ThirdTitle>
-          <ThirdSubtitle>우리 동네의 다양한 이야기를 이웃과 함께 나누어요.</ThirdSubtitle>
+          <ThirdSubtitle>
+            우리 동네의 다양한 이야기를 이웃과 함께 나누어요.
+          </ThirdSubtitle>
           <FlexContainer>
             <ViewdogWrapper>
               <Viewdog src={'/src/assets/viewdog.png'} alt="강아지사진" />
@@ -56,9 +56,8 @@ const Main = () => {
               </FlexTextContainer>
             </ViewdogWrapper>
           </FlexContainer>
-      
         </ThirdTitleContainer>
-          <View3 src={'/src/assets/view3.png'} alt="강아지사진" />
+        <View3 src={'/src/assets/view3.png'} alt="강아지사진" />
       </ThirdSection>
     </MainContainer>
   );
@@ -151,11 +150,10 @@ const TitleContainer = styled.div`
 `;
 
 const Title = styled.h1`
-
   font-size: 40px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 `;
 
 const Subtitle = styled.h2`
@@ -172,11 +170,10 @@ const SecondTitleContainer = styled.div`
   animation-delay: 0.5s;
 `;
 const SecondTitle = styled.h1`
-
   font-size: 40px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 `;
 
 const SecondSubtitle = styled.h2`
@@ -191,11 +188,10 @@ const ThirdTitleContainer = styled.div`
 `;
 
 const ThirdTitle = styled.h1`
-
   font-size: 40px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 `;
 
 const ThirdSubtitle = styled.h2`
@@ -217,7 +213,6 @@ const SmallSubtitle = styled.p`
   margin-bottom: 20px;
 `;
 
-
 const AnimatedTextContainer = styled.div`
   display: flex;
   align-items: center;
@@ -232,7 +227,7 @@ const MainDog = styled.img`
   margin-right: 10px;
 `;
 const View3 = styled.img`
-margin-left: 80px;
+  margin-left: 80px;
   width: 350px;
   height: 600px;
   border-radius: 20px;
@@ -249,8 +244,11 @@ const ViewdogWrapper = styled.div`
   background-color: #f6d7e2;
   margin: 10px auto;
 `;
+
+// FEEDBACK: 어디는 indent가 있고 어디엔 없네요. 통일해주세요. 사소한거지만 코드가 이렇게 작성되어 있으면 대충작성한 느낌을 많이 받습니다.
+// 그리고 margin은 margin끼리 묶어놓는 등 나중에 스타일을 수정할 때 읽을걸 고려해서 스타일을 작성해주세요.
 const Viewdog = styled.img`
-margin-top: 95px;
+  margin-top: 95px;
   width: 50px;
   height: 60px;
   border-radius: 20px;
@@ -258,8 +256,8 @@ margin-top: 95px;
 `;
 
 const Mac = styled.img`
-margin-top: 50px;
- width: 600px;
+  margin-top: 50px;
+  width: 600px;
   height: 400px;
 `;
 const AnimatedText = styled.h3`

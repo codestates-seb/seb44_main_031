@@ -5,6 +5,9 @@ import useDidMountEffect from './useDidMountEffect';
 import { fetchAddress } from './myPageSlice';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store/store';
+
+// FEEDBACK: 어디는 스타일이 아래에 위치하고 어디는 이렇게 위에 위치하네요. 통일해주세요.
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -51,14 +54,14 @@ const Form = () => {
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
-  const [map, setMap] = useState<any>();
-  const [marker, setMarker] = useState<any>();
+  const [map, setMap] = useState<any>(); // FEEDBACK: 'map'처럼 사전에 정의된 메서드 이름은 사용하지 않는 것이 좋습니다. (map은 이미 Array.prototype.map에 사용되고 있습니다.)
+  const [marker, setMarker] = useState<any>(); // FEEDBACK: any 타입은 사용을 최대한 지양해야 합니다. 타입스크립트를 무효화하기 때문입니다.
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const open = useDaumPostcodePopup(
-    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js',
   );
-  console.log(1);
+  console.log(1); // FEEDBACK: 불필요한 console.log는 지워주세요.
 
   const handleComplete = (data: any) => {
     console.log(1);
@@ -66,12 +69,17 @@ const Form = () => {
     console.log(data);
     console.log(data.roadAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     setAddress(data.address);
+
+    // FEEDBACK: 주석은 다른 사람도 보는 문장입니다. 다른 사람에게 설명하듯이 작성해야 합니다.
+    // 만약 불필요하다면 제거해주세요.
     //여기서 goaddress할필요가 없음 유즈이펙트땜
   };
   const handleClick = () => {
     open({ onComplete: handleComplete });
     console.log(0);
   };
+  // FEEDBACK: 전반적으로 코드가 너무 다닥다닥 붙어있습니다. 가독성에 좋지 않습니다.
+  // FEEDBACK: 이 프로젝트의 컨벤션은 카멜케이스 같은데 new_script는 스테이크 케이스네요. 통일해주세요. (복붙이라는 느낌은 왜 나는 걸까요...)
   const new_script = (src: string) => {
     return new Promise<void>((resolve, reject) => {
       const script = document.createElement('script');
@@ -87,7 +95,7 @@ const Form = () => {
   };
   useEffect(() => {
     const my_script = new_script(
-      'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=2e9c72e22b8b9402a65bbc568e1d75b1'
+      'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=2e9c72e22b8b9402a65bbc568e1d75b1',
     );
     //스크립트 읽기 완료 후 카카오맵 설정
     my_script.then(() => {
@@ -103,7 +111,7 @@ const Form = () => {
         //마커설정
         const markerPosition = new kakao.maps.LatLng(
           37.56000302825312,
-          126.97540593203321
+          126.97540593203321,
         );
         const marker = new kakao.maps.Marker({
           position: markerPosition,
@@ -191,10 +199,10 @@ const Form = () => {
             console.log(latitude);
             setLongitude(mouseEvent.latLng.getLng());
           }
-        }
+        },
       );
     },
-    [latitude, map, marker]
+    [latitude, map, marker],
   );
 
   useDidMountEffect(() => {
@@ -207,18 +215,14 @@ const Form = () => {
   const handleAddressModifyClick = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      dispatch(fetchAddress({ address, latitude, longitude })).then(
-        () => {
-         
-          
-            alert('주소를 변경했습니다');
-          
-          navigate('/users/mypage');
-          window.location.reload();
-        }
-      );
+      dispatch(fetchAddress({ address, latitude, longitude })).then(() => {
+        alert('주소를 변경했습니다');
+
+        navigate('/users/mypage');
+        window.location.reload();
+      });
     },
-    [dispatch, address, latitude, longitude, navigate]
+    [dispatch, address, latitude, longitude, navigate],
   );
   return (
     <Container>

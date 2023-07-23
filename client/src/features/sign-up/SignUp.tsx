@@ -5,9 +5,10 @@ import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { actionS } from './signUpSlice';
-// import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux'; // FEEDBACK: 사용하지 않는 import는 지우는 것이 좋습니다.
 import { useAppDispatch } from '../../store/store';
 
+// FEEDBACK: 이 상수는 다른 곳에서도 사용하는데 여기에서만 이렇게 빼주는 이유가 있을까요?
 const ec2URL = 'ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
 const Container = styled.div`
@@ -272,9 +273,9 @@ const SignUp: React.FC = () => {
       console.log([username, email, password, latitude, longitude, address]);
       dispatch(
         actionS({ username, email, password, latitude, longitude, address })
-      ).then(() => {        
+      ).then(() => {
           alert('회원가입 성공');
-          navigate('/users/sign-in');        
+          navigate('/users/sign-in');
       });
       // .catch((err) => console.log(err.message));
     },
@@ -436,7 +437,7 @@ const SignUp: React.FC = () => {
                 <StyledButtonPink3D onClick={goId}>
                   중복 확인 발급
                 </StyledButtonPink3D>
-               
+
               </IdCheckForm>
               {usernameError && <p>{usernameError}</p>}
             </InputUsername>
@@ -485,7 +486,7 @@ const SignUp: React.FC = () => {
                 value={password}
                 onChange={onChangePassword}
                 required
-              ></input>             
+              ></input>
             </InputPW>
             {passwordError && <p>{passwordError}</p>}
             <InputAddress>

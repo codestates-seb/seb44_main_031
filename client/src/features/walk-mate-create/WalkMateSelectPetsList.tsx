@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction } from 'react';
 import { styled } from 'styled-components';
 import { FormDatas } from './hooks/useWalkMateForm';
 
+// FEEDBACK: propType -> PropType으로 변경해주세요.
+// FEEDBACK: -PropType -> -Props로 변경하는 건 어떨까요?
 interface propType {
   inputValue: FormDatas;
   setInputValue: Dispatch<SetStateAction<FormDatas>>;

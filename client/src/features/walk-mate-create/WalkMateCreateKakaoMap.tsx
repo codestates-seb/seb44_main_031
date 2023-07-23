@@ -54,6 +54,7 @@ const WalkMateCreateKakaoMap = ({
     // 지도에 마커를 표시합니다
     marker.setMap(map);
 
+    // FEEDBACK: 공통 로직을 함수로 분리해서 좋습니다 !
     // 좌표로 법정동 상세 주소 정보를 요청하는 함수
     const searchDetailAddrFromCoords = (coords: any, callback: any) => {
       geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);

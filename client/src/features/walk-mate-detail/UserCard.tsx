@@ -74,6 +74,8 @@ const UserCard = () => {
           },
         }
       );
+
+      // FEEDBACK: 'AttendeeInfo[]' 형식에 'result' 속성이 없습니다.ts(2339) 에러가 발생합니다.
       setAttendeeInfo(response.data.result);
     } catch (error) {
       if (error.response && error.response.status === 409) {

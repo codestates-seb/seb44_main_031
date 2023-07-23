@@ -5,6 +5,7 @@ import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
+// FEEDBACK: 글로벌 타입 설정은 프로젝트 루트 디렉터리에서 하는 것이 좋습니다.
 declare global {
   interface Window {
     kakao: any;

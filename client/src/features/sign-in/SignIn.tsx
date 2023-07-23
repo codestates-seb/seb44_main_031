@@ -133,30 +133,30 @@ const SignIn = () => {
     },
     []
   );
-  const location = useLocation();  
- 
+  const location = useLocation();
 
-     
-   
+  // FEEDBACK: 불필요한 여백은 제거해주세요.
+
+
   const onSubmitJoin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      
-      console.log([email, password]);
+
+      console.log([email, password]); // FEEDBACK: 불필요한 console.log는 지워주세요.
       try {
         const resultAction: any = await dispatch(actionL({ email, password }));
         console.log(resultAction);
         const { accessToken, userId } = resultAction.payload;
         // Save the token and user ID
-        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('accessToken', accessToken); // FEEDBACK: localStorage 추상화 피드백을 참고해주세요.
         localStorage.setItem('userId', userId);
         const params = new URLSearchParams(location.search);
         const path = params.get('path');
-        console.log(path);    
-        if(path===null){
+        console.log(path);
+        if(path===null){ // FEEDBACK: if (path === null) 처럼 여백을 주세요.
           navigate('/walk-mate/all');
-        }else{
-          navigate(`${path}`);
+        }else{ // FEEDBACK: } else { 처럼 여백을 주세요.
+          navigate(`${path}`); // FEEDBACK: path는 이미 string인데 `${path}` 처럼 감싸준 이유가 있을까요?
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);

@@ -21,6 +21,9 @@ const BookmarkIcon = () => {
       });
       return;
     }
+
+    // FEEDBACK: if (isMookmarked)를 했고 여기에 도달했다면 이미 !isBookmarked라는 것이 확실하므로
+    // 아래 조건문은 불필요합니다.
     if (!isBookmakred) {
       toast.success('북마크가 등록 되었습니다', {
         toastId: 'bookmark-on',

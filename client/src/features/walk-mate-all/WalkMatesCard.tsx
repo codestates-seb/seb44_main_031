@@ -27,7 +27,7 @@ const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
     const handleCardClick = () => {
       navigate(getWalkMateDetailUrl(article.articleId));
     };
-    console.log(article);
+    console.log(article); // FEEDBACK: 불필요한 console.log는 지워주세요.
 
     return (
       <StyledCardContainer

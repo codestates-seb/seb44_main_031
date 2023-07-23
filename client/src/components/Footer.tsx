@@ -21,6 +21,7 @@ const Footer = () => {
 
 export default Footer;
 
+// FEEDBACK: /* Pink background... */ 라고 주석은 되어있는데 실제론 white로 되어있어서 혼동됩니다. 그리고 이렇게 되어 있으면 자연스레 '복붙'이 떠오르는 건 왜일까요...
 const FooterContainer = styled.footer`
   background-color: white; /* Pink background color for the footer */
   padding: 20px;

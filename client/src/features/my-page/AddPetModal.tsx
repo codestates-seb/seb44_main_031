@@ -4,6 +4,8 @@ import styled from 'styled-components';
 interface ModalDefaultType {
   onClickToggleAddPetModal: () => void;
 }
+
+// FEEDBACK: 불필요한 주석은 제거해주세요.
 //프롭스 드릴링이 머였드라
 //레이 쾌스트
 function AddPetModal({
@@ -16,7 +18,7 @@ function AddPetModal({
       <Backdrop
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          console.log(2);
+          console.log(2); // FEEDBACK: 불필요한 console.log는 지워주세요.
           if (onClickToggleAddPetModal) {
             onClickToggleAddPetModal();
             console.log(1);

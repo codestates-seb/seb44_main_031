@@ -11,6 +11,32 @@ import {
 } from '../api/reactRouterUrl';
 import Logout from '../features/sign-in/LogOut';
 
+// FEEDBACK: localStorage.getItem('accessToken')은 다른 곳에서도 충분히 쓰일 가능성이 있습니다.
+// 왜냐하면 localStorage 자체가 전역적으로 쓰이는 것이기 때문입니다.
+// 그렇다면 'accessToken'이 여러군데에서 쓰일텐데 이렇게 하드코딩으로 쓰는 것은 좋은 방법이 아닙니다.
+// 따라서 const KEY_ACCESS_TOKEN = 'accessToken'; 처럼 상수화해서 관리하거나
+// 아니면 localStorage를 추상화해서 쓰는 방법이 더 좋습니다.
+// 아래 코드는 예시 입니다.
+
+// localStorage.ts
+const KEY_ACCESS_TOKEN = 'accessToken';
+
+/**
+ * LocalStorage를 추상화한 객체입니다.
+ */
+export const LocalStorageAuth = {
+  getAccessToken: () => {
+    return localStorage.getItem(KEY_ACCESS_TOKEN);
+  },
+  setAccessToken: (accessToken: string) => {
+    localStorage.setItem(KEY_ACCESS_TOKEN, accessToken);
+  },
+  removeAccessToken: () => {
+    localStorage.removeItem(KEY_ACCESS_TOKEN);
+  },
+  // ...
+};
+
 const Header = () => {
   const navigate = useNavigate();
 
@@ -37,6 +63,7 @@ const Header = () => {
         <StyledNavLink to={myPageUrl}>마이페이지</StyledNavLink>
       </NavigationContainer>
       <AuthContainer>
+        {/* Logout은 버튼인데 Button 이라는 이름이 없고 LoginButton은 Logout과 달리 Button이 붙어있네요. 이름은 통일성 있게 관리해주세요. */}
         {localStorage.getItem('accessToken') ? (
           <Logout />
         ) : (

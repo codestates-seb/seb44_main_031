@@ -60,13 +60,13 @@ interface WalkMatesFiltersProps {
   searchQuery: string;
   userAddress: string;
   isLoading: boolean;
-  // Add other prop types as needed
+  // Add other prop types as needed // FEEDBACK: 불필요한 주석은 제거해주세요.
 }
 
 // 컴포넌트
 const WalkMatesFilters = ({
   selectedFilter,
-  setSelectedFilter,
+  setSelectedFilter, // FEEDBACK: 상태 setter를 바로 전달하는 건 좋지 않습니다.
   searchQuery,
   userAddress,
   isLoading,
@@ -77,6 +77,7 @@ const WalkMatesFilters = ({
     label: '반경 3km 이내',
   });
 
+  // FEEDBACK: 변수명은 명사로 작성해야 합니다.
   const searchResult =
     searchQuery === '' ? null : (
       <StyeldSearchResult>

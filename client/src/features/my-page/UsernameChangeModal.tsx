@@ -1,6 +1,7 @@
 import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
+// FEEDBACK: 어떤 인터페이스는 -Type이 아닌데, 여기는 -Type이라고 이름을 붙였습니다. 통일해주세요.
 interface ModalDefaultType {
   onClickUsernameChangeToggleModal: () => void;
 }

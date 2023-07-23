@@ -21,6 +21,35 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { MAXIMUM_IMAGE_SIZE } from '../../constants/fileSize';
 
+// FEEDBACK: setInputValue를 proprs로 바로 넘기는 것 처럼, 상태 setter를 바로 컴포넌트의 props로 전달하는 건 좋지 않은 선택입니다.
+// 왜냐하면 setInputValue의 타입이 바뀌거나 이름이 바뀌는 등 변화가 생겼을 때 전달 받은 모든 컴포넌트를 수정해야 하기 때문입니다.
+// 따라서 별도의 함수를 만들거나 훅을 만들면 좋습니다.
+
+// 예시
+const Component = () => {
+  return <div></div>;
+};
+
+const Page = () => {
+  const [inputValue, _setInputValue] = useState<string>('');
+  const setInputValue = (value: string) => {
+    _setInputValue(value);
+  };
+
+  return <Component setInputValue={setInputValue}>...</Component>
+}
+
+// 또는
+
+const useInputValue = () => {
+  const [inputValue, _setInputValue] = useState<string>('');
+  const setInputValue = (value: string) => {
+    _setInputValue(value);
+  };
+
+  return [inputValue, setInputValue];
+};
+
 const WalkMateCreate = () => {
   const navigate = useNavigate();
 
