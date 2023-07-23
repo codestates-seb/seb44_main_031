@@ -119,6 +119,7 @@ public class AuthService {
     public void signUp(final SignUpRequest request) {
         checkDuplicatedUsername(request.getUsername());
         checkDuplicatedEmail(request.getEmail());
+        verifyEmailCode(request.getCode(), request.getEmail());
 
         final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         final List<String> roles = authorityUtils.createRoles(request.getEmail());

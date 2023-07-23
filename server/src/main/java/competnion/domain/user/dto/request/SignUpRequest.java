@@ -25,4 +25,6 @@ public class SignUpRequest {
     private Double longitude;
     @NotBlank
     private String address;
+    @NotBlank
+    private String code;
 }
