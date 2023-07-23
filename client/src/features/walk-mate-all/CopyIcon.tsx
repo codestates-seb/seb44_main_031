@@ -15,7 +15,6 @@ const CopyIcon = ({ textToCopy }: { textToCopy: string }) => {
         hideProgressBar: true,
       });
     } catch (error) {
-      console.error('Failed to copy URL:', error);
       toast.error(`Failed to copy URL: ${error}`, {
         toastId: 'copy-error',
         autoClose: 900,

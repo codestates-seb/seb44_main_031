@@ -19,6 +19,7 @@ import {
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { MAXIMUM_IMAGE_SIZE } from '../../constants/fileSize';
 
 const WalkMateCreate = () => {
   const navigate = useNavigate();
@@ -108,9 +109,6 @@ const WalkMateCreate = () => {
       });
       formData.append('request', jsonBlob);
 
-      console.log(requestData);
-      console.log([...formData]);
-
       try {
         setIsLoading(true);
         const response = await axiosInstance.post(
@@ -121,7 +119,6 @@ const WalkMateCreate = () => {
         toast.success('산책 모집 글 등록 성공!', { position: 'bottom-right' });
         navigate(`/walk-mate/${response.data.result}`);
       } catch (error: unknown | Error | AxiosError) {
-        console.log(error);
         if (isAxiosError(error)) {
           if (error.response) {
             const responseData: unknown = error.response.data;
@@ -172,14 +169,14 @@ const WalkMateCreate = () => {
             type="file"
             id="image"
             name="image"
-            // value={inputValue.image}
             onChange={handleImageChange}
             accept="image/png, image/jpeg"
             required
             autoFocus
+            max={MAXIMUM_IMAGE_SIZE}
           />
           {!isValid.image && isTouched.image && (
-            <p className="error-message">error message</p>
+            <p className="error-message">1MB 이하의 이미지를 업로드 해주세요</p>
           )}
         </div>
         <div className="input-field">

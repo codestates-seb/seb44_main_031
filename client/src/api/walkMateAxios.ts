@@ -1,5 +1,6 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { SelectedFilter } from '../features/walk-mate-all/WalkMateAll';
+import { toast } from 'react-toastify';
 // import { toast } from 'react-toastify';
 // import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -53,11 +54,6 @@ export const getArticlesUrl = (
   selectedFilter: SelectedFilter,
   searchQuery: string
 ) => {
-  // console.log(
-  //   `articles?page=${page}&size=${size}days=${30}`,
-  //   selectedFilter,
-  //   searchQuery
-  // );
   if (searchQuery === '') {
     return `articles?page=${page}&size=${size}&days=${selectedFilter.period.value}&sort=${selectedFilter.viewOrder.value}`;
   }
@@ -75,38 +71,29 @@ export const fetchWalkMates = async (
     // getArticlesUrlJsonServer(pageParam, size, selectedFilter, searchQuery)
     getArticlesUrl(pageParam, size, selectedFilter, searchQuery)
   );
-  console.log('get request success!');
-
-  // toast.success('새로운 모임 글 받아오기 성공!', {
-  //   toastId: 'success',
-  //   autoClose: 1500,
-  //   position: 'bottom-left',
-  // });
-
   return response;
 };
 
-// axiosInstance.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     // 토큰 인증이 안됐을 경우 현재 페이지 주소를 state 으로 담아서 로그인 페이지로 이동.
-//     const navigate = useNavigate();
-//     const location = useLocation();
-//     console.log(error.response);
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse<any, any>) => response,
+  (error: AxiosError) => {
+    // 토큰 인증이 안됐을 경우 현재 페이지 주소를 state 으로 담아서 로그인 페이지로 이동.
+    if (
+      error.response?.status === 401 ||
+      (error.response?.data as any)?.status === 401 ||
+      (error.response?.data as any)?.message === 'USER NOT FOUND'
+    ) {
+      toast.error(error.message);
 
-//     if (
-//       error.response.status === 401 ||
-//       error.response.status === 404 ||
-//       error.response.message === 'USER NOT FOUND'
-//     ) {
-//       navigate(signInUrl, {
-//         state: { path: location.pathname },
-//       });
-//     }
+      const currentPath = window.location.pathname;
+      window.location.href = `${signInUrl}?path=${encodeURIComponent(
+        currentPath
+      )}`;
+    }
 
-//     return Promise.reject(error);
-//   }
-// );
+    return Promise.reject(error);
+  }
+);
 
 export const isAxiosError = (err: unknown): err is AxiosError => {
   return (err as AxiosError).isAxiosError === true;

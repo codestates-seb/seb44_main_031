@@ -3,11 +3,6 @@ import { styled } from 'styled-components';
 export const SibaLoadingSpinner = () => {
   return (
     <StyledLoadingSpinnerContainer>
-      {/* <img
-        src="/src/assets/loading-spinner-dog-1.gif"
-        alt="dog-loading-spinner"
-        className="dog-loading-spinner"
-      /> */}
       <StyledSibaLoadingSpinnerImageTag
         src="/src/assets/loading-spinner-dog-1.gif"
         alt="dog-loading-spinner"
@@ -21,11 +16,6 @@ const StyledLoadingSpinnerContainer = styled.div`
   justify-content: center;
   align-items: center;
   height: 900px;
-
-  /* .dog-loading-spinner {
-    width: 30%;
-    border-radius: 100px;
-  } */
 `;
 
 export const StyledSibaLoadingSpinnerImageTag = styled.img`

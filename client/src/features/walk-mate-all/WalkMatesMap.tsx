@@ -5,9 +5,6 @@ import {
 } from '../../constants/imageSrcPath';
 import { Article, WalkMateAllContext } from './WalkMateAll';
 
-// const latitude = 37.58251737488069;
-// const longitude = 126.98517705739235;
-
 interface WalkMatesMapProps {
   setSelectedCard: React.Dispatch<React.SetStateAction<number | null>>;
 }
@@ -16,10 +13,8 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
   const mapRef = useRef<HTMLDivElement>(null);
 
   const queryData = useContext(WalkMateAllContext);
-  console.log('WalkMatesMap rendered');
 
   useEffect(() => {
-    console.log('WalkMatesMap useEffect rendered');
     const latitude = queryData?.pages[0].data.userInfo.latitude;
     const longitude = queryData?.pages[0].data.userInfo.longitude;
 
@@ -50,6 +45,40 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
     // 지도에 원을 표시합니다
     circle.setMap(map);
 
+    // 내 위치를 표시할 마커 생성, 인포 윈도우, 마우스 호버 이벤트 등록하기
+    // 마커를 표시할 위치입니다
+    const myPosition = new kakao.maps.LatLng(latitude, longitude);
+
+    // 마커를 생성합니다
+    const marker = new kakao.maps.Marker({
+      position: myPosition,
+    });
+
+    // 마커를 지도에 표시합니다.
+    marker.setMap(map);
+
+    // 마커에 커서가 오버됐을 때 마커 위에 표시할 인포윈도우를 생성합니다
+    const iwContent =
+      '<div style="padding:5px; text-align:center; margin-left:10px;">내 등록 위치입니다</div>'; // 인포윈도우에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+
+    // 인포윈도우를 생성합니다
+    const infowindow = new kakao.maps.InfoWindow({
+      content: iwContent,
+    });
+
+    // 마커에 마우스오버 이벤트를 등록합니다
+    kakao.maps.event.addListener(marker, 'mouseover', function () {
+      // 마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
+      infowindow.open(map, marker);
+    });
+
+    // 마커에 마우스아웃 이벤트를 등록합니다
+    kakao.maps.event.addListener(marker, 'mouseout', function () {
+      // 마커에 마우스아웃 이벤트가 발생하면 인포윈도우를 제거합니다
+      infowindow.close();
+    });
+
+    // 산책 모임들의 여러개의 마커 등록하기
     // 마커 이미지의 이미지 주소입니다
     const imageSrc = mapMarkerIconRedPath;
 
@@ -62,12 +91,9 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
         // 마커 이미지를 생성합니다
         const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
 
-        // latlng: new kakao.maps.LatLng(37.582660916157515, 126.98361081274618),
-
         // 마커를 생성합니다
         const marker = new kakao.maps.Marker({
           map: map, // 마커를 표시할 지도
-          // position: positions[i].latlng, // 마커를 표시할 위치
           position: new kakao.maps.LatLng(article.latitude, article.longitude), // 마커를 표시할 위치
           title: article.location, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
           image: markerImage, // 마커 이미지
@@ -75,11 +101,12 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
 
         markerIdMap.set(marker, article.articleId);
 
-        // const iwRemoveable = true;
         // 마커에 표시할 인포윈도우를 생성합니다
         const infowindow = new kakao.maps.InfoWindow({
-          content: `<div style="display:flex; flex-wrap:wrap; padding:10px; height:50px; width:260px; text-align:center;">${article.title}</div>`, // 인포윈도우에 표시할 내용
-          // removable: iwRemoveable,
+          content: `<div style="display:flex; flex-wrap:wrap; padding:10px; height:50px; width:260px; text-align:center;">${
+            article.title.slice(0, 35) + '...'
+          }</div>`, // 인포윈도우에 표시할 내용
+          // removable: iwRemoveable, // x 버튼 기능 추가
         });
 
         // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
@@ -96,7 +123,6 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
           makeOutListener(infowindow)
         );
 
-        // 테스트
         kakao.maps.event.addListener(marker, 'click', function () {
           // Get the corresponding ID from the markerIdMap
           const markerId = markerIdMap.get(marker);
@@ -112,7 +138,6 @@ const WalkMatesMap = ({ setSelectedCard }: WalkMatesMapProps) => {
           );
 
           // 스크롤을 해당 카드로 이동시킵니다
-          // window.scrollTo(0, 100);
           const pairedCard = window.document.getElementById(`card-${markerId}`);
           pairedCard?.scrollIntoView({
             behavior: 'smooth',

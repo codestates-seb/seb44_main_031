@@ -11,9 +11,7 @@ export const sliceContentLengthEndWithDots = (
 };
 
 export const getFirstThreeChunks = (string: string) => {
-  // return string.split(' ').slice(0, 3).join(' ');
   const chunks = string.split(' ');
-  // console.log(chunks);
   const firstThreeChunks = chunks.slice(0, 3).join(' ');
   return firstThreeChunks;
 };

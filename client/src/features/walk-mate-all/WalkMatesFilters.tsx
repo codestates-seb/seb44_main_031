@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { SelectedFilter } from './WalkMateAll';
 import { getFirstThreeChunks } from './utils/formattingArticle';
 
+// Select 컴포넌트 타입, 옵션 설정
 interface Option {
   value: string;
   label: string;
@@ -19,8 +20,8 @@ const optionPeriod = [
   { value: '2', label: '2일 이내' },
 ];
 const optionViewOrder = [
-  { value: 'asc', label: '모임 가까운순' },
-  { value: 'desc', label: '모임 늦은순' },
+  { value: 'asc', label: '마감 임박순' },
+  { value: 'desc', label: '마감 늦은순' },
 ];
 const optionDistance = [{ value: 'within-3km-radius', label: '반경 3km 이내' }];
 
@@ -52,6 +53,7 @@ const customStyles = {
   }),
 };
 
+// 컴포넌트 Props 타입
 interface WalkMatesFiltersProps {
   selectedFilter: SelectedFilter;
   setSelectedFilter: React.Dispatch<React.SetStateAction<SelectedFilter>>;
@@ -61,6 +63,7 @@ interface WalkMatesFiltersProps {
   // Add other prop types as needed
 }
 
+// 컴포넌트
 const WalkMatesFilters = ({
   selectedFilter,
   setSelectedFilter,
@@ -68,7 +71,7 @@ const WalkMatesFilters = ({
   userAddress,
   isLoading,
 }: WalkMatesFiltersProps) => {
-  // 서비스에 거리 단위 필터 기능이 추가되면 WalkMateAll 의 selectedFilter state에 distance state를 병합시키고 삭제하면 됩니다.
+  // 추후 서비스에 거리 단위 필터 기능이 추가되면 WalkMateAll 의 selectedFilter state에 distance state를 병합시키고 삭제하면 됩니다.
   const [distance, setDistance] = useState<Option | null>({
     value: 'within-3km-radius',
     label: '반경 3km 이내',
@@ -85,7 +88,6 @@ const WalkMatesFilters = ({
   return (
     <>
       <StyledFilterContainer>
-        {/* <h2>서울특별시 인사동 근처</h2> */}
         <h2>{userAddress && getFirstThreeChunks(userAddress)} 근처</h2>
         <Select
           className="select-period"
@@ -95,7 +97,6 @@ const WalkMatesFilters = ({
           isSearchable={false}
           defaultValue={selectedFilter.period}
           onChange={(selectedOption) => {
-            console.log(selectedOption);
             setSelectedFilter((prev) => {
               return {
                 ...prev,
@@ -113,7 +114,6 @@ const WalkMatesFilters = ({
           isSearchable={false}
           defaultValue={selectedFilter.viewOrder}
           onChange={(selectedOption) => {
-            console.log(selectedOption);
             setSelectedFilter((prev) => {
               return {
                 ...prev,
@@ -188,7 +188,6 @@ const StyledFilterContainer = styled.div`
 `;
 
 const StyeldSearchResult = styled.div`
-  /* text-align: center; */
   margin-bottom: 10px;
   width: 100%;
   background-color: white;

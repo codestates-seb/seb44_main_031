@@ -5,12 +5,15 @@ import { IoIosArrowDropupCircle } from 'react-icons/io';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchWalkMates } from '../../api/walkMateAxios';
 import { toast } from 'react-toastify';
-import WalkMatesHeader from './WalkMatesHeader';
+import WalkMatesHeader, {
+  StyeldCreateWalkMateLinkButton,
+} from './WalkMatesHeader';
 import WalkMatesSerchBar from './WalkMatesSerchBar';
 import WalkMatesFilters from './WalkMatesFilters';
 import WalkMatesCard from './WalkMatesCard';
 import WalkMatesMap from './WalkMatesMap';
 import { SibaLoadingSpinner } from '../../components/styles/LoaodingSpinner';
+import { createWalkMateURL } from '../../api/reactRouterUrl';
 
 export const WalkMateAllContext = createContext<any>(null);
 
@@ -29,8 +32,6 @@ export type Article = {
   isViewerJoining: boolean;
 };
 
-const pageSize = 4;
-
 export type SelectedFilter = {
   period: { value: string; label: string };
   viewOrder: {
@@ -39,10 +40,11 @@ export type SelectedFilter = {
   };
 };
 
-// component
-const WalkMateAll = () => {
-  console.log('WalkMateAll rendered');
+// 한 페이지당 가져올 article 개수
+const pageSize = 4;
 
+// 컴포넌트
+const WalkMateAll = () => {
   const [selectedFilter, setSelectedFilter] = useState<SelectedFilter>({
     period: { value: '30', label: '30일 이내' },
     viewOrder: {
@@ -51,13 +53,9 @@ const WalkMateAll = () => {
     },
   });
   const [searchQuery, setSearchQuery] = useState('');
-
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
 
-  const handleScrollIconClick = () => {
-    window.scrollTo(0, 0);
-  };
-
+  // 무한스크롤을 위한 useInfiniteQuery 훅
   const {
     data,
     error,
@@ -70,23 +68,15 @@ const WalkMateAll = () => {
     queryKey: ['articles', selectedFilter, searchQuery],
     queryFn: ({ pageParam = 1 }) =>
       fetchWalkMates(pageParam, pageSize, selectedFilter, searchQuery),
-    // getNextPageParam: (lastPage, pages) => {
-    //   return lastPage?.data.articles.length === pageSize
-    //     ? pages.length + 1
-    //     : undefined;
-    // },
     getNextPageParam: (lastPage) => {
       return lastPage?.data.pageinfo.currentPage ===
         lastPage?.data.pageinfo.totalPage
         ? undefined
         : lastPage?.data.pageinfo.currentPage + 1;
     },
-    // cacheTime: 0,
-    // keepPreviousData: true,
   });
 
-  console.log(data);
-
+  // 무한스크롤을 감지를 위한 인터센션 옵저버 ref 생성
   const intObserver = useRef<IntersectionObserver | null>(null);
   const lastArticleRef = useCallback(
     (lastArticle: HTMLElement | null) => {
@@ -96,7 +86,6 @@ const WalkMateAll = () => {
 
       intObserver.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasNextPage) {
-          console.log('마지막 산책 글 근처임');
           fetchNextPage();
         }
       });
@@ -106,9 +95,14 @@ const WalkMateAll = () => {
     [isFetchingNextPage, fetchNextPage, hasNextPage]
   );
 
+  // 위로가기 아이콘 눌렀을때 화면의 최상단으로 스크롤 이동
+  const handleScrollIconClick = () => {
+    window.scrollTo(0, 0);
+  };
+
+  // Error 일때 보여줄 화면
   if (isError) {
     let errorMessage = '';
-    console.log(error);
 
     if ((error as any)?.response) {
       errorMessage =
@@ -128,6 +122,7 @@ const WalkMateAll = () => {
     );
   }
 
+  // Loading 중 일때 보여줄 화면
   if (isLoading) {
     return <SibaLoadingSpinner />;
   }
@@ -135,8 +130,25 @@ const WalkMateAll = () => {
   // Filter 에 내려줄 유저 주소
   const userAddress = data?.pages[0].data.userInfo.address;
 
-  const content = data?.pages.map((page) => {
+  const content = data?.pages.map((page, index) => {
+    // 해당 article 이 없을 경우
+    if (page.data.articles.length === 0) {
+      return (
+        <StyledArticlesNotFoundInfo key={index}>
+          <p>현재 위치와 필터로 개설된 모임이 없습니다 🧐</p>
+          <p>다른 필터나 키워드를 검색해주세요</p>
+          <br />
+          <p>또는 나만의 산책 모임을 개설해 보세요 🥰</p>
+          <StyeldCreateWalkMateLinkButton to={createWalkMateURL}>
+            산책 모임 개설하기
+          </StyeldCreateWalkMateLinkButton>
+        </StyledArticlesNotFoundInfo>
+      );
+    }
+
+    // article 이 있을 경우
     return page.data.articles.map((article: Article, index: number) => {
+      // 마지막 article 을 찾아서 Card에 intersection observer ref 걸어주기
       if (page.data.articles.length === index + 1) {
         return (
           <WalkMatesCard
@@ -237,6 +249,19 @@ const StyeldMainContentContainer = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 25px;
+`;
+
+const StyledArticlesNotFoundInfo = styled.div`
+  margin-top: 80px;
+  text-align: center;
+
+  .dog-paws-emoji {
+    fill: pink;
+  }
+
+  a {
+    margin: 20px auto;
+  }
 `;
 
 const StyledWalkMatesListContainer = styled.div`

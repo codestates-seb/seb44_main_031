@@ -8,6 +8,7 @@ import { axiosInstance, getCreateArticleUrl } from '../../../api/walkMateAxios';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AxiosError, isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { MAXIMUM_IMAGE_SIZE } from '../../../constants/fileSize';
 
 export interface FormDatas {
   image: File | null;
@@ -113,7 +114,6 @@ const useWalkMateForm = () => {
           };
         });
       } catch (error: unknown | Error | AxiosError) {
-        console.log(error);
         if (isAxiosError(error)) {
           if (error.response) {
             const errorMessage: string = error.response.data.message;
@@ -122,8 +122,6 @@ const useWalkMateForm = () => {
             // Show the error message as a pop-up
             toast.error(`${status}: ${errorMessage}`);
             setError(`${status}: ${errorMessage}`);
-            // setError(errorMessage);
-            // setError(error.message);
           } else {
             // Handle other types of errors (e.g., network error)
             toast.error(`${error.message}`);
@@ -158,11 +156,22 @@ const useWalkMateForm = () => {
   }, []);
 
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const file = input?.files && input.files[0];
+
+    // 이미지 파일 1MB 이하만 업로드 가능
+    if (file && file.size > MAXIMUM_IMAGE_SIZE) {
+      setFormDatas({ ...formDatas, image: null });
+      setIsTouched({ ...isTouched, image: true });
+      setValidations({ ...validations, image: false });
+      alert('1MB 이하의 이미지만 올릴 수 있습니다');
+      // Clear the file input to prevent submitting the file
+      return;
+    }
+
     if (e.currentTarget.files !== null) {
       setFormDatas({ ...formDatas, image: e.currentTarget?.files[0] });
       setIsTouched({ ...isTouched, image: true });
-
-      console.log(e.currentTarget.files[0]);
     }
     // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
     const isImageValid = e.currentTarget.files?.length;

@@ -20,8 +20,6 @@ type ArticleProps = {
 
 const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
   ({ article, selectedCard }, ref: React.ForwardedRef<any>) => {
-    console.log('WalkMatesCard rendered');
-
     const navigate = useNavigate();
 
     const articleDetailPageUrl = `${FE_BASE_URL}/walk-mate/${article.articleId}`;
@@ -29,6 +27,7 @@ const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
     const handleCardClick = () => {
       navigate(getWalkMateDetailUrl(article.articleId));
     };
+    console.log(article);
 
     return (
       <StyledCardContainer
