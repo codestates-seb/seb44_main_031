@@ -79,6 +79,7 @@ jobs:
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}" >> $GITHUB_ENV
           echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> $GITHUB_ENV
           echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> $GITHUB_ENV
+          echo "CONFIG_DOMAIN=${{ secrets.CONFIG_DOMAIN }}" >> $GITHUB_ENV
         shell: bash
 
       - name: Generate application.yml
@@ -94,6 +95,7 @@ jobs:
           echo "    credentials:" >> ./server/src/main/resources/application.yml
           echo "      accessKey: $AWS_ACCESS_KEY" >> ./server/src/main/resources/application.yml
           echo "      secretKey: $AWS_SECRET_KEY" >> ./server/src/main/resources/application.yml
+          echo "config.domain: $CONFIG_DOMAIN" >> ./server/src/main/resources/application.yml
           echo "Spring:" >> ./server/src/main/resources/application.yml
           echo "  servlet:" >> ./server/src/main/resources/application.yml
           echo "    multipart:" >> ./server/src/main/resources/application.yml
