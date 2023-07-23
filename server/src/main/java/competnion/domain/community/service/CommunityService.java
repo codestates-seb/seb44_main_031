@@ -7,6 +7,7 @@ import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.entity.ArticleImage;
+import competnion.domain.community.entity.ArticleStatus;
 import competnion.domain.community.entity.Attend;
 import competnion.domain.community.mapper.ArticleMapper;
 import competnion.domain.community.repository.ArticleImageRepository;
@@ -23,6 +24,7 @@ import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.ZonedDateTimeUtil;
 import competnion.infra.s3.S3Util;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
@@ -114,6 +116,10 @@ public class CommunityService {
     // 산책 완료
     public void close(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
+
+        checkArticleOwner(user, article);
+        checkAlreadyClose(article);
+
         if (dateUtil.getNow().isBefore(article.getStartDate().plusMinutes(30)))
             throw new BusinessLogicException(CAN_NOT_CLOSE);
         article.updateStatus(CLOSED);
@@ -252,10 +258,13 @@ public class CommunityService {
         if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
     }
 
+    private void checkArticleOwner(final User user, final Article article) {
+        if (article.getUser() != user) throw new BusinessLogicException(NOT_ARTICLE_OWNER);
+    }
+
     private void checkMeetingTimeClosed(final ZonedDateTime startDate, final ZonedDateTime endDate) {
         ZonedDateTime now = dateUtil.getNow();
-        final long minutes = MINUTES.between(now, startDate);
-        if (now.isAfter(endDate) || minutes <= 30)
+        if (now.plusMinutes(30).isAfter(startDate) || now.plusMinutes(30).equals(startDate))
             throw new BusinessLogicException(MEETING_TIME_CLOSED);
     }
 
@@ -293,6 +302,11 @@ public class CommunityService {
                 user, startDate, endDate);
     }
 
+    private void checkAlreadyClose(Article article) {
+        if (article.getArticleStatus().equals(CLOSED))
+            throw new BusinessLogicException(ALREADY_CLOSED);
+    }
+
     private void checkValidMeetingDate(ArticlePostRequest request) {
         final ZonedDateTime startDate = request.getStartDate().plusMinutes(29);
         final int endDate = parseInt(request.getEndDate());
@@ -302,6 +316,12 @@ public class CommunityService {
 
         if (startDate.isAfter(startDate.plusMinutes(endDate)) || startDate.equals(startDate.plusMinutes(endDate)))
             throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
+    }
+
+    private Boolean checkParticipation (Article article,long userId) {
+        return extractUsersFromAttend(article.getId()).stream()
+                .map(User::getId)
+                .anyMatch(attendee -> attendee.equals(userId));
     }
 
     private List<User> extractUsersFromAttend(final long articleId) {
@@ -362,12 +382,6 @@ public class CommunityService {
             articleImageRepository.save(articleImage);
             article.getImages().add(articleImage);
         }
-    }
-
-    private Boolean checkParticipation (Article article,long userId) {
-        return extractUsersFromAttend(article.getId()).stream()
-                .map(User::getId)
-                .anyMatch(attendee -> attendee.equals(userId));
     }
 
     private int countLefts (Article article) {

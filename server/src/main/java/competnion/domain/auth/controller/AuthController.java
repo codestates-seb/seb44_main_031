@@ -74,7 +74,7 @@ public class AuthController { // VerificationFilter 이후의 처리
     }
 
     // 이메일 인증 후 유저 탈퇴
-    @DeleteMapping
+    @DeleteMapping("/delete")
     public Response<Void> deleteUser(@UserContext final User user) {
         authService.deleteUser(user);
         return Response.success();
