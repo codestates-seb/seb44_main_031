@@ -9,6 +9,7 @@ import {
   secondHandUrl,
   petShopUrl,
 } from '../api/reactRouterUrl';
+import Logout from '../features/sign-in/LogOut';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -36,8 +37,14 @@ const Header = () => {
         <StyledNavLink to={myPageUrl}>마이페이지</StyledNavLink>
       </NavigationContainer>
       <AuthContainer>
-        <LoginButton onClick={handleLogin}>Login</LoginButton>
-        <SignUp onClick={handleSignUpClick}>회원가입</SignUp>
+        {localStorage.getItem('accessToken') ? (
+          <Logout />
+        ) : (
+          <>
+            <LoginButton onClick={handleLogin}>Login</LoginButton>
+            <SignUp onClick={handleSignUpClick}>회원가입</SignUp>
+          </>
+        )}
       </AuthContainer>
     </HeaderContainer>
   );
@@ -123,6 +130,9 @@ const StyledNavLink = styled(NavLink)`
 const AuthContainer = styled.div`
   display: flex;
   gap: 10px;
+  .logout {
+    width: 20px;
+  }
 `;
 
 const LoginButton = styled.button`

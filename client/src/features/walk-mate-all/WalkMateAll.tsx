@@ -49,7 +49,7 @@ const WalkMateAll = () => {
     period: { value: '30', label: '30일 이내' },
     viewOrder: {
       value: 'asc',
-      label: '모임 가까운순',
+      label: '마감 임박순',
     },
   });
   const [searchQuery, setSearchQuery] = useState('');

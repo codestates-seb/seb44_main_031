@@ -30,8 +30,7 @@ export const StyledButtonPink3D = styled.button`
 
   @media (min-width: 768px) {
     & {
-      min-width: 120px;
-      padding: 0 25px;
+      min-width: 100px;
     }
   }
 `;

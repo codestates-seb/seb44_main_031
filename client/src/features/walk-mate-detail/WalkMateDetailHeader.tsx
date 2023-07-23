@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from 'styled-components';
-
+import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
 interface Owner {
   userId: number;
-  username: string;
-  userimUrl: string;
+  nickname: string;
+  imgUrl: string;
   pets: Pet[];
 }
 
@@ -47,7 +47,12 @@ const WalkMateDetailHeader = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get<WalkMateData>(
-          'http://localhost:3001/articles/'
+          `${API_URL}/articles/${articleId}`,
+          {
+            headers: {
+              Authorization: AUTH_TOKEN,
+            },
+          }
         );
         setWalkMateData(response.data);
       } catch (error) {
@@ -68,10 +73,10 @@ const WalkMateDetailHeader = () => {
       <WalkMateDetailHeaderBox>
         <div className="title">{article.title}</div>
         <DetailHeaderBox>
-          <ProfileImage src={owner.userimUrl} alt="프로필이미지" />
+          <ProfileImage src={owner.imgUrl} alt="프로필이미지" />
           <DetailTextBox>
             <div className="uptext">Hosted By</div>
-            <div className="profilename">{owner.username}</div>
+            <div className="profilename">{owner.nickname}</div>
           </DetailTextBox>
         </DetailHeaderBox>
       </WalkMateDetailHeaderBox>
@@ -107,6 +112,9 @@ const DetailHeaderBox = styled.div`
 const ProfileImage = styled.img`
   width: 50px;
   height: 50px;
+
+  border-radius: 50%;
+  margin-right: 10px;
 `;
 const DetailTextBox = styled.div`
   margin-top: 10px;

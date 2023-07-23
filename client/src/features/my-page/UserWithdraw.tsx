@@ -2,11 +2,11 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
 interface ModalDefaultType {
-  onClickUsernameChangeToggleModal: () => void;
+  onClickUserWithdrawModal: () => void;
 }
 
-function UsernameChangeModal({
-  onClickUsernameChangeToggleModal,
+function UserWithdrawModal({
+    onClickUserWithdrawModal,
   children,
 }: PropsWithChildren<ModalDefaultType>) {
   return (
@@ -16,8 +16,8 @@ function UsernameChangeModal({
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
 
-          if (onClickUsernameChangeToggleModal) {
-            onClickUsernameChangeToggleModal();
+          if (onClickUserWithdrawModal) {
+            onClickUserWithdrawModal();
           }
         }}
       />
@@ -37,8 +37,8 @@ const ModalContainer = styled.div`
 `;
 
 const DialogBox = styled.dialog`
-  width: 550px;
-  height: 260px;
+  width: 400px;
+  height: 190px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -46,7 +46,6 @@ const DialogBox = styled.dialog`
   border-radius: 20px;
   box-shadow: 0 0 30px rgba(30, 30, 30, 0.185);
   box-sizing: border-box;
-  margin-left: -100px;
   background-color: white;
   z-index: 10000;
 `;
@@ -60,4 +59,4 @@ const Backdrop = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
 `;
 
-export default UsernameChangeModal;
+export default UserWithdrawModal;
