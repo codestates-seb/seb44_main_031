@@ -48,7 +48,7 @@ const initialState: UserState = {
         gender: false,
         mbti: 'intp',
         neutralization: true,
-        imgUrl: 'string',
+        imgUrl: '',
         breed: 'string',
         breedName: 'string',
       },

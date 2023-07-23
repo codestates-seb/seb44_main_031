@@ -13,6 +13,8 @@ import Main from './components/Main';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
+import UserPage from './features/my-page/UserPage';
+import Logout from './features/sign-in/LogOut';
 
 function App() {
   return (
@@ -31,6 +33,9 @@ function App() {
           <Route path="sign-in" element={<SignIn />} />
           <Route path="mypage" element={<Mypage />} />
           <Route path="test" element={<Form />} />
+          <Route path="userpage/:userId" element={<UserPage/>}/>
+          <Route path="logout" element={<Logout/>}/>
+
         </Route>
       </Routes>
       <Footer />

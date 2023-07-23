@@ -1,5 +1,6 @@
 import { styled } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import Logout from '../features/sign-in/LogOut';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -26,9 +27,14 @@ const Header = () => {
         <NavLink>우리동네 애견샵</NavLink>
         <NavLink>마이페이지</NavLink>
       </NavigationContainer>
-      <AuthContainer>
+      <AuthContainer>        
+        {localStorage.getItem('accessToken')?
+        <Logout /> 
+        :<>
         <LoginButton onClick={handleLogin}>Login</LoginButton>
         <SignUp onClick={handleSignUpClick}>회원가입</SignUp>
+        </> 
+      }
       </AuthContainer>
     </HeaderContainer>
   );
@@ -103,6 +109,9 @@ const NavLink = styled.a`
 const AuthContainer = styled.div`
   display: flex;
   gap: 10px;
+ .logout{
+  width:20px;
+ }
 `;
 
 const LoginButton = styled.button`
