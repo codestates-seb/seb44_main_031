@@ -12,9 +12,6 @@ on:
     branches:
       - be
 
-permissions:
-  contents: read
-
 env:
   S3_BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
   RESOURCE_PATH: ./server/src/main/resources/application.yml
