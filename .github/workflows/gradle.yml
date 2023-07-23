@@ -116,7 +116,7 @@ jobs:
           echo "    port: '$SPRING_REDIS_PORT'" >> ./server/src/main/resources/application.yml
           echo "  datasource:" >> ./server/src/main/resources/application.yml
           echo "    url: '$SPRING_DATASOURCE_URL'" >> ./server/src/main/resources/application.yml
-          echo "    username: '$SPRING_DATASOURCE_USERNAME'" >> ./server/src/main/resources/application.yml"
+          echo "    username: '$SPRING_DATASOURCE_USERNAME'" >> ./server/src/main/resources/application.yml
           echo "    password: '$SPRING_DATASOURCE_PASSWORD'" >> ./server/src/main/resources/application.yml
           echo "    driver-class-name: com.mysql.cj.jdbc.Driver" >> ./server/src/main/resources/application.yml
           echo "  jpa:" >> ./server/src/main/resources/application.yml
