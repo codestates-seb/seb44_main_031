@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { styled } from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
+import { API_URL,  TOKEN_USERID } from '../../api/APIurl';
 import { FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -46,6 +46,7 @@ const UserCard = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
   const [isAttendeeInfoFetched, setIsAttendeeInfoFetched] = useState(false);
+  const [isUserAttending, setIsUserAttending] = useState(false);
   const navigate = useNavigate();
 
   //산책 상세페이지 get 요청
@@ -54,14 +55,18 @@ const UserCard = () => {
       try {
         const response = await axios.get(`${API_URL}/articles/${articleId}`, {
           headers: {
-            Authorization: AUTH_TOKEN,
+            Authorization: localStorage.getItem('accessToken'),
           },
         });
 
         setAttendees(response.data.attendees);
         setArticleData(response.data.article);
+        const userIsAttending = response.data.attendees.some(
+          (attendee: Attendee) => attendee.userId === parseInt(TOKEN_USERID)
+        );
+        setIsUserAttending(userIsAttending);
       } catch (error) {
-        console.error('attendees 가져오는중 오류 발생:', error);
+        toast.error('attendees 가져오는중 오류 발생:', error);
       }
     };
 
@@ -74,7 +79,7 @@ const UserCard = () => {
         `${API_URL}/articles/attendee-info/${articleId}`,
         {
           headers: {
-            Authorization: AUTH_TOKEN,
+            Authorization: localStorage.getItem('accessToken'),
           },
         }
       );
@@ -83,7 +88,7 @@ const UserCard = () => {
       if (error.response && error.response.status === 409) {
         toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
       } else {
-        console.error('attendee-info 가져오는 중 오류 발생:', error);
+        toast.error('api 가져오는 중 오류 발생:', error);
       }
     }
   };
@@ -139,7 +144,7 @@ const handleRegister = async () => {
     
     await axios.post(`${API_URL}/articles/attend`, postData, {
       headers: {
-        Authorization: AUTH_TOKEN,
+        Authorization: localStorage.getItem('accessToken'),
       },
     }); 
    
@@ -168,7 +173,7 @@ const handleRegister = async () => {
     try {
       await axios.delete(`${API_URL}/articles/cancel/${articleId}`, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: localStorage.getItem('accessToken'),
         },
       });
 
@@ -182,6 +187,43 @@ const handleRegister = async () => {
     }
   };
 
+
+  const handleDeleteArticle = async (userId: number) => {
+    try {
+      // 주인 여부 확인
+      const ownerUserId = attendees[0].userId; // 주최자의 userId를 가져옵니다.
+      if (ownerUserId !== parseInt(TOKEN_USERID)) {
+        toast.error('작성자만 삭제가 가능합니다.');
+        console.log('글의 주인이 아니므로 삭제할 수 없습니다.');
+        return;
+      }
+  
+      await axios.delete(`${API_URL}/articles/${articleId}`, {
+        headers: {
+          Authorization: localStorage.getItem('accessToken'),
+        },
+      });
+  
+      setAttendees((prevAttendees) =>
+        prevAttendees.filter((attendee) => attendee.id !== userId)
+      );
+      navigate('/walk-mate/all')
+      toast.success('게시글 삭제가 완료되었습니다.')
+    } catch (error:any) {
+      console.error('삭제 중 오류 발생:', error);
+  
+      if (error.response && error.response.status === 409) {
+        const errorMessage = error.response.data.message;
+        if (errorMessage === 'USER ALREADY ATTENDED') {
+          toast.error('유저가 참가되어 있어서 삭제 불가합니다.');
+        } else {
+          toast.error('삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        toast.error('삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
   return (
     <>
       <UserCardContainer>
@@ -229,7 +271,8 @@ const handleRegister = async () => {
         </UserCardRow>
       </UserCardContainer>
       <ButtonBox>
-        <button onClick={openModal}>참가하기</button>
+      {!isUserAttending && <button onClick={openModal}>참가하기</button>}
+        <button onClick={handleDeleteArticle}>글 삭제</button>
       </ButtonBox>
 
       {showModal && (

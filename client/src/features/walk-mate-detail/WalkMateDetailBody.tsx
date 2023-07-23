@@ -3,7 +3,7 @@ import {  useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
-import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
+import { API_URL, TOKEN_USERID } from '../../api/APIurl';
 
 
 interface Comment {
@@ -43,7 +43,7 @@ const WalkMateDetailBody = () => {
           `${API_URL}/articles/${articleId}`,
           {
             headers: {
-              Authorization: AUTH_TOKEN,
+              Authorization: localStorage.getItem('accessToken'),
             },
           }
         );
@@ -71,7 +71,7 @@ const WalkMateDetailBody = () => {
           },
           {
             headers: {
-              Authorization: AUTH_TOKEN,
+              Authorization: localStorage.getItem('accessToken'),
             },
           }
         );
@@ -88,7 +88,7 @@ const WalkMateDetailBody = () => {
     try {
       await axios.delete(`${API_URL}/articles/${articleId}/comments/${id}`, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: localStorage.getItem('accessToken'),
         },
       });
       const updatedComments = comments.filter(
@@ -163,21 +163,25 @@ const WalkMateBodyContainer = styled.div`
 const WalkDogImage = styled.img`
   margin-top: 40px;
   border-radius: 30px;
-  width: 500px;
+  width: 580px;
   margin-bottom: 40px;
 `;
 
 const TextBox = styled.div`
-  width: 500px;
-  height: 300px;
-  padding: 10px;
+  width: 600px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
 
   .TextBoxTitle {
-    margin-bottom: 20px;
     font-size: 24px;
     font-weight: bold;
     color: #333333;
+    margin-bottom: 10px;
   }
 
   .TextBoxBody {

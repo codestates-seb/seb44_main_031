@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from 'styled-components';
-import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
+import { API_URL} from '../../api/APIurl';
 interface Owner {
   userId: number;
   nickname: string;
@@ -50,7 +50,7 @@ const WalkMateDetailHeader = () => {
           `${API_URL}/articles/${articleId}`,
           {
             headers: {
-              Authorization: AUTH_TOKEN,
+              Authorization: localStorage.getItem('accessToken'),
             },
           }
         );
@@ -97,7 +97,7 @@ const WalkMateDetailHeaderBox = styled.div`
   margin-left: 300px;
   background-color: #ffffff;
   height: 100px;
-
+  margin-left: 490px;
   .title {
     font-size: 22px;
     font-weight: 500;
