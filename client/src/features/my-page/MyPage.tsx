@@ -20,7 +20,9 @@ interface PetData {
   birth: string;
   gender: boolean;
   neutralization: boolean;
+
   breedId: number;
+
   mbti: string;
   image: File | null;
 }
@@ -524,6 +526,7 @@ const Mypage = () => {
       console.log(files[0]);
       console.log('이미지바뀜');
     }
+
   };
   const handlePetImgChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -608,6 +611,7 @@ const Mypage = () => {
 
     if (type === 'checkbox') {
       inputValue = (event.target as HTMLInputElement).checked; // 타입 캐스팅
+
       if (name === 'neutralization') {
         inputValue = inputValue === true; // 서버에서 문자열로 반환되는 경우 'true'를 boolean 값으로 변환
       }
@@ -618,6 +622,7 @@ const Mypage = () => {
       } else if (value === 'female') {
         inputValue = false;
       }
+
     }
     setPetData((prevData) => ({
       ...prevData,
@@ -630,7 +635,9 @@ const Mypage = () => {
     event.persist;
     const formData = new FormData();
     formData.append('image', petData.image || '');
+
     console.log(petData.image);
+
     const requestData = {
       name: petData.name,
       birth: petData.birth,
@@ -638,6 +645,7 @@ const Mypage = () => {
       gender: petData.gender,
       neutralization: petData.neutralization,
       breedId: Number(petData.breedId),
+
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
       type: 'application/json',
@@ -659,6 +667,7 @@ const Mypage = () => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
         console.log(response.data);
         petData.petId = response.data.result.id;
+
         console.log(petData);
         setOpenAddPetModal(false);
         window.location.reload();
@@ -695,6 +704,7 @@ const Mypage = () => {
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.log(petId);
+
         console.error(error);
       });
   };
@@ -714,6 +724,7 @@ const Mypage = () => {
           neutralization: petData.neutralization,
           breedId: Number(petData.breedId),
         },
+
         {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
@@ -721,7 +732,7 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        // 요청이 성공적으로 처리되었을 때 실행할 코드
+
         console.log(response.data);
         window.location.reload();
       })
@@ -945,6 +956,7 @@ const Mypage = () => {
                   <p>견종 : {pet.breedName}</p>
                   <p>중성화 여부 : {pet.neutralization ? '했음' : '안했음'}</p>
                   <p>성별 : {pet.gender ? '남자' : '여자'}</p>
+
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>
@@ -1029,6 +1041,7 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
+
                       <select
                         name="breedId"
                         id="breedId"
@@ -1059,6 +1072,7 @@ const Mypage = () => {
                         <option value="22">골든 리트리버</option>
                         <option value="23">진돗개</option>
                       </select>
+
                     </InputWrapper>
                   </InputContainer>
                 </div>
@@ -1192,6 +1206,7 @@ const Mypage = () => {
                     </InputWrapper>
                     <InputWrapper>
                       <InputLabel>견종 :</InputLabel>
+
                       <select
                         name="breedId"
                         id="breedId"

@@ -21,6 +21,7 @@ interface Profile {
       imgUrl: string;
       breed: string;
       breedName: string;
+
     }
   ];
 }
@@ -51,6 +52,7 @@ const initialState: UserState = {
         imgUrl: '',
         breed: 'string',
         breedName: 'string',
+
       },
     ],
   },
@@ -75,6 +77,7 @@ interface FetchUsersResponse {
         imgUrl: string;
         breed: string;
         breedName: string;
+
       }
     ];
   };

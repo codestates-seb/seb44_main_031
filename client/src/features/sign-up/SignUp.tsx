@@ -272,11 +272,9 @@ const SignUp: React.FC = () => {
       console.log([username, email, password, latitude, longitude, address]);
       dispatch(
         actionS({ username, email, password, latitude, longitude, address })
-      ).then(() => {
-        
+      ).then(() => {        
           alert('회원가입 성공');
-          navigate('/users/sign-in');
-        
+          navigate('/users/sign-in');        
       });
       // .catch((err) => console.log(err.message));
     },
