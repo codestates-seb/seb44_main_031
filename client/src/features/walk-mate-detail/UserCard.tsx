@@ -190,8 +190,8 @@ const handleRegister = async () => {
 
   const handleDeleteArticle = async (userId: number) => {
     try {
-      // 주인 여부 확인
-      const ownerUserId = attendees[0].userId; // 주최자의 userId를 가져옵니다.
+ 
+      const ownerUserId = attendees[0].userId;
       if (ownerUserId !== parseInt(TOKEN_USERID)) {
         toast.error('작성자만 삭제가 가능합니다.');
         console.log('글의 주인이 아니므로 삭제할 수 없습니다.');
@@ -272,7 +272,7 @@ const handleRegister = async () => {
       </UserCardContainer>
       <ButtonBox>
       {!isUserAttending && <button onClick={openModal}>참가하기</button>}
-        <button onClick={handleDeleteArticle}>글 삭제</button>
+      <button onClick={() => handleDeleteArticle(attendees[attendees.length - 1].userId)}>글 삭제</button>
       </ButtonBox>
 
       {showModal && (
