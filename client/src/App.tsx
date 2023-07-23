@@ -1,4 +1,4 @@
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Form, Route, Routes, useLocation } from 'react-router-dom';
 import GlobalStyle from './components/styles/GlobalStyled';
 import WalkMateCreate from './features/walk-mate-create/WalkMateCreate';
 import WalkMateAll from './features/walk-mate-all/WalkMateAll';
@@ -11,6 +11,8 @@ import Main from './components/Main';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AUTO_CLOSE_MS_TIME } from './constants/toastUi';
+import UserPage from './features/my-page/UserPage';
+import Logout from './features/sign-in/LogOut';
 
 import Mypage from './features/my-page/MyPage';
 function App() {
@@ -37,6 +39,10 @@ function App() {
           <Route path="sign-up" element={<SignUp />} />
           <Route path="sign-in" element={<SignIn />} />
           <Route path="mypage" element={<Mypage />} />
+          <Route path="mapChange" element={<Form />} />
+          <Route path="userpage/:userId" element={<UserPage/>}/>
+          <Route path="logout" element={<Logout/>}/>
+
         </Route>
       </Routes>
   {!shouldHideFooter && <Footer />}
