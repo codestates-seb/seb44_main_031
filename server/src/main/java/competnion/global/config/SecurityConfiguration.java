@@ -91,6 +91,8 @@ public class SecurityConfiguration implements WebMvcConfigurer {
                                 .antMatchers(HttpMethod.GET,"/auth/check-username").permitAll()
                                 .antMatchers(HttpMethod.POST,"/auth/reissue").permitAll()
 
+                                .antMatchers(HttpMethod.GET, "/users/**").permitAll()
+
 
 
                                 .anyRequest().authenticated()

@@ -155,7 +155,7 @@ public class AuthService {
     }
 
     public void checkEmailValidate(final User user, final String email) {
-        if (user.getEmail().equals(email))
+        if (!user.getEmail().equals(email))
             throw new BusinessLogicException(INVALID_EMAIL);
     }
 

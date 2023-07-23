@@ -27,7 +27,6 @@ import static org.springframework.util.Assert.notNull;
 
 @Getter
 @Entity
-@DynamicUpdate
 @Table(name = "users")
 @NoArgsConstructor(access = PROTECTED)
 @Where(clause = "deleted_at is NULL")
