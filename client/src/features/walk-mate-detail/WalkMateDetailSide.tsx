@@ -1,16 +1,28 @@
 import { styled } from 'styled-components';
 import { FaRegClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
+interface ArticleData {
+  startDate: string;
+  location: number;
+
+}
+
 const WalkMateDetailSide = () => {
   const [map, setMap] = useState<any>();
   const [marker, setMarker] = useState<any>();
   console.log(map, marker);
+  const { articleId } = useParams<{ articleId: string }>();
+  const [articleData, setArticleData] = useState<ArticleData | null>(null);
 
   useEffect(() => {
     window.kakao.maps.load(() => {
@@ -25,25 +37,52 @@ const WalkMateDetailSide = () => {
     });
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/articles/${articleId}`, {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        });
+
+        setArticleData(response.data.article);
+      } catch (error) {
+        console.error('attendees 가져오는중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, [articleId]);
+
+  const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    };
+  
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+  
+    return `${formattedDate}`;
+  };
+
   return (
     <SlideBox>
-      <SlideContainer>
-        <SideDog src="/src/assets/sidedog.png" />
-        <SideTextUp>
-          <div className="Name">콩이파파: ENFP</div>
-          <div className="Name">콩이: INFP</div>
-        </SideTextUp>
-      </SlideContainer>
       <SlideContainer>
         <SideTextDown>
           <div className="Line">
             <FaRegClock className="Icon" />
-            <div className="Name">2023.06.30 금요일</div>
+            {articleData && formatDateTime(articleData.startDate)}
           </div>
           <div className="Line">
             <div className="Name">
               <FaMapMarkerAlt className="LocationIcon" />
-              한강공원
+              {articleData && (articleData.location)}
             </div>
           </div>
         </SideTextDown>
@@ -57,32 +96,14 @@ export default WalkMateDetailSide;
 
 const SlideContainer = styled.div`
   margin-top: 40px;
-  width: 250px;
+  width: 280px;
   height: 150px;
   border-radius: 30px;
-  background-color: var(--pink-200);
+  background-color: #fcfcfc;
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const SideDog = styled.img`
-  width: 64px;
-  height: 64px;
-  margin-right: 10px;
-`;
-
-const SideTextUp = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .Name {
-    margin-top: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--black-900);
-  }
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 `;
 
 const SideTextDown = styled.div`
@@ -96,7 +117,7 @@ const SideTextDown = styled.div`
   }
 
   .Icon {
-    margin-top: 14px;
+    margin-top: -5px;
     margin-right: 5px;
     font-size: 17px;
     color: var(--black-900);
@@ -113,7 +134,7 @@ const SideTextDown = styled.div`
 const MapContainer = styled.div`
   margin-top: 50px;
   border-radius: 30px;
-  width: 250px;
+  width: 280px;
   height: 500px;
 `;
 

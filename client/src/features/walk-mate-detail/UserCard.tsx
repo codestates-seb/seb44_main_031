@@ -1,45 +1,62 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { styled } from 'styled-components';
+import { useParams } from 'react-router-dom';
+import { API_URL,AUTH_TOKEN,TOKEN_USERID } from '../../api/APIurl';
+import { FiTrash2 } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 
 interface Attendee {
-  userId: number;
-  username: string;
-  userimUrl: string;
+  id: number;
+  nickname: string;
+  imgUrl: string | null;
   pets: Pet[];
+  userId: number;
 }
 
 interface Pet {
-  petImUrl: string;
-  petName: string;
-  gender: string;
+  name: string;
+  gender: boolean;
 }
+
 interface AttendeeInfo {
-  petname: string;
-  petimgUrl: string;
-  petId: number;
+  name: string;
+  imgUrl: string;
+  id: number;
+
 }
+
 interface PetItemProps {
   readonly $isSelected: boolean;
 }
+interface ArticleData {
+  startDate: string;
+  endDate: string;
+  attendant: number;
+  
+}
+
 const UserCard = () => {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedPets, setSelectedPets] = useState<number[]>([]);
   const [attendeeInfo, setAttendeeInfo] = useState<AttendeeInfo[]>([]);
-
-  //산책 상세페이지 get 요청
+  const { articleId } = useParams<{ articleId: string }>();
+  const [articleData, setArticleData] = useState<ArticleData | null>(null);
+  const [isAttendeeInfoFetched, setIsAttendeeInfoFetched] = useState(false);
+  //산책 상세페이지 get 요청 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/articles');
+        const response = await axios.get(`${API_URL}/articles/${articleId}`, {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        });
 
-        const attendeesData = response.data.attendees;
-        if (attendeesData && attendeesData.length > 0) {
-          setAttendees(attendeesData);
-        } else {
-          console.error('받을 데이터가 존재하지 않습니다.', response.data);
-        }
+        setAttendees(response.data.attendees);
+        setArticleData(response.data.article);
+        
       } catch (error) {
         console.error('attendees 가져오는중 오류 발생:', error);
       }
@@ -47,29 +64,34 @@ const UserCard = () => {
 
     fetchData();
   }, []);
-  //참가하기 버튼을 눌렀을때 get 요청
-  useEffect(() => {
-    const fetchAttendeeInfo = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/attendee-info');
-
-        const attendeeInfoData = response.data;
-        if (attendeeInfoData && attendeeInfoData.length > 0) {
-          setAttendeeInfo(attendeeInfoData);
-        } else {
-          console.error('받을 데이터가 존재하지 않습니다.', response.data);
-        }
-      } catch (error) {
-        console.error('attendee-info 가져오는 중 오류 발생:', error);
+// 참가하기 버튼 눌렀을때  
+const fetchAttendeeInfo = async () => {
+  try {
+    const response = await axios.get<AttendeeInfo[]>(
+      `${API_URL}/articles/attendee-info/${articleId}`,
+      {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
       }
-    };
+    );
+    setAttendeeInfo(response.data.result);
+  } catch (error ) {
+    if (error.response && error.response.status === 409) {
+      toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
+    } else {
+      console.error('attendee-info 가져오는 중 오류 발생:', error);
+    }
+  }
+};
 
-    fetchAttendeeInfo();
-  }, []);
-
-  const openModal = () => {
-    setShowModal(true);
-  };
+const openModal = async () => {
+  if (!isAttendeeInfoFetched) {
+    await fetchAttendeeInfo();
+    setIsAttendeeInfoFetched(true);
+  }
+  setShowModal(true);
+};
 
   const closeModal = () => {
     setShowModal(false);
@@ -82,28 +104,69 @@ const UserCard = () => {
       setSelectedPets([...selectedPets, petId]);
     }
   };
+// 강아지 데리고 갈 목록들 post
+const handleRegister = async () => {
+  if (!articleData) {
+    console.error('articleData가 유효하지 않습니다.');
+    return;
+  }
 
-  const handleRegister = async () => {
-    try {
-      await axios.post('http://localhost:3001/articles/attend', {
-        selectedPets,
-      });
-      console.log('등록이 완료되었습니다.');
+  const { startDate, endDate, attendant } = articleData; 
+  const selectedPetIds = selectedPets.map((petId) => petId);
 
-      closeModal();
-    } catch (error) {
+  const postData = {
+    petIds: selectedPetIds,
+    articleId: parseInt(articleId),
+    startDate,
+    endDate,
+    attendant,
+  };
+
+  try {
+    
+    await axios.post(`${API_URL}/articles/attend`, postData, {
+      headers: {
+        Authorization: AUTH_TOKEN,
+      },
+    });
+    window.location.reload();
+    console.log('등록이 완료되었습니다.');
+    closeModal();
+  } catch (error : unknown) {
+    if (error.response && error.response.status === 409) {
+      toast.error('이미 참가중인 펫이 존재합니다!');
+    } else {
       console.error('등록 중 오류 발생:', error);
     }
-  };
-  // api에서 gender에 따라 남여 이미지 다르게
-  const getPetImageUrl = (gender: string) => {
-    if (gender === 'boy') {
-      return '/src/assets/petmily-logo-white.png';
-    } else if (gender === 'girl') {
-      return '/src/assets/petmily-logo-pink.png';
-    }
+  }
+};
 
-    return '/src/assets/petmily-logo-white.png';
+  const getPetImageUrl = (gender: boolean) => {
+    if (gender) {
+      return '/src/assets/petmily-logo-pink.png';
+    } else {
+      return '/src/assets/petmily-logo-white.png';
+    }
+  };
+
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      
+      await axios.delete(`${API_URL}/articles/cancel/${articleId}`, {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
+      });
+
+      
+      setAttendees((prevAttendees) =>
+        prevAttendees.filter((attendee) => attendee.id !== userId)
+      );
+      window.location.reload();
+      console.log('유저 삭제가 완료되었습니다.');
+    } catch (error) {
+      console.error('삭제 중 오류 발생:', error);
+    }
   };
 
   return (
@@ -111,9 +174,19 @@ const UserCard = () => {
       <UserCardContainer>
         <UserCardRow>
           {attendees.map((attendee, index) => (
-            <UserCardComponent key={index}>
-              <ProfileCard src={attendee.userimUrl} alt="프로필이미지" />
-              <Username>{attendee.username}</Username>
+         <UserCardComponent key={index}>
+      {index > 0 && (
+  <div>
+    {attendee.userId === (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
+      <FiTrash2
+        className="delete-icon"
+        onClick={() => handleDeleteUser(attendee.id)}
+      />
+    )}
+  </div>
+)}
+              <ProfileCard src={attendee.imgUrl ?? undefined} alt="프로필이미지" />
+              <Username>{attendee.nickname}</Username>
               <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
                 {attendee.pets.map((pet, index) => (
@@ -122,7 +195,7 @@ const UserCard = () => {
                       src={getPetImageUrl(pet.gender)}
                       alt="강아지 이미지"
                     />
-                    <PetName>{pet.petName}</PetName>
+                    <PetName>{pet.name}</PetName>
                   </PetInfo>
                 ))}
               </Tooltip>
@@ -139,15 +212,15 @@ const UserCard = () => {
           <ModalContent>
             <h2>산책에 데려갈 강아지 선택</h2>
             <PetList>
-              {attendeeInfo.map((pets, index) => (
+              {attendeeInfo !== null && attendeeInfo.map((pets, index) => (
                 <PetItem
                   key={index}
-                  onClick={() => handlePetSelect(pets.petId)}
-                  $isSelected={selectedPets.includes(pets.petId)}
+                  onClick={() => handlePetSelect(pets.id)}
+                  $isSelected={selectedPets.includes(pets.id)}
                 >
-                  <PetImage src={pets.petimgUrl} alt="강아지 이미지" />
-                  <PetName>{pets.petname}</PetName>
-                  {selectedPets.includes(pets.petId) && (
+                  <PetImage src={pets.imgUrl} alt="강아지 이미지" />
+                  <PetName>{pets.name}</PetName>
+                  {selectedPets.includes(pets.id) && (
                     <PetCheckIcon>&#10003;</PetCheckIcon>
                   )}
                 </PetItem>
@@ -176,15 +249,16 @@ const UserCardContainer = styled.div`
   width: 600px;
   height: 250px;
   border-radius: 30px;
-  background-color: var(--pink-200);
+  background-color: var(--pink-100);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 `;
 
 const UserCardRow = styled.div`
   display: flex;
+  margin-left: 10px;
 `;
 
 const UserCardComponent = styled.div`
@@ -208,6 +282,15 @@ const UserCardComponent = styled.div`
     box-shadow: 0px 12px 15px rgba(0, 0, 0, 0.3),
       0px 5px 10px rgba(0, 0, 0, 0.2);
   }
+  .delete-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    cursor: pointer;
+    width: 15px;
+    height: 15px;
+    fill: var(--pink-200); 
+  }
 `;
 
 const Tooltip = styled.div`
@@ -216,7 +299,7 @@ const Tooltip = styled.div`
   left: 50%;
   bottom: 190px;
   transform: translateX(-50%);
-  background-color: #646fd4;
+  background-color: var(--pink-300);
   padding: 10px;
   border-radius: 5px;
   color: #fff;
@@ -231,7 +314,7 @@ const Tooltip = styled.div`
     transform: translateX(-50%);
     border-width: 8px;
     border-style: solid;
-    border-color: transparent transparent #646fd4 transparent;
+    border-color: transparent transparent var(--pink-300) transparent;
   }
 
   ${UserCardComponent}:hover & {
@@ -292,6 +375,7 @@ const ButtonBox = styled.div`
     cursor: pointer;
   }
 `;
+
 const ModalContainer = styled.div`
   position: fixed;
   top: 0;
@@ -309,7 +393,7 @@ const ModalContent = styled.div`
   padding: 40px;
   border-radius: 10px;
   z-index: 10;
-  max-width: 400px;
+  max-width: 500px;
 `;
 
 const ModalOverlay = styled.div`
@@ -335,7 +419,7 @@ const PetItem = styled.div<PetItemProps>`
   align-items: center;
   margin-bottom: 10px;
   cursor: pointer;
-  width: 100px;
+  width: 120px;
   height: 50px;
   padding: 8px;
   border-radius: 5px;
