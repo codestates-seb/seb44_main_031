@@ -1,0 +1,92 @@
+cloud:
+  aws:
+    s3:
+      bucket: ${BUCKET_NAME}
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false # CloudFormation 구성을 사용하지 않도록 설정
+    credentials:
+      accessKey: ${AWS_ACCESS_KEY}
+      secretKey: ${AWS_SECRET_KEY}
+config.domain: http://mybucketforpetmily.s3-website.ap-northeast-2.amazonaws.com
+
+Spring:
+  jackson:
+    time-zone: Asia/Seoul
+
+  servlet:
+    multipart:
+      max-file-size: 1MB
+      max-request-size: 3MB
+
+  mail:
+    host: ${MAIL_HOST} # gmail SMTP 서버
+    port: ${MAIL_PORT} # gmail SMTP 서버
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties: # 추가 속성
+      mail:
+        smtp:
+          auth: true # SMTP 서버에 인증
+          ssl:
+            enable: true
+          starttls: # TLS 를 사용하여 안전한 연결 설정
+            enable: true
+            required: true
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+
+  #  h2:
+  #    console:
+  #      enabled: true
+  #      path: /h2-console
+  #  profiles:
+  #    active: local
+  #  datasource:
+  #    url: jdbc:h2:mem:test
+  #    username: sa
+  #    password:
+  #    driver-class-name: org.h2.Driver
+  #  jpa:
+  #    database-platform: org.hibernate.dialect.H2Dialect
+  #    hibernate:
+  #      ddl-auto: create-drop
+  #    show-sql: true
+  #    properties:
+  #      hibernate:
+  #        format_sql: true
+
+  datasource:
+    url: ${RDS_URL}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      use-new-id-generator-mappings: false
+    database: mysql
+    database-platform: org.hibernate.spatial.dialect.mysql.MySQL56InnoDBSpatialDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
+
+jwt:
+  key: ${JWT_KEY}
+  access-token-expiration-minutes: 6000
+  refresh-token-expiration-minutes: 20160
+
+logging.level:
+  org.hibernate.SQL: debug

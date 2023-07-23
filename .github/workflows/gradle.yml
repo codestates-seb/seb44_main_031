@@ -1,0 +1,182 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches:
+      - dev
+
+env:
+  S3_BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+  RESOURCE_PATH: ./server/src/main/resources/application.yml
+  CODE_DEPLOY_APPLICATION_NAME: petmily
+  CODE_DEPLOY_DEPLOYMENT_GROUP_NAME: petmily-group
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: ./server/
+
+#      - name: Set yaml file
+#        uses: microsoft/variable-substitution@v1
+#        with:
+#          files: ${{ env.RESOURCE_PATH }}
+#        env:
+#          spring.datasource.url: ${{ secrets.RDS_URL }}
+#          spring.datasource.username: ${{ secrets.RDS_USERNAME }}
+#          spring.datasource.password: ${{ secrets.RDS_PASSWORD }}
+#          spring.redis.host: ${{ secrets.REDIS_HOST }}
+#          spring.redis.port: ${{ secrets.REDIS_PORT }}
+#
+#          spring.mail.host: ${{ secrets.MAIL_HOST }}
+#          spring.mail.username: ${{ secrets.MAIL_USERNAME }}
+#          spring.mail.password: ${{ secrets.MAIL_PASSWORD }}
+#          spring.mail.port: ${{ secrets.MAIL_PORT }}
+#
+#          jwt.Key: ${{ secrets.JWT_KEY }}
+#
+#          cloud.aws.credentials.accessKey: ${{ secrets.AWS_ACCESS_KEY }}
+#          cloud.aws.credentials.secretKey: ${{ secrets.AWS_SECRET_KEY }}
+#          cloud.aws.s3.bucket: ${{ secrets.BUCKET_NAME }}
+      - name: Set Environment Variables
+        run: |
+          echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> $GITHUB_ENV
+          echo "SPRING_MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_ENV
+          echo "SPRING_MAIL_PORT=${{ secrets.MAIL_PORT }}" >> $GITHUB_ENV
+          echo "SPRING_MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> $GITHUB_ENV
+          echo "SPRING_MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "SPRING_REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $GITHUB_ENV
+          echo "SPRING_REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_URL=${{ secrets.RDS_URL }}" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> $GITHUB_ENV
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Generate application.yml
+        run: |
+          echo "cloud:" > ./server/src/main/resources/application.yml
+          echo "  aws:" >> ./server/src/main/resources/application.yml
+          echo "    s3:" >> ./server/src/main/resources/application.yml
+          echo "      bucket: $S3_BUCKET_NAME" >> ./server/src/main/resources/application.yml
+          echo "    region:" >> ./server/src/main/resources/application.yml
+          echo "      static: ap-northeast-2" >> ./server/src/main/resources/application.yml
+          echo "    stack:" >> ./server/src/main/resources/application.yml
+          echo "      auto: false # CloudFormation 구성을 사용하지 않도록 설정" >> ./server/src/main/resources/application.yml
+          echo "    credentials:" >> ./server/src/main/resources/application.yml
+          echo "      accessKey: $AWS_ACCESS_KEY" >> ./server/src/main/resources/application.yml
+          echo "      secretKey: $AWS_SECRET_KEY" >> ./server/src/main/resources/application.yml
+          echo "Spring:" >> ./server/src/main/resources/application.yml
+          echo "  servlet:" >> ./server/src/main/resources/application.yml
+          echo "    multipart:" >> ./server/src/main/resources/application.yml
+          echo "      max-file-size: 1MB" >> ./server/src/main/resources/application.yml
+          echo "      max-request-size: 3MB" >> ./server/src/main/resources/application.yml
+          echo "  mail:" >> ./server/src/main/resources/application.yml
+          echo "    host: '$SPRING_MAIL_HOST'" >> ./server/src/main/resources/application.yml
+          echo "    port: '$SPRING_MAIL_PORT'" >> ./server/src/main/resources/application.yml
+          echo "    username: '$SPRING_MAIL_USERNAME'" >> ./server/src/main/resources/application.yml
+          echo "    password: '$SPRING_MAIL_PASSWORD'" >> ./server/src/main/resources/application.yml
+          echo "    properties:" >> ./server/src/main/resources/application.yml
+          echo "      mail:" >> ./server/src/main/resources/application.yml
+          echo "        smtp:" >> ./server/src/main/resources/application.yml
+          echo "          auth: true" >> ./server/src/main/resources/application.yml
+          echo "          ssl:" >> ./server/src/main/resources/application.yml
+          echo "            enable: true" >> ./server/src/main/resources/application.yml
+          echo "          starttls:" >> ./server/src/main/resources/application.yml
+          echo "            enable: true" >> ./server/src/main/resources/application.yml
+          echo "            required: true" >> ./server/src/main/resources/application.yml
+          echo "  redis:" >> ./server/src/main/resources/application.yml
+          echo "    host: '$SPRING_REDIS_HOST'" >> ./server/src/main/resources/application.yml
+          echo "    port: '$SPRING_REDIS_PORT'" >> ./server/src/main/resources/application.yml
+          echo "  datasource:" >> ./server/src/main/resources/application.yml
+          echo "    url: '$SPRING_DATASOURCE_URL'" >> ./server/src/main/resources/application.yml
+          echo "    username: '$SPRING_DATASOURCE_USERNAME'" >> ./server/src/main/resources/application.yml
+          echo "    password: '$SPRING_DATASOURCE_PASSWORD'" >> ./server/src/main/resources/application.yml
+          echo "    driver-class-name: com.mysql.cj.jdbc.Driver" >> ./server/src/main/resources/application.yml
+          echo "  jpa:" >> ./server/src/main/resources/application.yml
+          echo "    defer-datasource-initialization: true" >> ./server/src/main/resources/application.yml
+          echo "    hibernate:" >> ./server/src/main/resources/application.yml
+          echo "      ddl-auto: update" >> ./server/src/main/resources/application.yml
+          echo "      naming:" >> ./server/src/main/resources/application.yml
+          echo "        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl" >> ./server/src/main/resources/application.yml
+          echo "      use-new-id-generator-mappings: false" >> ./server/src/main/resources/application.yml
+          echo "    database: mysql" >> ./server/src/main/resources/application.yml
+          echo "    database-platform: org.hibernate.spatial.dialect.mysql.MySQL56InnoDBSpatialDialect" >> ./server/src/main/resources/application.yml
+          echo "    properties:" >> ./server/src/main/resources/application.yml
+          echo "      hibernate:" >> ./server/src/main/resources/application.yml
+          echo "        show_sql: true" >> ./server/src/main/resources/application.yml
+          echo "        format_sql: true" >> ./server/src/main/resources/application.yml
+          echo "  sql:" >> ./server/src/main/resources/application.yml
+          echo "    init:" >> ./server/src/main/resources/application.yml
+          echo "      mode: always" >> ./server/src/main/resources/application.yml
+          echo "jwt:" >> ./server/src/main/resources/application.yml
+          echo "  key: '$JWT_KEY'" >> ./server/src/main/resources/application.yml
+          echo "  access-token-expiration-minutes: 6000" >> ./server/src/main/resources/application.yml
+          echo "  refresh-token-expiration-minutes: 20160" >> ./server/src/main/resources/application.yml
+          echo "logging.level:" >> ./server/src/main/resources/application.yml
+          echo "  org.hibernate.SQL: debug" >> ./server/src/main/resources/application.yml
+        shell: bash
+
+      - name: Build with Gradle
+        run: ./gradlew build --stacktrace
+        working-directory: ./server/
+
+      - name: Cleanup Gradle Cache
+        # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
+        # Restoring these files from a GitHub Actions cache might cause problems for future builds.
+        if: ${{ always() }}
+        run: |
+          rm -f ~/.gradle/caches/modules-2/modules-2.lock
+          rm -f ~/.gradle/caches/modules-2/gc.properties
+
+      - name: Make zip file
+        run: zip -r ./competnion.zip .
+        shell: bash
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./competnion.zip s3://$S3_BUCKET_NAME/competnion.zip
+
+
+      - name: Code Deploy
+        run: |
+          aws deploy create-deployment \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
+          --deployment-group-name ${{ env.CODE_DEPLOY_DEPLOYMENT_GROUP_NAME }} \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=competnion.zip
