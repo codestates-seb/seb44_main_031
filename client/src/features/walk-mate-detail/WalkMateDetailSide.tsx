@@ -14,28 +14,37 @@ declare global {
 interface ArticleData {
   startDate: string;
   location: number;
-
 }
 
 const WalkMateDetailSide = () => {
-  const [map, setMap] = useState<any>();
-  const [marker, setMarker] = useState<any>();
-  console.log(map, marker);
+  // const [map, setMap] = useState<any>();
   const { articleId } = useParams<{ articleId: string }>();
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
+  console.log(articleData);
 
   useEffect(() => {
     window.kakao.maps.load(() => {
       const container = document.getElementById('map');
       const options = {
-        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
+        center: new window.kakao.maps.LatLng(33.450701, 126.570667), // 위도 경도 articleData 에서 받아서 변경해야함
         level: 3,
       };
 
-      setMap(new window.kakao.maps.Map(container, options));
-      setMarker(new window.kakao.maps.Marker());
+      const map = new window.kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+      // 내 위치를 표시할 마커 생성, 인포 윈도우, 마우스 호버 이벤트 등록하기
+      // 마커를 표시할 위치입니다
+      const myPosition = new kakao.maps.LatLng(33.450701, 126.570667);
+
+      // 마커를 생성합니다
+      const marker = new kakao.maps.Marker({
+        position: myPosition,
+      });
+
+      // 마커를 지도에 표시합니다.
+      marker.setMap(map);
     });
-  }, []);
+  }, [articleData]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,9 +74,11 @@ const WalkMateDetailSide = () => {
       minute: 'numeric',
       hour12: true,
     };
-  
-    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
-  
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(
+      date
+    );
+
     return `${formattedDate}`;
   };
 
@@ -82,7 +93,7 @@ const WalkMateDetailSide = () => {
           <div className="Line">
             <div className="Name">
               <FaMapMarkerAlt className="LocationIcon" />
-              {articleData && (articleData.location)}
+              {articleData && articleData.location}
             </div>
           </div>
         </SideTextDown>
@@ -103,7 +114,7 @@ const SlideContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SideTextDown = styled.div`

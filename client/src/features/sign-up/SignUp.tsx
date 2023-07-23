@@ -49,11 +49,18 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   ${StyledButtonPink3D} {
+    width: 100px;
     height: 30px;
+    padding:3px;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  .submit{
+    display:flex;
+    justify-content: center;
+   margin-top: 20px;
   }
 `;
 const InputUsername = styled.div`
@@ -139,7 +146,7 @@ const InputPW = styled.div`
 const InputAddress = styled.div`
   display: flex;
   margin: 6px 0 6px;
-
+  justify-content: space-between;
   > div {
     text-align: left;
     margin: 2px 0 2px;
@@ -160,11 +167,25 @@ const EmailAuthForm = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  > input {
+    margin: 2px 0 2px;
+    border: 1px solid #babfc4;
+    border-radius: 3px;
+    padding: 0.6em 0.7em;
+    color: #0c0d0e;
+  }
 `;
 const IdCheckForm = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  > input {
+    margin: 2px 0 2px;
+    border: 1px solid #babfc4;
+    border-radius: 3px;
+    padding: 0.6em 0.7em;
+    color: #0c0d0e;
+  }
 `;
 const SignUp: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -176,6 +197,8 @@ const SignUp: React.FC = () => {
   const [validCode, setValidCode] = useState('');
   const [latitude, setLatitude] = useState(0);
   const [longitude, setLongitude] = useState(0);
+  const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
   const open = useDaumPostcodePopup(
     'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
   );
@@ -196,14 +219,40 @@ const SignUp: React.FC = () => {
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
+      setPasswordError(null);
+
+      // Password validation
+      const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,16}$/;
+      if (!passwordRegex.test(password)) {
+        setPasswordError(
+          '비밀번호는 영문, 숫자, 특수문자(!@#$%^&*)를 포함하여 10~16글자로 입력해주세요.'
+        );
+      }else if(passwordRegex.test(password)===true){
+        setPasswordError(
+          '유효한 비밀번호입니다'
+        );
+      }
     },
-    []
+    [password]
   );
   const onChangeDisplay = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setUsername(e.target.value);
+      setUsernameError(null);
+
+      // Username validation
+      const usernameRegex = /^[a-zA-Z0-9가-힣]{2,8}$/;
+      if (!usernameRegex.test(username)) {
+        setUsernameError(
+          '닉네임은 2~8글자의 한글, 영어, 숫자로만 입력해주세요.'
+        );
+      }else if(usernameRegex.test(username)===true){
+        setUsernameError(
+          '유효한 닉네임입니다.'
+        );
+      }
     },
-    []
+    [username]
   );
   //배포후 에러 처리 해보기
   const onSubmitJoin = useCallback(
@@ -223,17 +272,9 @@ const SignUp: React.FC = () => {
       console.log([username, email, password, latitude, longitude, address]);
       dispatch(
         actionS({ username, email, password, latitude, longitude, address })
-      ).then((resultAction: any) => {
-        const { success } = resultAction.payload;
-        console.log(resultAction.payload);
-        if (success === true) {
+      ).then(() => {        
           alert('회원가입 성공');
-          navigate('/users/sign-in');
-        } else {
-          console.log(resultAction);
-
-          alert('비밀번호 아이디 이메일 인증을 모두 수행하쇼');
-        }
+          navigate('/users/sign-in');        
       });
       // .catch((err) => console.log(err.message));
     },
@@ -283,7 +324,6 @@ const SignUp: React.FC = () => {
           console.log(response);
           setValidCode(emailAuth);
           alert('인증에 성공하셨습니다');
-
         })
         .catch((error) => {
           console.error(error);
@@ -396,7 +436,9 @@ const SignUp: React.FC = () => {
                 <StyledButtonPink3D onClick={goId}>
                   중복 확인 발급
                 </StyledButtonPink3D>
+               
               </IdCheckForm>
+              {usernameError && <p>{usernameError}</p>}
             </InputUsername>
             <InputEmail>
               <div>E-mail</div>
@@ -443,8 +485,9 @@ const SignUp: React.FC = () => {
                 value={password}
                 onChange={onChangePassword}
                 required
-              ></input>
+              ></input>             
             </InputPW>
+            {passwordError && <p>{passwordError}</p>}
             <InputAddress>
               {/* <div value={address} onChange={goAddress}>
                 {address}aa
@@ -462,7 +505,7 @@ const SignUp: React.FC = () => {
               </StyledButtonPink3D>
             </InputAddress>
 
-            <div>
+            <div className='submit'>
               <StyledButtonPink3D>회원가입</StyledButtonPink3D>
             </div>
           </SignUpForm>

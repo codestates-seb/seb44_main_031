@@ -45,3 +45,16 @@ export const stringToDate = (dateString: string, timeString: string) => {
   const date = new Date(timestamp);
   return date;
 };
+
+export const stringToLocaleString = (dateString: string) => {
+  const options = {
+    weekday: 'long' as const,
+    year: 'numeric' as const,
+    month: 'long' as const,
+    day: 'numeric' as const,
+    hour: '2-digit' as const,
+    minute: '2-digit' as const,
+  };
+
+  return new Date(dateString).toLocaleString(undefined, options);
+};

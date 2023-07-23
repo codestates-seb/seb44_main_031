@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { styled } from 'styled-components';
-import { API_URL,AUTH_TOKEN } from '../../api/APIurl';
+import { API_URL, AUTH_TOKEN } from '../../api/APIurl';
 interface Owner {
   userId: number;
   nickname: string;
@@ -112,6 +112,9 @@ const DetailHeaderBox = styled.div`
 const ProfileImage = styled.img`
   width: 50px;
   height: 50px;
+
+  border-radius: 50%;
+  margin-right: 10px;
   border-radius: 30px;
   margin-right: 20px;
 `;

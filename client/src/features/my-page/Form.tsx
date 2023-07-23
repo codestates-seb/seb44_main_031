@@ -194,7 +194,7 @@ const Form = () => {
         }
       );
     },
-    [map, marker]
+    [latitude, map, marker]
   );
 
   useDidMountEffect(() => {
@@ -208,14 +208,13 @@ const Form = () => {
     async (e: React.FormEvent) => {
       e.preventDefault();
       dispatch(fetchAddress({ address, latitude, longitude })).then(
-        (resultAction: any) => {
-          const { success } = resultAction.payload;
-          if (success === true) {
-            alert('닉네임 변경완료');
-          } else {
-            alert('다시 시도해 주세요');
-          }
+        () => {
+         
+          
+            alert('주소를 변경했습니다');
+          
           navigate('/users/mypage');
+          window.location.reload();
         }
       );
     },

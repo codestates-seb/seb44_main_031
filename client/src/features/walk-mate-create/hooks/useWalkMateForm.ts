@@ -5,15 +5,19 @@ import {
   nowDateAfterSomeMinutes,
 } from '../../../utils/date-utils';
 import { axiosInstance, getCreateArticleUrl } from '../../../api/walkMateAxios';
-import { AxiosError } from 'axios';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { AxiosError, isAxiosError } from 'axios';
+import { toast } from 'react-toastify';
+import { MAXIMUM_IMAGE_SIZE } from '../../../constants/fileSize';
 
 export interface FormDatas {
-  image: string;
+  image: File | null;
   title: string;
   body: string;
   date: string;
   initDate: string;
   time: string;
+  duration: string;
   attendant: number;
   location: { lat: number; lng: number };
   walkLocation: { lat: number; lng: number };
@@ -28,6 +32,7 @@ export interface Validations {
   body: boolean;
   date: boolean;
   time: boolean;
+  duration: boolean;
   attendant: boolean;
   location: boolean;
 }
@@ -50,12 +55,13 @@ const useWalkMateForm = () => {
   // 성공적으로 submit 하면 초기 state 값으로 reset 해야함 (근데 어차피 페이지 navigate 되니까 상관없을듯)
 
   const [formDatas, setFormDatas] = useState<FormDatas>({
-    image: '',
+    image: null,
     title: '',
     body: '',
     date: '',
     initDate: '',
     time: '',
+    duration: '60',
     attendant: 4,
     location: { lat: 33.450701, lng: 126.570667 },
     walkLocation: { lat: 33.450701, lng: 126.570667 },
@@ -70,6 +76,7 @@ const useWalkMateForm = () => {
     body: false,
     date: true,
     time: true,
+    duration: true,
     attendant: true,
     location: true,
   });
@@ -89,20 +96,6 @@ const useWalkMateForm = () => {
   const [error, setError] = useState<null | string>(null);
 
   useEffect(() => {
-    // 유저가 페이지에 접속한 시점의 Date initial value
-    const thirtyMinLater = nowDateAfterSomeMinutes(30);
-    const stringFormatDate = dateToStringDate(thirtyMinLater);
-    const stringFormatTime = dateToStringTime(thirtyMinLater);
-
-    setFormDatas((prev) => {
-      return {
-        ...prev,
-        initDate: stringFormatDate,
-        date: stringFormatDate,
-        time: stringFormatTime,
-      };
-    });
-
     // GET 요청보내서 사용자 위치 정보, 강아지정보, 로그인여부 받아와야함.
     const fetchUserData = async () => {
       try {
@@ -121,27 +114,67 @@ const useWalkMateForm = () => {
           };
         });
       } catch (error: unknown | Error | AxiosError) {
-        if (error instanceof AxiosError) {
-          setError(error.message);
-          return;
-        }
-        if (error instanceof Error) {
-          setError(error.message);
+        if (isAxiosError(error)) {
+          if (error.response) {
+            const errorMessage: string = error.response.data.message;
+            const status: number = error.response.status;
+
+            // Show the error message as a pop-up
+            toast.error(`${status}: ${errorMessage}`);
+            setError(`${status}: ${errorMessage}`);
+          } else {
+            // Handle other types of errors (e.g., network error)
+            toast.error(`${error.message}`);
+            setError(`${error.message}`);
+          }
+        } else {
+          // Handle other types of errors (e.g., network error)
+          toast.error('An error occurred. Please try again later.');
+          setError('An error occurred. Please try again later.');
         }
       } finally {
         setIsPageLoading(false);
       }
     };
     fetchUserData();
+
+    // 유저가 페이지에 접속한 시점의 Date initial value
+    const fourtyMinLater = nowDateAfterSomeMinutes(40);
+    const stringFormatDate = dateToStringDate(fourtyMinLater);
+    const stringFormatTime = dateToStringTime(fourtyMinLater);
+
+    setFormDatas((prev) => {
+      return {
+        ...prev,
+        initDate: stringFormatDate,
+        date: stringFormatDate,
+        time: stringFormatTime,
+      };
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setFormDatas({ ...formDatas, image: e.currentTarget.value });
-    setIsTouched({ ...isTouched, image: true });
+    const input = e.currentTarget;
+    const file = input?.files && input.files[0];
 
+    // 이미지 파일 1MB 이하만 업로드 가능
+    if (file && file.size > MAXIMUM_IMAGE_SIZE) {
+      setFormDatas({ ...formDatas, image: null });
+      setIsTouched({ ...isTouched, image: true });
+      setValidations({ ...validations, image: false });
+      alert('1MB 이하의 이미지만 올릴 수 있습니다');
+      // Clear the file input to prevent submitting the file
+      return;
+    }
+
+    if (e.currentTarget.files !== null) {
+      setFormDatas({ ...formDatas, image: e.currentTarget?.files[0] });
+      setIsTouched({ ...isTouched, image: true });
+    }
     // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
-    const isImageValid = e.currentTarget.value !== '';
+    const isImageValid = e.currentTarget.files?.length;
     if (isImageValid) {
       setValidations({ ...validations, image: true });
     } else if (!isImageValid) {

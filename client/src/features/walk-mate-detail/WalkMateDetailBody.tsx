@@ -3,6 +3,8 @@ import {  useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
+import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
+import { toast } from 'react-toastify';
 import { API_URL, AUTH_TOKEN,TOKEN_USERID } from '../../api/APIurl';
 
 interface Comment {
@@ -12,7 +14,7 @@ interface Comment {
   commentContent: string;
   createdAt: string;
   imgurl: string;
-  body:string
+  body: string;
 }
 
 interface Article {
@@ -39,21 +41,22 @@ const WalkMateDetailBody = () => {
     const fetchArticle = async () => {
       try {
         const response = await axios.get<Article>(
-          `${API_URL}/articles/${articleId}`,  {
+          `${API_URL}/articles/${articleId}`,
+          {
             headers: {
               Authorization: AUTH_TOKEN,
             },
           }
         );
         setArticle(response.data.article);
-       
+
         setComments(response.data.comments || []);
       } catch (error) {
         console.error('Failed to fetch comments:', error);
       }
     };
     fetchArticle();
-  }, []); 
+  }, []);
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(e.target.value);
@@ -84,24 +87,21 @@ const WalkMateDetailBody = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(
-        `${API_URL}/articles/${articleId}/comments/${id}`,
-        {
-          headers: {
-            Authorization: AUTH_TOKEN,
-          },
-        }
-      );
+      await axios.delete(`${API_URL}/articles/${articleId}/comments/${id}`, {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
+      });
       const updatedComments = comments.filter(
         (comment) => comment.commentId !== id
       );
       setComments(updatedComments);
+      toast.success('댓글 삭제 완료되었습니다.');
       window.location.reload();
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
   };
-
 
   return (
     <BodyContainer>
@@ -118,19 +118,22 @@ const WalkMateDetailBody = () => {
         <UserCard />
 
         {article?.comments.map((comment) => (
-  <Comment key={comment.commentId}>
-    <UserProfileImage src={comment.imgurl} alt="프로필 사진" />
-    <CommentContent>
-      <CommentAuthor>{comment.username}</CommentAuthor>
-      <CommentText>{comment.body}</CommentText>
-    </CommentContent>
-    {comment.userId === (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
-      <CommentDeleteButton onClick={() => handleCommentDelete(comment.commentId)}>
-        삭제
-      </CommentDeleteButton>
-    )}
-  </Comment>
-))}
+          <Comment key={comment.commentId}>
+            <UserProfileImage src={comment.imgurl} alt="프로필 사진" />
+            <CommentContent>
+              <CommentAuthor>{comment.username}</CommentAuthor>
+              <CommentText>{comment.body}</CommentText>
+            </CommentContent>
+            {comment.userId ===
+              (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
+              <CommentDeleteButton
+                onClick={() => handleCommentDelete(comment.commentId)}
+              >
+                삭제
+              </CommentDeleteButton>
+            )}
+          </Comment>
+        ))}
 
         <CommentBox>
           {/* <UserProfileImage src={comments.imgurl} alt="프로필 사진" /> */}
@@ -195,7 +198,6 @@ const CommentBox = styled.div`
   align-items: center;
   width: 580px;
   border-radius: 5px;
-  
 `;
 
 const UserProfileImage = styled.img`
@@ -243,13 +245,12 @@ const Comment = styled.div`
 const CommentContent = styled.div`
   flex: 1;
   width: 580px;
- 
 `;
 
 const CommentText = styled.div`
   margin-bottom: 5px;
   font-size: 14px;
-  color:  var(--black-900);
+  color: var(--black-900);
 `;
 
 const CommentAuthor = styled.div`
