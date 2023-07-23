@@ -271,7 +271,7 @@ const SignUp: React.FC = () => {
       }
       console.log([username, email, password, latitude, longitude, address]);
       dispatch(
-        actionS({ username, email, password, latitude, longitude, address })
+        actionS({ username, email, password,emailAuth, latitude, longitude, address })
       ).then(() => {        
           alert('회원가입 성공');
           navigate('/users/sign-in');        

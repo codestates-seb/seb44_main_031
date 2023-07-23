@@ -20,9 +20,9 @@ interface PetData {
   birth: string;
   gender: boolean;
   neutralization: boolean;
-  breedId: number;
+  breed: number;
   mbti: string;
-  image: File | null;
+  image : File | null;
   imgUrl:string;
 }
 const Container = styled.div`
@@ -177,7 +177,7 @@ const MapPart = styled.div`
   flex-direction: column;
   width: 400px;
   height: 300px;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   background-color: #f1f2f3;
   font-size: 0.8rem;
@@ -266,7 +266,7 @@ const Mypage = () => {
     birth: '',
     gender: true,
     neutralization: false,
-    breedId: 1,
+    breed: 2,
     mbti: '',
     image: null,
     imgUrl:'',
@@ -645,7 +645,7 @@ const Mypage = () => {
       mbti: petData.mbti,
       gender: petData.gender,
       neutralization: petData.neutralization,
-      breedId: Number(petData.breedId),
+      breed: Number(petData.breed),
 
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
@@ -724,9 +724,8 @@ const Mypage = () => {
           mbti: petData.mbti,
           gender: petData.gender,
           neutralization: petData.neutralization,
-          breedId: Number(petData.breedId),
+          breedId: Number(petData.breed),
         },
-
         {
           headers: {
             Authorization: localStorage.getItem('accessToken'),
@@ -908,13 +907,14 @@ const Mypage = () => {
           )}
         </UserPart>
         <MapPart>
+        <Map />
           <div>
-            <div>{profile.address}</div>
+            <h2>{profile.address}</h2>
             <StyledButtonPink3D onClick={handleModifyAddress}>
               변경
             </StyledButtonPink3D>
           </div>
-          <Map />
+          
         </MapPart>
       </UserContainer>
       <DogPart>
@@ -1048,7 +1048,7 @@ const Mypage = () => {
                       <select
                         name="breedId"
                         id="breedId"
-                        value={petData.breedId}
+                        value={petData.breed}
                         onChange={handleInputChange}
                       >
                         <option value="1">토이 푸들</option>
@@ -1213,7 +1213,7 @@ const Mypage = () => {
                       <select
                         name="breedId"
                         id="breedId"
-                        value={petData.breedId}
+                        value={petData.breed}
                         onChange={handleInputChange}
                       >
                         <option value="1">토이 푸들</option>
