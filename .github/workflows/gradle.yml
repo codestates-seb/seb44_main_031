@@ -102,8 +102,8 @@ jobs:
           echo "      max-file-size: 1MB" >> ./server/src/main/resources/application.yml
           echo "      max-request-size: 3MB" >> ./server/src/main/resources/application.yml
           echo "  mail:" >> ./server/src/main/resources/application.yml
-          echo "    host: '$SPRING_MAIL_HOST'" >> ./server/src/main/resources/application.yml
-          echo "    port: '$SPRING_MAIL_PORT'" >> ./server/src/main/resources/application.yml
+          echo "    host: smtp.gmail.com" >> ./server/src/main/resources/application.yml
+          echo "    port: 587" >> ./server/src/main/resources/application.yml
           echo "    username: '$SPRING_MAIL_USERNAME'" >> ./server/src/main/resources/application.yml
           echo "    password: '$SPRING_MAIL_PASSWORD'" >> ./server/src/main/resources/application.yml
           echo "    properties:" >> ./server/src/main/resources/application.yml
