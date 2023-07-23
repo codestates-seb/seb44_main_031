@@ -55,6 +55,8 @@ public class ArticleResponseDto {
                 private String body;
                 private ZonedDateTime startDate;
                 private ZonedDateTime endDate;
+                private Double latitude;
+                private Double longitude;
                 private String location;
                 private int attendant;
                 private List<CommentDto.Response> comments;
@@ -70,6 +72,8 @@ public class ArticleResponseDto {
                                 article.getBody(),
                                 article.getStartDate(),
                                 article.getEndDate(),
+                                article.getPoint().getY(),
+                                article.getPoint().getX(),
                                 article.getLocation(),
                                 article.getAttendant(),
                                 comments
