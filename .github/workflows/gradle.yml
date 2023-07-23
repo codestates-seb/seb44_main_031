@@ -10,10 +10,7 @@ name: Java CI with Gradle
 on:
   push:
     branches:
-      - be
-
-permissions:
-  contents: read
+      - dev
 
 env:
   S3_BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
