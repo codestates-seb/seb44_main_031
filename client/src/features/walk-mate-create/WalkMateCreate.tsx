@@ -342,7 +342,7 @@ const WalkMateCreate = () => {
                 <>
                   <span>산책 모임 개설하기</span>
                   <img
-                    src="/src/assets/petmily-logo-white.png"
+                    src="/assets/petmily-logo-white.png"
                     alt=""
                     width={25}
                     height={25}

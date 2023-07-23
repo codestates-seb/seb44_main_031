@@ -33,6 +33,10 @@ interface ArticleData {
   endDate: string;
   attendant: number;
 }
+interface AttendeeInfoResponse {
+  result: AttendeeInfo[];
+}
+
 
 const UserCard = () => {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
@@ -66,7 +70,7 @@ const UserCard = () => {
   // 참가하기 버튼 눌렀을때
   const fetchAttendeeInfo = async () => {
     try {
-      const response = await axios.get<AttendeeInfo[]>(
+      const response = await axios.get<AttendeeInfoResponse>(
         `${API_URL}/articles/attendee-info/${articleId}`,
         {
           headers: {
@@ -75,7 +79,7 @@ const UserCard = () => {
         }
       );
       setAttendeeInfo(response.data.result);
-    } catch (error) {
+    } catch (error: any) {
       if (error.response && error.response.status === 409) {
         toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
       } else {
@@ -103,47 +107,60 @@ const UserCard = () => {
       setSelectedPets([...selectedPets, petId]);
     }
   };
-  // 강아지 데리고 갈 목록들 post
-  const handleRegister = async () => {
-    if (!articleData) {
-      console.error('articleData가 유효하지 않습니다.');
-      return;
-    }
 
-    const { startDate, endDate, attendant } = articleData;
-    const selectedPetIds = selectedPets.map((petId) => petId);
 
-    const postData = {
-      petIds: selectedPetIds,
-      articleId: parseInt(articleId),
-      startDate,
-      endDate,
-      attendant,
-    };
 
-    try {
-      await axios.post(`${API_URL}/articles/attend`, postData, {
-        headers: {
-          Authorization: AUTH_TOKEN,
-        },
-      });
-      window.location.reload();
-      console.log('등록이 완료되었습니다.');
-      closeModal();
-    } catch (error: unknown) {
-      if (error.response && error.response.status === 409) {
-        toast.error('이미 참가중인 펫이 존재합니다!');
-      } else {
-        console.error('등록 중 오류 발생:', error);
-      }
-    }
+
+
+// 강아지 데리고 갈 목록들 post
+const handleRegister = async () => {
+  if (!articleData) {
+    console.error('articleData가 유효하지 않습니다.');
+    return;
+  }
+
+  const { startDate, endDate, attendant } = articleData;
+  const selectedPetIds = selectedPets.map((petId) => petId);
+
+
+  const formattedStartDate = startDate ? startDate.substring(0, 16) : null;
+  const formattedEndDate = endDate ? endDate.substring(0, 16) : null;
+
+  const postData = {
+    petIds: selectedPetIds,
+    articleId: articleId ? parseInt(articleId) : undefined,
+    startDate: formattedStartDate,
+    endDate: formattedEndDate,
+    attendant,
   };
+
+
+  try {
+    
+    await axios.post(`${API_URL}/articles/attend`, postData, {
+      headers: {
+        Authorization: AUTH_TOKEN,
+      },
+    }); 
+   
+    console.log('등록이 완료되었습니다.');
+    window.location.reload();
+    closeModal();
+  } catch (error : any) {
+    if (error.response && error.response.status === 409) {
+      toast.error('이미 참가중인 펫이 존재합니다!');
+    } else {
+      console.error('등록 중 오류 발생:', error);
+      console.log(formattedStartDate)
+    }
+  }
+};
 
   const getPetImageUrl = (gender: boolean) => {
     if (gender) {
-      return '/src/assets/petmily-logo-pink.png';
+      return '/assets/petmily-logo-pink.png';
     } else {
-      return '/src/assets/petmily-logo-white.png';
+      return '/assets/petmily-logo-white.png';
     }
   };
 
@@ -180,9 +197,12 @@ const UserCard = () => {
                 <div>
                   {attendee.userId ===
                     (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
-                    <FiTrash2
+                      <FiTrash2
                       className="delete-icon"
-                      onClick={() => handleDeleteUser(attendee.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteUser(attendee.id);
+                      }}
                     />
                   )}
                 </div>

@@ -99,7 +99,7 @@ const WalkMateDetailHeaderBox = styled.div`
   height: 100px;
 
   .title {
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 500;
   }
 `;
@@ -115,6 +115,8 @@ const ProfileImage = styled.img`
 
   border-radius: 50%;
   margin-right: 10px;
+  border-radius: 30px;
+  margin-right: 20px;
 `;
 const DetailTextBox = styled.div`
   margin-top: 10px;

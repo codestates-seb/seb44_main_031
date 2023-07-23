@@ -4,7 +4,7 @@ export const SibaLoadingSpinner = () => {
   return (
     <StyledLoadingSpinnerContainer>
       <StyledSibaLoadingSpinnerImageTag
-        src="/src/assets/loading-spinner-dog-1.gif"
+        src="/assets/loading-spinner-dog-1.gif"
         alt="dog-loading-spinner"
       />
     </StyledLoadingSpinnerContainer>

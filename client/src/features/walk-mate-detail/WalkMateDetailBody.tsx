@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import {  useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
 import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
-import { toast } from 'react-toastify';
+
+
 interface Comment {
   commentId: number;
   userId: number;
@@ -94,7 +95,6 @@ const WalkMateDetailBody = () => {
         (comment) => comment.commentId !== id
       );
       setComments(updatedComments);
-      toast.success('댓글 삭제 완료되었습니다.');
       window.location.reload();
     } catch (error) {
       console.error('Failed to delete comment:', error);
@@ -134,7 +134,7 @@ const WalkMateDetailBody = () => {
         ))}
 
         <CommentBox>
-          <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
+          {/* <UserProfileImage src={comments.imgurl} alt="프로필 사진" /> */}
           <CommentInput
             type="text"
             value={newComment}
