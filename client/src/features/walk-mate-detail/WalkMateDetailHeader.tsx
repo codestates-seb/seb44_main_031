@@ -97,7 +97,7 @@ const WalkMateDetailHeaderBox = styled.div`
   margin-left: 300px;
   background-color: #ffffff;
   height: 100px;
-
+  margin-left: 490px;
   .title {
     font-size: 22px;
     font-weight: 500;

@@ -60,6 +60,7 @@ const UserCard = () => {
 
         setAttendees(response.data.attendees);
         setArticleData(response.data.article);
+        
       } catch (error) {
         console.error('attendees 가져오는중 오류 발생:', error);
       }
@@ -182,6 +183,43 @@ const handleRegister = async () => {
     }
   };
 
+
+  const handleDeleteArticle = async (userId: number) => {
+    try {
+      // 주인 여부 확인
+      const ownerUserId = attendees[0].userId; // 주최자의 userId를 가져옵니다.
+      if (ownerUserId !== parseInt(TOKEN_USERID)) {
+        toast.error('작성자만 삭제가 가능합니다.');
+        console.log('글의 주인이 아니므로 삭제할 수 없습니다.');
+        return;
+      }
+  
+      await axios.delete(`${API_URL}/articles/${articleId}`, {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
+      });
+  
+      setAttendees((prevAttendees) =>
+        prevAttendees.filter((attendee) => attendee.id !== userId)
+      );
+      navigate('/walk-mate/all')
+      toast.success('게시글 삭제가 완료되었습니다.')
+    } catch (error:any) {
+      console.error('삭제 중 오류 발생:', error);
+  
+      if (error.response && error.response.status === 409) {
+        const errorMessage = error.response.data.message;
+        if (errorMessage === 'USER ALREADY ATTENDED') {
+          toast.error('유저가 참가되어 있어서 삭제 불가합니다.');
+        } else {
+          toast.error('삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        toast.error('삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
   return (
     <>
       <UserCardContainer>
@@ -230,6 +268,7 @@ const handleRegister = async () => {
       </UserCardContainer>
       <ButtonBox>
         <button onClick={openModal}>참가하기</button>
+        <button onClick={handleDeleteArticle}>글 삭제</button>
       </ButtonBox>
 
       {showModal && (
