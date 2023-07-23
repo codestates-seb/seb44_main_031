@@ -22,6 +22,8 @@ else
   sudo kill -9 $CURRENT_PID
   sleep 5
 fi
+echo "> Redis 서버 시작" >> /home/ubuntu/action/server/deploy.log
+sudo service redis-server start
 
 DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
 echo "> DEPLOY_JAR 배포"    >> /home/ubuntu/action/server/deploy.log
