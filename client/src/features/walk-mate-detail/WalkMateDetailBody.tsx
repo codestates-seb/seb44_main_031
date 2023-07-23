@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
 import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
-import { toast } from 'react-toastify';
-import { API_URL, AUTH_TOKEN,TOKEN_USERID } from '../../api/APIurl';
+
 
 interface Comment {
   commentId: number;
@@ -96,7 +95,6 @@ const WalkMateDetailBody = () => {
         (comment) => comment.commentId !== id
       );
       setComments(updatedComments);
-      toast.success('댓글 삭제 완료되었습니다.');
       window.location.reload();
     } catch (error) {
       console.error('Failed to delete comment:', error);

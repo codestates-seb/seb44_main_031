@@ -99,7 +99,7 @@ const WalkMateDetailHeaderBox = styled.div`
   height: 100px;
 
   .title {
-    font-size: 25px;
+    font-size: 22px;
     font-weight: 500;
   }
 `;

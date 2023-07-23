@@ -420,7 +420,7 @@ const SignUp: React.FC = () => {
         <form onSubmit={onSubmitJoin}>
           <SignUpForm>
             <Logo>
-              <img src="/src/assets/petmily-logo-pink.png" alt="logo petmily" />
+              <img src="/assets/petmily-logo-pink.png" alt="logo petmily" />
             </Logo>
             <InputUsername>
               <div>닉네임</div>

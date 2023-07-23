@@ -153,10 +153,11 @@ const SignIn = () => {
         const params = new URLSearchParams(location.search);
         const path = params.get('path');
         console.log(path);    
-        if(path===null){
+        if(path===null || path==='users/sign-in'){
           navigate('/walk-mate/all');
         }else{
           navigate(`${path}`);
+          console.log(path)
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);
@@ -172,7 +173,7 @@ const SignIn = () => {
     <Container>
       <Contents>
         <Logo>
-          <img src="/src/assets/petmily-logo-pink.png" alt="logo petmily" />
+          <img src="/assets/petmily-logo-pink.png" alt="logo petmily" />
         </Logo>
 
         <LoginForm onSubmit={onSubmitJoin}>

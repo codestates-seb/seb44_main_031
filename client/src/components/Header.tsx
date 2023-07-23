@@ -27,7 +27,7 @@ const Header = () => {
   return (
     <HeaderContainer>
       <LogoContainer onClick={handleLogoClick}>
-        <LogoImage src="/src/assets/petmily-logo-pink.png" alt="PetMily Logo" />
+        <LogoImage src="/assets/petmily-logo-pink.png" alt="PetMily Logo" />
         <LogoText>PetMily</LogoText>
       </LogoContainer>
       <NavigationContainer>

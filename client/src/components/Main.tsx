@@ -1,8 +1,23 @@
 import { styled, keyframes } from 'styled-components';
 import { StyledButtonPink3D } from './styles/StyledButtons';
 
+import { useNavigate } from 'react-router-dom';
 
 const Main = () => {
+  const navigate = useNavigate();
+
+  const handlePostView = () => {
+    // 로그인 여부 확인
+    const userId = localStorage.getItem('userId');
+
+    if (userId) {
+      // 로그인 상태라면 '/walk-mate/all' 페이지로 이동
+      navigate('/walk-mate/all');
+    } else {
+      // 로그인 상태가 아니라면 '/users/sign-in' 페이지로 이동
+      navigate('/users/sign-in');
+    }
+  };
   return (
     <MainContainer>
       <FirstSection>
@@ -10,12 +25,12 @@ const Main = () => {
           <Title>당신 근처의 소중한 이웃들과 함께</Title>
           <Subtitle>소중한 반려견들과 함께하는 즐거운 산책 시스템</Subtitle>
           <AnimatedText>
-            <Logo src="/src/assets/petmily-logo-pink.png"/>
+            <Logo src="/assets/petmily-logo-pink.png"/>
             PetMily
             </AnimatedText>
         </TitleContainer>
         <AnimatedTextContainer>
-          <MainDog src={'/src/assets/maindog.png'} alt="강아지사진" />
+          <MainDog src={'/assets/maindog.png'} alt="강아지사진" />
           
         </AnimatedTextContainer>
       </FirstSection>
@@ -23,10 +38,10 @@ const Main = () => {
         <SecondTitleContainer>
         <SecondTitle>혼자 가기 외로운 산책</SecondTitle>
           <SecondSubtitle>동네 사람들과 같이 산책해요!</SecondSubtitle>
-          <StyledButtonPink3D>게시글 보기</StyledButtonPink3D>
+          <StyledButtonPink3D onClick={handlePostView}>게시글 보기</StyledButtonPink3D>
         </SecondTitleContainer>
         <AnimatedTextContainer>
-          <Mac src={'/src/assets/macbook.png'} alt="맥북" />
+          <Mac src={'/assets/macbook.png'} alt="맥북" />
         </AnimatedTextContainer>
       </SecondSection>
       <ThirdSection>
@@ -35,30 +50,30 @@ const Main = () => {
           <ThirdSubtitle>우리 동네의 다양한 이야기를 이웃과 함께 나누어요.</ThirdSubtitle>
           <FlexContainer>
             <ViewdogWrapper>
-              <Viewdog src={'/src/assets/viewdog.png'} alt="강아지사진" />
+              <Viewdog src={'/assets/viewdog.png'} alt="강아지사진" />
               <FlexTextContainer>
-                <SmallTitle>우리 동네 산책</SmallTitle>
+                <SmallTitle>동네 산책</SmallTitle>
                 <SmallSubtitle>혼자 놀기심심해요 같이놀아요.</SmallSubtitle>
               </FlexTextContainer>
             </ViewdogWrapper>
             <ViewdogWrapper>
-              <Viewdog src={'/src/assets/viewdog.png'} alt="강아지사진" />
+              <Chat src={'/assets/chat.png'} alt="채팅사진" />
               <FlexTextContainer>
-                <SmallTitle>우리 동네 산책</SmallTitle>
-                <SmallSubtitle>혼자 놀기심심해요 같이놀아요.</SmallSubtitle>
+                <SmallTitle> 동네 모임</SmallTitle>
+                <SmallSubtitle>이웃과 온 오프라인으로 만나요.</SmallSubtitle>
               </FlexTextContainer>
             </ViewdogWrapper>
             <ViewdogWrapper>
-              <Viewdog src={'/src/assets/viewdog.png'} alt="강아지사진" />
+              <Deal src={'/assets/deal.png'} alt="거래" />
               <FlexTextContainer>
-                <SmallTitle>우리 동네 산책</SmallTitle>
-                <SmallSubtitle>혼자 놀기심심해요 같이놀아요.</SmallSubtitle>
+                <SmallTitle>중고 거래</SmallTitle>
+                <SmallSubtitle>필요한 물품들을 거래해요.</SmallSubtitle>
               </FlexTextContainer>
             </ViewdogWrapper>
           </FlexContainer>
       
         </ThirdTitleContainer>
-          <View3 src={'/src/assets/view3.png'} alt="강아지사진" />
+          <View3 src={'/assets/view3.png'} alt="강아지사진" />
       </ThirdSection>
     </MainContainer>
   );
@@ -205,14 +220,14 @@ const ThirdSubtitle = styled.h2`
   margin-bottom: 30px;
 `;
 const SmallTitle = styled.h3`
-  font-size: 15px;
+  font-size: 18px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `;
 
 const SmallSubtitle = styled.p`
-  font-size: 10px;
+  font-size: 14px;
   color: #666666;
   margin-bottom: 20px;
 `;
@@ -231,6 +246,7 @@ const MainDog = styled.img`
   height: auto;
   margin-right: 10px;
 `;
+
 const View3 = styled.img`
 margin-left: 80px;
   width: 350px;
@@ -250,7 +266,21 @@ const ViewdogWrapper = styled.div`
   margin: 10px auto;
 `;
 const Viewdog = styled.img`
-margin-top: 95px;
+margin-top: 120px;
+  width: 50px;
+  height: 60px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+`;
+const Chat = styled.img`
+margin-top: 120px;
+  width: 50px;
+  height: 60px;
+  border-radius: 20px;
+  margin-bottom: 30px;
+`;
+const Deal = styled.img`
+margin-top: 120px;
   width: 50px;
   height: 60px;
   border-radius: 20px;

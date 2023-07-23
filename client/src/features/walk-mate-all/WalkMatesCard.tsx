@@ -37,7 +37,7 @@ const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
         onClick={handleCardClick}
       >
         <div className="article-image-container">
-          {/* <img src="/src/assets/Walkdog.png" alt="" className="article-image" /> */}
+          {/* <img src="/assets/Walkdog.png" alt="" className="article-image" /> */}
           <img src={article.imageUrls[0]} alt="" className="article-image" />
         </div>
         <StyledContentsContainer>

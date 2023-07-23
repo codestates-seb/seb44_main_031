@@ -188,7 +188,7 @@ const WalkMateAll = () => {
           <StyledWalkMatesListContainer>
             {isLoading ? (
               <img
-                src="/src/assets/loading-spinner-dog-1.gif"
+                src="/assets/loading-spinner-dog-1.gif"
                 alt="dog-loading-spinner"
                 className="dog-loading-spinner"
               />
@@ -200,7 +200,7 @@ const WalkMateAll = () => {
         </StyeldMainContentContainer>
         {isFetchingNextPage && (
           <img
-            src="/src/assets/loading-spinner-dog-1.gif"
+            src="/assets/loading-spinner-dog-1.gif"
             alt="dog-loading-spinner"
             className="dog-loading-spinner"
           />
