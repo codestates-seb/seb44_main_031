@@ -4,13 +4,22 @@ import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import { styled } from 'styled-components';
 import useWalkMateForm from './hooks/useWalkMateForm';
 import WalkMateCreateKakaoMap from './WalkMateCreateKakaoMap';
-import { nowDateAfterSomeMinutes, stringToDate } from '../../utils/date-utils';
-import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
+import { nowDateAfterSomeMinutes } from '../../utils/date-utils';
+import {
+  LoadingSpinner,
+  SibaLoadingSpinner,
+} from '../../components/styles/LoaodingSpinner';
 import WalkMateSelectPetsList from './WalkMateSelectPetsList';
-import { axiosInstance, postCreateArticleUrl } from '../../api/walkMateAxios';
+import {
+  axiosInstance,
+  isAxiosError,
+  postCreateArticleUrl,
+} from '../../api/walkMateAxios';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { MAXIMUM_IMAGE_SIZE } from '../../constants/fileSize';
 
 const WalkMateCreate = () => {
   const navigate = useNavigate();
@@ -78,7 +87,9 @@ const WalkMateCreate = () => {
       const formData = new FormData();
 
       // 이미지 데이터
-      formData.append('image', inputValue.image);
+      if (inputValue.image !== null) {
+        formData.append('image', inputValue.image);
+      }
 
       // json 으로 보낼 blob 데이터
       const requestData = {
@@ -87,50 +98,62 @@ const WalkMateCreate = () => {
         location: inputValue.walkAddress,
         latitude: inputValue.walkLocation.lat,
         longitude: inputValue.walkLocation.lng,
-        date: stringToDate(inputValue.date, inputValue.time),
+        startDate: `${inputValue.date}T${inputValue.time}`,
+        endDate: inputValue.duration,
         attendant: inputValue.attendant,
         petIds: inputValue.selectedPets,
       };
-      const blob = new Blob([JSON.stringify(requestData)], {
+
+      const jsonBlob = new Blob([JSON.stringify(requestData)], {
         type: 'application/json',
       });
-      formData.append('request', blob);
+      formData.append('request', jsonBlob);
 
       try {
         setIsLoading(true);
-        const response = await axiosInstance.post(postCreateArticleUrl, {
-          data: formData,
-        });
-        toast.success('산책 모집 글 등록 성공!');
+        const response = await axiosInstance.post(
+          postCreateArticleUrl,
+          formData
+        );
+
+        toast.success('산책 모집 글 등록 성공!', { position: 'bottom-right' });
         navigate(`/walk-mate/${response.data.result}`);
-      } catch (err: unknown) {
-        if (err instanceof AxiosError) {
-          toast.error(err.message);
+      } catch (error: unknown | Error | AxiosError) {
+        if (isAxiosError(error)) {
+          if (error.response) {
+            const responseData: unknown = error.response.data;
+            const errorMessage: string = (responseData as { message: string })
+              .message;
+            // const errorMessage: string = error.response.data.message;
+            const status: number = error.response.status;
+
+            // Show the error message as a pop-up
+            toast.error(`${status}: ${errorMessage}`);
+          } else {
+            // Handle other types of errors (e.g., network error)
+            toast.error('An error occurred. Please try again later.');
+          }
+        } else {
+          // Handle other types of errors (e.g., network error)
+          toast.error('An error occurred. Please try again later.');
         }
       } finally {
         // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
         await setTimeout(() => {
           setIsLoading(false);
-        }, 3000);
+        }, 2000);
       }
     }
   };
 
   if (isPageLoading) {
-    return (
-      <FormDivContainer>
-        <img
-          src="/src/assets/loading-spinner-dog-1.gif"
-          alt="dog-loading-spinner"
-        />
-      </FormDivContainer>
-    );
+    return <SibaLoadingSpinner />;
   }
 
   if (error) {
     return (
       <FormDivContainer>
-        <p>{error}</p>
+        <StyledErrorMessage>{error}</StyledErrorMessage>
       </FormDivContainer>
     );
   }
@@ -146,14 +169,14 @@ const WalkMateCreate = () => {
             type="file"
             id="image"
             name="image"
-            value={inputValue.image}
             onChange={handleImageChange}
             accept="image/png, image/jpeg"
             required
             autoFocus
+            max={MAXIMUM_IMAGE_SIZE}
           />
           {!isValid.image && isTouched.image && (
-            <p className="error-message">error message</p>
+            <p className="error-message">1MB 이하의 이미지를 업로드 해주세요</p>
           )}
         </div>
         <div className="input-field">
@@ -229,6 +252,29 @@ const WalkMateCreate = () => {
                 현재 시각의 30분 후 부터 선택 가능합니다.
               </p>
             )}
+          </div>
+          <div className="input-field">
+            <label htmlFor="duration">예상 소요 시간</label>
+            <select
+              id="duration"
+              name="selectedDuration"
+              className="input-field-duration"
+              value={inputValue.duration}
+              onChange={(e) => {
+                setInputValue({
+                  ...inputValue,
+                  duration: e.target.value,
+                });
+              }}
+              required
+            >
+              <option value={30}>30분</option>
+              <option value={60}>1시간</option>
+              <option value={90}>1시간 30분</option>
+              <option value={120}>2시간</option>
+              <option value={150}>2시간 30분</option>
+              <option value={180}>3시간</option>
+            </select>
           </div>
         </div>
         <p className="notice-p notice-p-date">
@@ -451,4 +497,22 @@ const StyledForm = styled.form`
   .input-attendant-container {
     margin-top: 10px;
   }
+
+  .input-field-duration {
+    font-size: 16px;
+    border: 1.5px solid var(--black-400);
+    border-radius: 15px;
+    padding: 10px;
+    width: 100%;
+
+    &:focus {
+      outline: 0;
+      border: 2px solid var(--pink-400);
+    }
+  }
+`;
+
+const StyledErrorMessage = styled.p`
+  padding: 100px 50px;
+  text-align: center;
 `;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, Dispatch, SetStateAction } from 'react';
 import { distance } from '../../utils/distance';
 import { FormDatas, IsTouched, Validations } from './hooks/useWalkMateForm';
+import { mapMarkerIconRedPath } from '../../constants/imageSrcPath';
 
 interface PropType {
   inputValue: FormDatas;
@@ -38,11 +39,17 @@ const WalkMateCreateKakaoMap = ({
       walkLocation.lng
     );
 
+    // 마커 이미지의 이미지 주소, 이미지 크기, 마커 생성하기 입니다
+    const imageSrc = mapMarkerIconRedPath;
+    const imageSize = new kakao.maps.Size(24, 35);
+    const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+
     // 지도를 클릭한 위치에 표출할 마커입니다
     const marker = new kakao.maps.Marker({
       // 지도 중심좌표에 마커를 생성합니다
       // position: map.getCenter()
       position: markerPosition,
+      image: markerImage, // 마커 이미지
     });
     // 지도에 마커를 표시합니다
     marker.setMap(map);

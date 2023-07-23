@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
+import userProfileImg from '../../assets/Profile.png';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -13,7 +14,7 @@ import axios, { isAxiosError, AxiosError } from 'axios';
 import ModifyPasswordModal from './ModifyPasswordModal';
 import { useNavigate } from 'react-router-dom';
 import UserWithdrawModal from './UserWithdraw';
-import { PiDogDuotone } from "react-icons/pi";
+import { PiDogDuotone } from 'react-icons/pi';
 interface PetData {
   petId: number;
   name: string;
@@ -34,14 +35,14 @@ const Container = styled.div`
   width: 100%;
   background-color: #f1f2f3;
   font-size: 0.8rem;
-   input {
+  input {
     margin: 2px 0 2px;
     border: 1px solid #babfc4;
     border-radius: 3px;
     padding: 0.6em 0.7em;
     color: #0c0d0e;
   }
-  ${StyledButtonPink3D}{
+  ${StyledButtonPink3D} {
     width: 100px;
     padding: 2px;
   }
@@ -73,7 +74,6 @@ const UserTitle = styled.div`
 
 const UserCard = styled.div`
   text-align: center;
-  
 `;
 
 const UserPartButtons = styled.div`
@@ -84,7 +84,7 @@ const UserPartButtons = styled.div`
   ${StyledButtonPink3D} {
     width: 80px;
     padding: 3px;
-    margin-right:10px;
+    margin-right: 10px;
   }
 `;
 
@@ -100,7 +100,7 @@ const UserImgRe = styled.div`
   margin-top: 140px;
   width: 5px;
   height: 5px;
-  
+
   input {
     border-radius: 50%;
     border: solid 1px red;
@@ -119,8 +119,6 @@ const InputUsername = styled.div`
   flex-direction: column;
   margin: 6px 0 6px;
 
-  
-
   > input {
     margin: 2px 0 2px;
     border: 1px solid #babfc4;
@@ -137,7 +135,6 @@ const InputUsername = styled.div`
     align-items: center;
     font-size: 14px;
   }
-  
 `;
 
 const InputPassword = styled.div`
@@ -214,7 +211,7 @@ const PetImg = styled.img`
 `;
 
 const PetImgRe = styled.div`
-  form{
+  form {
     width: 200px;
     height: 200px;
   }
@@ -226,12 +223,12 @@ const PetImgRe = styled.div`
   }
 `;
 const PetProfile = styled.div`
-width: 200px;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-`
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 const PetSetting = styled.div`
   display: flex;
   flex-direction: column;
@@ -253,10 +250,10 @@ const PetAdd = styled.div`
   }
 `;
 const EmailAuthForm = styled.div`
-  display: flex;  
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  margin:10px;
+  margin: 10px;
 `;
 const Mypage = () => {
   const dispatch = useAppDispatch();
@@ -271,6 +268,8 @@ const Mypage = () => {
     mbti: '',
     image: null,
   });
+
+  console.dir(`petData ${petData.image}`);
   const navigate = useNavigate();
 
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
@@ -287,7 +286,7 @@ const Mypage = () => {
 
   const handleModifyAddress = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
-    navigate('/users/test');
+    navigate('/users/mapChange');
   };
   const [isOpenModifyPasswordModal, setOpenModifyPasswordModal] =
     useState<boolean>(false);
@@ -388,7 +387,7 @@ const Mypage = () => {
           console.log(response);
 
           alert('인증을 완료 하셨습니다');
-          console.log(emailCheck)
+          console.log(emailCheck);
         })
         .catch((error) => {
           console.error(error);
@@ -397,11 +396,11 @@ const Mypage = () => {
     },
     [email]
   );
-  const onSubmitUserWithdraw= useCallback(
+  const onSubmitUserWithdraw = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      console.log(emailCheck)
+      console.log(emailCheck);
       if (emailCheck === false) {
         alert('이메일 인증을 진행해주세요');
         return;
@@ -430,7 +429,7 @@ const Mypage = () => {
           console.log(emailCheck);
         });
     },
-    [validId, emailCheck,username, password, dispatch]
+    [validId, emailCheck, username, password, dispatch]
   );
   const onSubmitUsernameChange = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
@@ -443,12 +442,10 @@ const Mypage = () => {
         return;
       }
       console.log([username]);
-      dispatch(fetchUsersname({ username, password })).then(
-        () => {
-            alert('닉네임 변경완료');
-            window.location.reload();
-        }
-      );
+      dispatch(fetchUsersname({ username, password })).then(() => {
+        alert('닉네임 변경완료');
+        window.location.reload();
+      });
       // .catch((err) => console.log(err.message));
     },
     [validId, username, password, dispatch]
@@ -465,9 +462,8 @@ const Mypage = () => {
       }
       dispatch(fetchPassword({ password, newPassword, newPasswordCheck })).then(
         () => {
-    
-            alert('비밀번호 변경완료');
-          
+          alert('비밀번호 변경완료');
+
           window.location.reload();
         }
       );
@@ -487,13 +483,13 @@ const Mypage = () => {
     useState<boolean>(false);
   const onClickUserWithdrawModal = useCallback(() => {
     setOpenUserWithdrawModal(!isOpenUserWithdrawModal);
-    }, [isOpenUserWithdrawModal]);
-    const handleUserWithdrawClick = (
-      event: React.MouseEvent<HTMLButtonElement>
-    ) => {
-      event.stopPropagation();
-      onClickUserWithdrawModal();
-    };
+  }, [isOpenUserWithdrawModal]);
+  const handleUserWithdrawClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation();
+    onClickUserWithdrawModal();
+  };
   const handleModifyPetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     onClickToggleModifyPetModal();
@@ -505,18 +501,26 @@ const Mypage = () => {
     } // Set the pet data as the default values for the input fields
   };
   const [isOpenModifyPetModal, setOpenModifyPetModal] =
-  useState<boolean>(false);
+    useState<boolean>(false);
   const onClickToggleModifyPetModal = useCallback(() => {
     setOpenModifyPetModal(!isOpenModifyPetModal);
   }, [isOpenModifyPetModal]);
-  
 
   useEffect(() => {
     console.log(localStorage.getItem('userId'), 'qkerkwkerkw');
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
-    
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
+    // if (e.currentTarget.files !== null) {
+    //   setPetData((prevData) => {
+    //     console.log('setPetData 실행됨');
+    //     return { ...prevData, image: e.currentTarget?.files[0] }; // 이미지를 input에서 선택한 파일로 업데이트
+    //   });
+    //   console.log(e.currentTarget.files[0]);
+    //   console.log('이미지바뀜');
+    // }
+    // valid: 꼭 한개 이상의 파일이 담겨있어야함: input value 값이 '' 빈문자열이 아니어야함.
+
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
@@ -526,7 +530,6 @@ const Mypage = () => {
       console.log(files[0]);
       console.log('이미지바뀜');
     }
-
   };
   const handlePetImgChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -537,7 +540,6 @@ const Mypage = () => {
       });
       console.log(files[0]);
       console.log('이미지바뀜');
-      
     }
   };
   const handlePetImageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -545,7 +547,7 @@ const Mypage = () => {
     event.persist();
     const petId = event.currentTarget.getAttribute('data-petid'); // 수정된 부분
     const formData = new FormData();
-    formData.append('image', petData.image || '');    
+    formData.append('image', petData.image || '');
     axios
       .patch(
         `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/pets/image/${petId}`,
@@ -569,19 +571,18 @@ const Mypage = () => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');        
+        console.log('setPetData 실행됨');
         return { ...prevData, image: files[0] };
       });
       console.log(files[0]);
       console.log('이미지바뀜');
     }
-
   };
   const handleUserImageSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     event.persist();
     const formData = new FormData();
-    formData.append('image', petData.image || '');    
+    formData.append('image', petData.image || '');
     axios
       .patch(
         `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/users/image`,
@@ -594,12 +595,11 @@ const Mypage = () => {
       )
       .then((response) => {
         console.log(response.data);
-      window.location.reload();
-
+        window.location.reload();
       })
       .catch((error) => {
         console.error(error);
-        alert('이미지가 너무크거나 형식에맞지 않습니다 jpg,png,jpeg')
+        alert('이미지가 너무크거나 형식에맞지 않습니다 jpg,png,jpeg');
       });
   };
   const handleInputChange = (
@@ -622,7 +622,6 @@ const Mypage = () => {
       } else if (value === 'female') {
         inputValue = false;
       }
-
     }
     setPetData((prevData) => ({
       ...prevData,
@@ -635,6 +634,7 @@ const Mypage = () => {
     event.persist;
     const formData = new FormData();
     formData.append('image', petData.image || '');
+    console.log(`petData.image: ${petData.image}`);
 
     console.log(petData.image);
 
@@ -645,7 +645,6 @@ const Mypage = () => {
       gender: petData.gender,
       neutralization: petData.neutralization,
       breedId: Number(petData.breedId),
-
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
       type: 'application/json',
@@ -732,7 +731,6 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-
         console.log(response.data);
         window.location.reload();
       })
@@ -753,29 +751,29 @@ const Mypage = () => {
           <UserCard>
             <UserImg src={profile.imgUrl}></UserImg>
             <UserImgRe>
-            <form     
-              onSubmit={handleUserImageSubmit}
-              style={{
-                width: '80px',
-                height: '20px',
-                display: 'flex',
-                justifyContent: 'space-around',
-                alignItems: 'center',
-              }}
-              encType="multipart/form-data"                     
-            > 
-              <label htmlFor="userProfile">
-                <BsFillGearFill className="Gear" />
-              </label>
-              <input
-                type="file"
-                name="image"
-                id="userProfile"
-                accept="image/*"
-                onChange={handleUserImgChange}
-              />
-              <button>변경</button>
-            </form>
+              <form
+                onSubmit={handleUserImageSubmit}
+                style={{
+                  width: '80px',
+                  height: '20px',
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  alignItems: 'center',
+                }}
+                encType="multipart/form-data"
+              >
+                <label htmlFor="userProfile">
+                  <BsFillGearFill className="Gear" />
+                </label>
+                <input
+                  type="file"
+                  name="image"
+                  id="userProfile"
+                  accept="image/*"
+                  onChange={handleUserImgChange}
+                />
+                <button>변경</button>
+              </form>
             </UserImgRe>
             <UserName>{profile.username}</UserName>
           </UserCard>
@@ -800,9 +798,9 @@ const Mypage = () => {
                 <InputUsername>
                   <h2>닉네임 바꾸기</h2>
                   <IdCheckForm>
-                  <div className="input-password-label">
-                    <div>새 Username</div>
-                  </div>
+                    <div className="input-password-label">
+                      <div>새 Username</div>
+                    </div>
                     <input
                       type="name"
                       id="signupusername"
@@ -881,25 +879,23 @@ const Mypage = () => {
           )}
           {isOpenUserWithdrawModal && (
             <UserWithdrawModal
-            onClickUserWithdrawModal={
-              onClickUserWithdrawModal
-              }
+              onClickUserWithdrawModal={onClickUserWithdrawModal}
             >
               <form onSubmit={onSubmitUserWithdraw}>
                 <h2>회원 탈퇴하기</h2>
-              <EmailAuthForm>
-                <input
-                  type="email"
-                  id="loginEamil"
-                  placeholder="이메일"
-                  value={email}
-                  onChange={onChangeEamil}
-                  required
-                ></input>
-                <StyledButtonPink3D onClick={goEmail}>
-                  이메일 인증
-                </StyledButtonPink3D>
-              </EmailAuthForm>
+                <EmailAuthForm>
+                  <input
+                    type="email"
+                    id="loginEamil"
+                    placeholder="이메일"
+                    value={email}
+                    onChange={onChangeEamil}
+                    required
+                  ></input>
+                  <StyledButtonPink3D onClick={goEmail}>
+                    이메일 인증
+                  </StyledButtonPink3D>
+                </EmailAuthForm>
                 <StyledButtonPink3D>탈퇴하기</StyledButtonPink3D>
               </form>
             </UserWithdrawModal>
@@ -934,9 +930,10 @@ const Mypage = () => {
                       }}
                       encType="multipart/form-data"
                       data-petid={pet.id}
-                    >                    
-                      <label htmlFor="dogProfile">                      
-                        <PiDogDuotone className="Dog" />프로필선택                    
+                    >
+                      <label htmlFor="dogProfile">
+                        <PiDogDuotone className="Dog" />
+                        프로필선택
                       </label>
                       <input
                         type="file"
@@ -945,11 +942,11 @@ const Mypage = () => {
                         accept="image/*"
                         onChange={handlePetImgChange}
                       />
-                      <button type='submit'> 변경 </button>
+                      <button type="submit"> 변경 </button>
                     </form>
                   </PetImgRe>
                 </PetProfile>
-                
+
                 <div>
                   <p>이름 : {pet.name}</p>
                   <p>강아지 mbti : {pet.mbti}</p>
@@ -961,16 +958,10 @@ const Mypage = () => {
                 </div>
                 <PetSetting>
                   <div>
-                    <button
-                      data-petid={pet.id}
-                      onClick={handleModifyPetClick}
-                    >
+                    <button data-petid={pet.id} onClick={handleModifyPetClick}>
                       변경
                     </button>
-                    <button
-                      data-petid={pet.id}
-                      onClick={handleDeletePetClick}
-                    >
+                    <button data-petid={pet.id} onClick={handleDeletePetClick}>
                       삭제
                     </button>
                   </div>
@@ -994,8 +985,8 @@ const Mypage = () => {
               }}
             >
               <PetProfile>
-                  <PetImg src={petData.imgUrl}></PetImg>
-                </PetProfile>
+                <PetImg src={petData.imgUrl}></PetImg>
+              </PetProfile>
               <AddInputContainer>
                 <div>
                   <InputContainer>
@@ -1072,7 +1063,6 @@ const Mypage = () => {
                         <option value="22">골든 리트리버</option>
                         <option value="23">진돗개</option>
                       </select>
-
                     </InputWrapper>
                   </InputContainer>
                 </div>

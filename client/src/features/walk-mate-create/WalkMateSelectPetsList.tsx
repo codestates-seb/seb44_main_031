@@ -115,11 +115,13 @@ const StyledPetCardContainer = styled.li<PetCardContainerProps>`
     transform: translateY(-5px);
     box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1),
       0px 5px 10px rgba(0, 0, 0, 0.1);
+    transition: 0.2s;
   }
 
   &:active {
     background-color: ${({ $isSelected }) => ($isSelected ? 'pink' : 'white')};
     transform: translateY(0px);
+    transition: 0.2s;
   }
 `;
 

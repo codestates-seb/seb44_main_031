@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { styled } from 'styled-components';
-import { useParams } from 'react-router-dom';
-import { API_URL,AUTH_TOKEN,TOKEN_USERID } from '../../api/APIurl';
+import { useNavigate, useParams } from 'react-router-dom';
+import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
 import { FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -23,7 +23,6 @@ interface AttendeeInfo {
   name: string;
   imgUrl: string;
   id: number;
-
 }
 
 interface PetItemProps {
@@ -33,7 +32,6 @@ interface ArticleData {
   startDate: string;
   endDate: string;
   attendant: number;
-  
 }
 
 const UserCard = () => {
@@ -44,7 +42,9 @@ const UserCard = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [articleData, setArticleData] = useState<ArticleData | null>(null);
   const [isAttendeeInfoFetched, setIsAttendeeInfoFetched] = useState(false);
-  //산책 상세페이지 get 요청 
+  const navigate = useNavigate();
+
+  //산책 상세페이지 get 요청
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,7 +56,6 @@ const UserCard = () => {
 
         setAttendees(response.data.attendees);
         setArticleData(response.data.article);
-        
       } catch (error) {
         console.error('attendees 가져오는중 오류 발생:', error);
       }
@@ -64,34 +63,34 @@ const UserCard = () => {
 
     fetchData();
   }, []);
-// 참가하기 버튼 눌렀을때  
-const fetchAttendeeInfo = async () => {
-  try {
-    const response = await axios.get<AttendeeInfo[]>(
-      `${API_URL}/articles/attendee-info/${articleId}`,
-      {
-        headers: {
-          Authorization: AUTH_TOKEN,
-        },
+  // 참가하기 버튼 눌렀을때
+  const fetchAttendeeInfo = async () => {
+    try {
+      const response = await axios.get<AttendeeInfo[]>(
+        `${API_URL}/articles/attendee-info/${articleId}`,
+        {
+          headers: {
+            Authorization: AUTH_TOKEN,
+          },
+        }
+      );
+      setAttendeeInfo(response.data.result);
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
+      } else {
+        console.error('attendee-info 가져오는 중 오류 발생:', error);
       }
-    );
-    setAttendeeInfo(response.data.result);
-  } catch (error ) {
-    if (error.response && error.response.status === 409) {
-      toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
-    } else {
-      console.error('attendee-info 가져오는 중 오류 발생:', error);
     }
-  }
-};
+  };
 
-const openModal = async () => {
-  if (!isAttendeeInfoFetched) {
-    await fetchAttendeeInfo();
-    setIsAttendeeInfoFetched(true);
-  }
-  setShowModal(true);
-};
+  const openModal = async () => {
+    if (!isAttendeeInfoFetched) {
+      await fetchAttendeeInfo();
+      setIsAttendeeInfoFetched(true);
+    }
+    setShowModal(true);
+  };
 
   const closeModal = () => {
     setShowModal(false);
@@ -104,42 +103,41 @@ const openModal = async () => {
       setSelectedPets([...selectedPets, petId]);
     }
   };
-// 강아지 데리고 갈 목록들 post
-const handleRegister = async () => {
-  if (!articleData) {
-    console.error('articleData가 유효하지 않습니다.');
-    return;
-  }
-
-  const { startDate, endDate, attendant } = articleData; 
-  const selectedPetIds = selectedPets.map((petId) => petId);
-
-  const postData = {
-    petIds: selectedPetIds,
-    articleId: parseInt(articleId),
-    startDate,
-    endDate,
-    attendant,
-  };
-
-  try {
-    
-    await axios.post(`${API_URL}/articles/attend`, postData, {
-      headers: {
-        Authorization: AUTH_TOKEN,
-      },
-    });
-    window.location.reload();
-    console.log('등록이 완료되었습니다.');
-    closeModal();
-  } catch (error : unknown) {
-    if (error.response && error.response.status === 409) {
-      toast.error('이미 참가중인 펫이 존재합니다!');
-    } else {
-      console.error('등록 중 오류 발생:', error);
+  // 강아지 데리고 갈 목록들 post
+  const handleRegister = async () => {
+    if (!articleData) {
+      console.error('articleData가 유효하지 않습니다.');
+      return;
     }
-  }
-};
+
+    const { startDate, endDate, attendant } = articleData;
+    const selectedPetIds = selectedPets.map((petId) => petId);
+
+    const postData = {
+      petIds: selectedPetIds,
+      articleId: parseInt(articleId),
+      startDate,
+      endDate,
+      attendant,
+    };
+
+    try {
+      await axios.post(`${API_URL}/articles/attend`, postData, {
+        headers: {
+          Authorization: AUTH_TOKEN,
+        },
+      });
+      window.location.reload();
+      console.log('등록이 완료되었습니다.');
+      closeModal();
+    } catch (error: unknown) {
+      if (error.response && error.response.status === 409) {
+        toast.error('이미 참가중인 펫이 존재합니다!');
+      } else {
+        console.error('등록 중 오류 발생:', error);
+      }
+    }
+  };
 
   const getPetImageUrl = (gender: boolean) => {
     if (gender) {
@@ -151,14 +149,12 @@ const handleRegister = async () => {
 
   const handleDeleteUser = async (userId: number) => {
     try {
-      
       await axios.delete(`${API_URL}/articles/cancel/${articleId}`, {
         headers: {
           Authorization: AUTH_TOKEN,
         },
       });
 
-      
       setAttendees((prevAttendees) =>
         prevAttendees.filter((attendee) => attendee.id !== userId)
       );
@@ -174,18 +170,27 @@ const handleRegister = async () => {
       <UserCardContainer>
         <UserCardRow>
           {attendees.map((attendee, index) => (
-         <UserCardComponent key={index}>
-      {index > 0 && (
-  <div>
-    {attendee.userId === (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
-      <FiTrash2
-        className="delete-icon"
-        onClick={() => handleDeleteUser(attendee.id)}
-      />
-    )}
-  </div>
-)}
-              <ProfileCard src={attendee.imgUrl ?? undefined} alt="프로필이미지" />
+            <UserCardComponent
+              key={index}
+              onClick={() => {
+                navigate(`/users/userpage/${attendee.userId}`);
+              }}
+            >
+              {index > 0 && (
+                <div>
+                  {attendee.userId ===
+                    (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
+                    <FiTrash2
+                      className="delete-icon"
+                      onClick={() => handleDeleteUser(attendee.id)}
+                    />
+                  )}
+                </div>
+              )}
+              <ProfileCard
+                src={attendee.imgUrl ?? undefined}
+                alt="프로필이미지"
+              />
               <Username>{attendee.nickname}</Username>
               <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
@@ -212,19 +217,20 @@ const handleRegister = async () => {
           <ModalContent>
             <h2>산책에 데려갈 강아지 선택</h2>
             <PetList>
-              {attendeeInfo !== null && attendeeInfo.map((pets, index) => (
-                <PetItem
-                  key={index}
-                  onClick={() => handlePetSelect(pets.id)}
-                  $isSelected={selectedPets.includes(pets.id)}
-                >
-                  <PetImage src={pets.imgUrl} alt="강아지 이미지" />
-                  <PetName>{pets.name}</PetName>
-                  {selectedPets.includes(pets.id) && (
-                    <PetCheckIcon>&#10003;</PetCheckIcon>
-                  )}
-                </PetItem>
-              ))}
+              {attendeeInfo !== null &&
+                attendeeInfo.map((pets, index) => (
+                  <PetItem
+                    key={index}
+                    onClick={() => handlePetSelect(pets.id)}
+                    $isSelected={selectedPets.includes(pets.id)}
+                  >
+                    <PetImage src={pets.imgUrl} alt="강아지 이미지" />
+                    <PetName>{pets.name}</PetName>
+                    {selectedPets.includes(pets.id) && (
+                      <PetCheckIcon>&#10003;</PetCheckIcon>
+                    )}
+                  </PetItem>
+                ))}
             </PetList>
             <ButtonBox>
               <button onClick={closeModal}>닫기</button>
@@ -276,6 +282,7 @@ const UserCardComponent = styled.div`
   box-shadow: 0px 8px 10px rgba(0, 0, 0, 0.2), 0px 3px 6px rgba(0, 0, 0, 0.15);
   transform: translateY(0);
   transition: transform 0.3s ease-in-out;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-10px);
@@ -289,7 +296,7 @@ const UserCardComponent = styled.div`
     cursor: pointer;
     width: 15px;
     height: 15px;
-    fill: var(--pink-200); 
+    fill: var(--pink-200);
   }
 `;
 

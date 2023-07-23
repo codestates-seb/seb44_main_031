@@ -1,2 +1,2 @@
 // toast container options constants
-export const AUTO_CLOSE_MS_TIME = 2000;
+export const AUTO_CLOSE_MS_TIME = 3000;
