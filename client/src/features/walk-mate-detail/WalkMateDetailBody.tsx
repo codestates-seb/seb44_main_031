@@ -3,7 +3,7 @@ import {  useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
-import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
+import { API_URL, TOKEN_USERID } from '../../api/APIurl';
 
 
 interface Comment {
@@ -43,7 +43,7 @@ const WalkMateDetailBody = () => {
           `${API_URL}/articles/${articleId}`,
           {
             headers: {
-              Authorization: AUTH_TOKEN,
+              Authorization: localStorage.getItem('accessToken'),
             },
           }
         );
@@ -71,7 +71,7 @@ const WalkMateDetailBody = () => {
           },
           {
             headers: {
-              Authorization: AUTH_TOKEN,
+              Authorization: localStorage.getItem('accessToken'),
             },
           }
         );
@@ -88,7 +88,7 @@ const WalkMateDetailBody = () => {
     try {
       await axios.delete(`${API_URL}/articles/${articleId}/comments/${id}`, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: localStorage.getItem('accessToken'),
         },
       });
       const updatedComments = comments.filter(

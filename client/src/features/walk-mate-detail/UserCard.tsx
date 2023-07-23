@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { styled } from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import { API_URL, AUTH_TOKEN, TOKEN_USERID } from '../../api/APIurl';
+import { API_URL,  TOKEN_USERID } from '../../api/APIurl';
 import { FiTrash2 } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
@@ -55,7 +55,7 @@ const UserCard = () => {
       try {
         const response = await axios.get(`${API_URL}/articles/${articleId}`, {
           headers: {
-            Authorization: AUTH_TOKEN,
+            Authorization: localStorage.getItem('accessToken'),
           },
         });
 
@@ -79,7 +79,7 @@ const UserCard = () => {
         `${API_URL}/articles/attendee-info/${articleId}`,
         {
           headers: {
-            Authorization: AUTH_TOKEN,
+            Authorization: localStorage.getItem('accessToken'),
           },
         }
       );
@@ -144,7 +144,7 @@ const handleRegister = async () => {
     
     await axios.post(`${API_URL}/articles/attend`, postData, {
       headers: {
-        Authorization: AUTH_TOKEN,
+        Authorization: localStorage.getItem('accessToken'),
       },
     }); 
    
@@ -173,7 +173,7 @@ const handleRegister = async () => {
     try {
       await axios.delete(`${API_URL}/articles/cancel/${articleId}`, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: localStorage.getItem('accessToken'),
         },
       });
 
@@ -200,7 +200,7 @@ const handleRegister = async () => {
   
       await axios.delete(`${API_URL}/articles/${articleId}`, {
         headers: {
-          Authorization: AUTH_TOKEN,
+          Authorization: localStorage.getItem('accessToken'),
         },
       });
   
