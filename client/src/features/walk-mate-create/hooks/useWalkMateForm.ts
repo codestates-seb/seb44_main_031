@@ -100,7 +100,11 @@ const useWalkMateForm = () => {
     const fetchUserData = async () => {
       try {
         setIsPageLoading(true);
-        const response = await axiosInstance.get(getCreateArticleUrl);
+        const response = await axiosInstance.get(getCreateArticleUrl, {
+          headers: {
+            Authorization: localStorage.getItem('accessToken'),
+          },
+        });
         const data = response.data;
         setFormDatas((prev) => {
           return {

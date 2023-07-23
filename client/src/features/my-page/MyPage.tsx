@@ -741,7 +741,6 @@ const Mypage = () => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.log(petData.petId);
         console.log(petData);
-
         console.error(error);
       });
   };
