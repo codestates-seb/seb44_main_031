@@ -46,7 +46,7 @@ const pageSize = 4;
 // 컴포넌트
 const WalkMateAll = () => {
   const [selectedFilter, setSelectedFilter] = useState<SelectedFilter>({
-    period: { value: '30', label: '30일 이내' },
+    period: { value: '29', label: '30일 이내' },
     viewOrder: {
       value: 'asc',
       label: '마감 임박순',

@@ -113,7 +113,12 @@ const WalkMateCreate = () => {
         setIsLoading(true);
         const response = await axiosInstance.post(
           postCreateArticleUrl,
-          formData
+          formData,
+          {
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
+          }
         );
 
         toast.success('산책 모집 글 등록 성공!', { position: 'bottom-right' });

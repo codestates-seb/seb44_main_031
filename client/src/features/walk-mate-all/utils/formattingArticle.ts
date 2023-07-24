@@ -1,11 +1,11 @@
 export const TITLE_LENGTH = 67;
-export const BODY_LENGTH = 120;
+export const BODY_LENGTH = 115;
 
 export const sliceContentLengthEndWithDots = (
   content: string,
   desiredLength: number
 ) => {
-  if (content.length <= 67) return content;
+  if (content.length <= 66) return content;
 
   return content.slice(0, desiredLength - 3) + '...';
 };
