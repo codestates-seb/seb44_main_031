@@ -1,8 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { styled } from 'styled-components';
 import { useCallback, useState } from 'react';
 import { actionL } from './signInSlice';
 import { useAppDispatch } from '../../store/store';
+import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -10,6 +12,10 @@ const Container = styled.div`
   min-height: 100vh;
   background-color: #f1f2f3;
   font-size: 0.8rem;
+  ${StyledButtonPink3D}{
+    width: 100px;
+    padding:2px;
+  }
 `;
 const Contents = styled.div`
   display: flex;
@@ -35,6 +41,15 @@ const LoginForm = styled.form`
   border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
+  .submit{
+    display: flex;
+    justify-content: center;
+    ${StyledButtonPink3D}{
+      width: 100px;
+      padding: 1px;
+      margin-top:10px;
+    }
+  }
 `;
 
 const InputEmail = styled.div`
@@ -118,11 +133,15 @@ const SignIn = () => {
     },
     []
   );
+  const location = useLocation();  
+ 
 
+     
+   
   const onSubmitJoin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-
+      
       console.log([email, password]);
       try {
         const resultAction: any = await dispatch(actionL({ email, password }));
@@ -131,7 +150,17 @@ const SignIn = () => {
         // Save the token and user ID
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', userId);
-        navigate('/');
+        const params = new URLSearchParams(location.search);
+        const path = params.get('path');
+        console.log(path);
+
+        if(path===null || path==='users/sign-in'){
+          navigate('/walk-mate/all');
+        }else{
+          navigate(`${path}`);
+          console.log(path)
+
+        }
       } catch (error: any) {
         console.log('로그인 에러:', error);
         console.log(
@@ -146,7 +175,7 @@ const SignIn = () => {
     <Container>
       <Contents>
         <Logo>
-          <img src="/src/assets/petmily-logo-pink.png" alt="logo petmily" />
+          <img src="/assets/petmily-logo-pink.png" alt="logo petmily" />
         </Logo>
 
         <LoginForm onSubmit={onSubmitJoin}>
@@ -172,8 +201,8 @@ const SignIn = () => {
               onChange={onChangePassword}
             />
           </InputPassword>
-          <div>
-            <button type="submit">로그인</button>
+          <div className='submit'>
+            <StyledButtonPink3D type="submit">로그인</StyledButtonPink3D>
           </div>
         </LoginForm>
         <Message>

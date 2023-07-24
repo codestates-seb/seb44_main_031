@@ -5,6 +5,7 @@ import axios from 'axios';
 interface JoinData {
   username: string;
   email: string;
+  emailAuth:string;
   password: string;
   latitude: number;
   longitude: number;
@@ -25,6 +26,7 @@ export const actionS = createAsyncThunk(
         {
           username: data.username,
           email: data.email,
+          emailAuth:data.emailAuth,
           password: data.password,
           latitude: data.latitude,
           longitude: data.longitude,

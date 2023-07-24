@@ -19,7 +19,9 @@ interface Profile {
       gender: boolean;
       neutralization: boolean;
       imgUrl: string;
-      breed: string;
+      breed: number;
+      breedName: string;
+
     }
   ];
 }
@@ -47,8 +49,10 @@ const initialState: UserState = {
         gender: false,
         mbti: 'intp',
         neutralization: true,
-        imgUrl: 'string',
-        breed: 'string',
+        imgUrl: '',
+        breed: 1,
+        breedName: 'string',
+
       },
     ],
   },
@@ -71,7 +75,9 @@ interface FetchUsersResponse {
         gender: boolean;
         neutralization: boolean;
         imgUrl: string;
-        breed: string;
+        breed: number;
+        breedName: string;
+
       }
     ];
   };

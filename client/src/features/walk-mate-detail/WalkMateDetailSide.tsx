@@ -1,49 +1,98 @@
 import { styled } from 'styled-components';
 import { FaRegClock, FaMapMarkerAlt } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
+import { API_URL} from '../../api/APIurl';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+
 declare global {
   interface Window {
     kakao: any;
   }
 }
 
+interface ArticleData {
+  startDate: string;
+  location: number;
+  latitude:number;
+  longitude:number;
+}
+
 const WalkMateDetailSide = () => {
-  const [map, setMap] = useState<any>();
-  const [marker, setMarker] = useState<any>();
-  console.log(map, marker);
+  // const [map, setMap] = useState<any>();
+  const { articleId } = useParams<{ articleId: string }>();
+  const [articleData, setArticleData] = useState<ArticleData | null>(null);
+
 
   useEffect(() => {
-    window.kakao.maps.load(() => {
-      const container = document.getElementById('map');
-      const options = {
-        center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-        level: 3,
-      };
+    if (articleData && articleData.latitude && articleData.longitude) {
+      window.kakao.maps.load(() => {
+        const container = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(articleData.latitude, articleData.longitude),
+          level: 3,
+        };
+  
+        const map = new window.kakao.maps.Map(container, options);
+  
+        const myPosition = new kakao.maps.LatLng(articleData.latitude, articleData.longitude);
+        const marker = new kakao.maps.Marker({
+          position: myPosition,
+        });
+  
+        marker.setMap(map);
+      });
+    }
+  }, [articleData]);
 
-      setMap(new window.kakao.maps.Map(container, options));
-      setMarker(new window.kakao.maps.Marker());
-    });
-  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`${API_URL}/articles/${articleId}`, {
+          headers: {
+            Authorization: localStorage.getItem('accessToken'),
+          },
+        });
+
+        setArticleData(response.data.article);
+      } catch (error) {
+        console.error('attendees 가져오는중 오류 발생:', error);
+      }
+    };
+
+    fetchData();
+  }, [articleId]);
+
+  const formatDateTime = (isoString: string) => {
+    const date = new Date(isoString);
+    const options: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    };
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(
+      date
+    );
+
+    return `${formattedDate}`;
+  };
 
   return (
     <SlideBox>
       <SlideContainer>
-        <SideDog src="/src/assets/sidedog.png" />
-        <SideTextUp>
-          <div className="Name">콩이파파: ENFP</div>
-          <div className="Name">콩이: INFP</div>
-        </SideTextUp>
-      </SlideContainer>
-      <SlideContainer>
         <SideTextDown>
           <div className="Line">
             <FaRegClock className="Icon" />
-            <div className="Name">2023.06.30 금요일</div>
+            {articleData && formatDateTime(articleData.startDate)}
           </div>
           <div className="Line">
             <div className="Name">
               <FaMapMarkerAlt className="LocationIcon" />
-              한강공원
+              {articleData && articleData.location}
             </div>
           </div>
         </SideTextDown>
@@ -57,32 +106,14 @@ export default WalkMateDetailSide;
 
 const SlideContainer = styled.div`
   margin-top: 40px;
-  width: 250px;
+  width: 280px;
   height: 150px;
   border-radius: 30px;
-  background-color: var(--pink-200);
+  background-color: #fcfcfc;
   display: flex;
   justify-content: center;
   align-items: center;
-`;
-
-const SideDog = styled.img`
-  width: 64px;
-  height: 64px;
-  margin-right: 10px;
-`;
-
-const SideTextUp = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  .Name {
-    margin-top: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    color: var(--black-900);
-  }
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const SideTextDown = styled.div`
@@ -96,7 +127,7 @@ const SideTextDown = styled.div`
   }
 
   .Icon {
-    margin-top: 14px;
+    margin-top: -5px;
     margin-right: 5px;
     font-size: 17px;
     color: var(--black-900);
@@ -113,7 +144,7 @@ const SideTextDown = styled.div`
 const MapContainer = styled.div`
   margin-top: 50px;
   border-radius: 30px;
-  width: 250px;
+  width: 280px;
   height: 500px;
 `;
 

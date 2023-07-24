@@ -83,7 +83,7 @@ const Map = () => {
         <InputAddress>
           <div
             id="map"
-            style={{ width: '200px', height: '200px', position: 'sticky' }}
+            style={{ width: '200px', height: '200px', position: 'sticky' ,zIndex:'1',borderRadius:"10px"}}
             className="map/"
           ></div>
         </InputAddress>

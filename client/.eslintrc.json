@@ -5,9 +5,10 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react-hooks/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "plugin:@tanstack/eslint-plugin-query/recommended"
   ],
-  "plugins": ["@typescript-eslint", "prettier", "react-refresh"],
+  "plugins": ["@typescript-eslint", "prettier", "react-refresh", "@tanstack/query"],
   "ignorePatterns": ["node_modules/"],
   "env": {
     "browser": true,
@@ -24,6 +25,8 @@
       {
         "endOfLine": "auto"
       }
-    ]
+    ],
+    "@tanstack/query/exhaustive-deps": "error",
+    "@tanstack/query/prefer-query-object-syntax": "error"
   }
 }

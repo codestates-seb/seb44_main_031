@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { styled } from 'styled-components';
+import {  useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import UserCard from './UserCard';
 import axios from 'axios';
+import { API_URL, TOKEN_USERID } from '../../api/APIurl';
+
 
 interface Comment {
   commentId: number;
@@ -9,15 +12,11 @@ interface Comment {
   username: string;
   commentContent: string;
   createdAt: string;
+  imgurl: string;
+  body: string;
 }
 
-interface Owner {
-  userId: number;
-  username: string;
-  userimUrl: string;
-}
-
-interface Post {
+interface Article {
   postId: number;
   title: string;
   body: string;
@@ -26,38 +25,37 @@ interface Post {
   createdAt: string;
   modifiedAt: string;
   comments: Comment[];
-}
-
-interface Attendee {
-  userId: number;
-  username: string;
-  userimUrl: string;
-}
-
-interface WalkMateDetailData {
-  owner: Owner;
-  post: Post;
-  attendees: Attendee[];
+  imageUrls: string[];
+  article: any;
 }
 
 const WalkMateDetailBody = () => {
+  const { articleId } = useParams<{ articleId: string }>();
+
+  const [article, setArticle] = useState<Article | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
 
   useEffect(() => {
-    fetchComments();
-  }, []);
+    const fetchArticle = async () => {
+      try {
+        const response = await axios.get<Article>(
+          `${API_URL}/articles/${articleId}`,
+          {
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
+          }
+        );
+        setArticle(response.data.article);
 
-  const fetchComments = async () => {
-    try {
-      const response = await axios.get<Comment[]>(
-        'http://localhost:3001/articles'
-      );
-      setComments(response.data);
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    }
-  };
+        setComments(response.data.comments || []);
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+      }
+    };
+    fetchArticle();
+  }, []);
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewComment(e.target.value);
@@ -67,13 +65,19 @@ const WalkMateDetailBody = () => {
     if (newComment.trim() !== '') {
       try {
         const response = await axios.post<Comment>(
-          'http://localhost:3001/articles',
+          `${API_URL}/articles/${articleId}/comments`,
           {
-            content: newComment,
+            body: newComment,
+          },
+          {
+            headers: {
+              Authorization: localStorage.getItem('accessToken'),
+            },
           }
         );
         setComments([...comments, response.data]);
         setNewComment('');
+        window.location.reload();
       } catch (error) {
         console.error('Failed to submit comment:', error);
       }
@@ -82,81 +86,55 @@ const WalkMateDetailBody = () => {
 
   const handleCommentDelete = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:3001/articles/${id}`);
+      await axios.delete(`${API_URL}/articles/${articleId}/comments/${id}`, {
+        headers: {
+          Authorization: localStorage.getItem('accessToken'),
+        },
+      });
       const updatedComments = comments.filter(
         (comment) => comment.commentId !== id
       );
       setComments(updatedComments);
+      window.location.reload();
     } catch (error) {
       console.error('Failed to delete comment:', error);
     }
   };
 
-  const walkMateDetailData: WalkMateDetailData = {
-    owner: {
-      userId: 1,
-      username: 'JohnDoe',
-      userimUrl: 'imageURL',
-    },
-    post: {
-      postId: 1,
-      title: '산책 장소 수정합니다',
-      body: '호수 공원에 1시간 정도 같이 산책 다녀오실 분 계신가요?',
-      location: '일산 호수 공원',
-      attendants: 3,
-      createdAt: '2023-07-11 15:00:00',
-      modifiedAt: '2023-07-11 15:00:00',
-      comments: [
-        {
-          commentId: 1,
-          userId: 2,
-          username: 'Kevin',
-          commentContent: '참여 눌렀습니다, 이따봐요!',
-          createdAt: '2023-07-11 15:00:00',
-        },
-      ],
-    },
-    attendees: [
-      {
-        userId: 1,
-        username: 'JohnDoe',
-        userimUrl: 'default',
-      },
-      {
-        userId: 2,
-        username: 'Kevin',
-        userimUrl: 'imageURL',
-      },
-    ],
-  };
-
   return (
     <BodyContainer>
       <WalkMateBodyContainer>
-        <WalkDogImage src="/src/assets/Walkdog.png" alt="강아지사진" />
-        <TextBox>
-          <div className="TextBoxTitle">{walkMateDetailData.post.title}</div>
-          <div className="TextBoxBody">{walkMateDetailData.post.body}</div>
-        </TextBox>
+        {article && (
+          <>
+            <WalkDogImage src={article.imageUrls[0]} alt="강아지사진" />
+            <TextBox>
+              <div className="TextBoxTitle">{article.title}</div>
+              <div className="TextBoxBody">{article.body}</div>
+            </TextBox>
+          </>
+        )}
         <UserCard />
 
-        {walkMateDetailData.post.comments.map((comment) => (
+        {article?.comments.map((comment) => (
           <Comment key={comment.commentId}>
-            <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
+            <UserProfileImage src={comment.imgurl} alt="프로필 사진" />
             <CommentContent>
               <CommentAuthor>{comment.username}</CommentAuthor>
-              <CommentText>{comment.commentContent}</CommentText>
+              <CommentText>{comment.body}</CommentText>
             </CommentContent>
-            <CommentDeleteButton
-              onClick={() => handleCommentDelete(comment.commentId)}
-            >
-              삭제
-            </CommentDeleteButton>
+            {comment.userId ===
+              (TOKEN_USERID !== null ? parseInt(TOKEN_USERID) : null) && (
+              <CommentDeleteButton
+                onClick={() => handleCommentDelete(comment.commentId)}
+              >
+                삭제
+              </CommentDeleteButton>
+            )}
           </Comment>
         ))}
 
         <CommentBox>
-          <UserProfileImage src="path_to_profile_image" alt="프로필 사진" />
+          {/* <UserProfileImage src={comments.imgurl} alt="프로필 사진" /> */}
           <CommentInput
             type="text"
             value={newComment}
@@ -185,21 +163,25 @@ const WalkMateBodyContainer = styled.div`
 const WalkDogImage = styled.img`
   margin-top: 40px;
   border-radius: 30px;
-  width: 500px;
+  width: 580px;
   margin-bottom: 40px;
 `;
 
 const TextBox = styled.div`
-  width: 500px;
-  height: 300px;
-  padding: 10px;
+  width: 600px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   border-radius: 10px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
 
   .TextBoxTitle {
-    margin-bottom: 20px;
     font-size: 24px;
     font-weight: bold;
     color: #333333;
+    margin-bottom: 10px;
   }
 
   .TextBoxBody {
@@ -212,9 +194,12 @@ const TextBox = styled.div`
 const CommentBox = styled.div`
   margin-top: 20px;
   margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f7eaf3;
   display: flex;
   align-items: center;
   width: 580px;
+  border-radius: 5px;
 `;
 
 const UserProfileImage = styled.img`
@@ -239,6 +224,7 @@ const CommentSubmitButton = styled.button`
   color: white;
   font-size: 16px;
   font-weight: bold;
+
   cursor: pointer;
 `;
 
@@ -246,11 +232,11 @@ const Comment = styled.div`
   display: flex;
   align-items: center;
   margin-top: 10px;
-  background-color: #f0f0f0;
+  background-color: #f7eaf3;
   padding: 10px;
   border-radius: 5px;
+  width: 600px;
 
-  /* 추가된 스타일 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 
@@ -267,12 +253,12 @@ const CommentContent = styled.div`
 const CommentText = styled.div`
   margin-bottom: 5px;
   font-size: 14px;
-  color: #333333;
+  color: var(--black-900);
 `;
 
 const CommentAuthor = styled.div`
   font-weight: bold;
-  color: #555555;
+  color: var(--black-900);
   margin-bottom: 3px;
 `;
 
@@ -280,7 +266,7 @@ const CommentDeleteButton = styled.button`
   padding: 5px 10px;
   border: none;
   background-color: transparent;
-  color: #333333;
+  color: var(--black-900);
   cursor: pointer;
   font-size: 12px;
   font-weight: bold;
