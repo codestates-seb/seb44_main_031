@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -134,7 +133,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 )
                 .fetch();
 
-        if (articles.size() > 0) throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
+        if (articles.size() > 0) throw new BusinessLogicException(NOT_VALID_MEETING_DATE, "이미 겹치는 시간에 참여했습니다.");
     }
 
     @Override

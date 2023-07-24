@@ -1,7 +1,10 @@
 package competnion.domain.pet.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import competnion.domain.community.dto.ArticleQueryDto;
+import competnion.domain.community.dto.QArticleQueryDto;
 import competnion.domain.pet.entity.Pet;
+import competnion.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -37,5 +40,18 @@ public class PetRepositoryCustomImpl implements PetRepositoryCustom{
                         pet.article.id.eq(articleId)
                 )
                 .fetch();
+    }
+
+    @Override
+    public ArticleQueryDto findArticlePetAttended(User user, Long petId) {
+        return jpaQueryFactory
+                .select(new QArticleQueryDto(article.id, article.title, article.startDate, article.createdAt))
+                .from(pet)
+                .leftJoin(pet.article, article)
+                .where(
+                        pet.id.eq(petId),
+                        pet.article.eq(article)
+                )
+                .fetchOne();
     }
 }

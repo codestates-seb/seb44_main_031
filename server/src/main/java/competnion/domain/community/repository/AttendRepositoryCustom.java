@@ -9,9 +9,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface AttendRepositoryCustom {
-    List<ArticleQueryDto> findAllArticlesUserAttended(
-            User user
-    );
+//    ArticleQueryDto findArticlesPetAttended(
+//            User user,
+//            Long petId
+//    );
     List<Attend> findAllArticlesUserAttendedExceptClosed(
             User user
     );

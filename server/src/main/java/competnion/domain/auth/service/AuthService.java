@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static competnion.global.exception.ExceptionCode.*;
+import static java.lang.String.format;
 
 @Slf4j
 @Service
@@ -137,7 +138,7 @@ public class AuthService {
 
     public void verifyEmailCode(final String code, final String email) {
         if (!code.equals(redisUtil.getData(email)))
-            throw new BusinessLogicException(INVALID_EMAIL_CODE);
+            throw new BusinessLogicException(INVALID_EMAIL_CODE, format("%s 이메일의 인증코드가 유효하지 않습니다❗", email));
     }
 
     @Transactional(readOnly = true)
@@ -150,29 +151,29 @@ public class AuthService {
         List<Pet> pets = user.getPets();
         for (Pet pet : pets)
             if (pet.getArticle() != null)
-                throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+                throw new BusinessLogicException(USER_ALREADY_ATTENDED, "참여중인 산책모임이 있어 탈퇴가 불가능합니다❗");
 
         userRepository.delete(user);
     }
 
     public void checkEmailValidate(final User user, final String email) {
         if (!user.getEmail().equals(email))
-            throw new BusinessLogicException(INVALID_EMAIL);
+            throw new BusinessLogicException(INVALID_EMAIL, format("%s 이메일이 유효하지 않습니다❗", email));
     }
 
     public void checkDuplicatedUsername(final String nickname) {
         if (userRepository.findByNickname(nickname).isPresent())
-            throw new BusinessLogicException(DUPLICATE_NICKNAME);
+            throw new BusinessLogicException(DUPLICATE_NICKNAME, format("%s 는(은) 중복된 닉네임 입니다❗", nickname));
     }
 
     public void checkDuplicatedEmail(final String email) {
         if (userRepository.findByEmail(email).isPresent())
-            throw new BusinessLogicException(DUPLICATE_EMAIL);
+            throw new BusinessLogicException(DUPLICATE_EMAIL, format("%s 중복된 이메일 입니다❗", email));
     }
 
     public void checkMatchPassword(final String password, final String encodePassword) {
         final boolean matches = passwordEncoder.matches(password, encodePassword);
-        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH);
+        if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH, "패스워드가 틀립니다❗");
     }
 
     public void saveUser(
