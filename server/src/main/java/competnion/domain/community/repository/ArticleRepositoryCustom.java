@@ -14,6 +14,7 @@ import java.util.List;
 
 public interface ArticleRepositoryCustom {
     Page<Article> findAllByKeywordAndDistanceAndDays(
+            User user,
             Point userPoint,
             String keyword,
             Integer days,
