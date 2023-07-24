@@ -1,8 +1,7 @@
 package competnion.domain.user.controller;
 
 import competnion.domain.community.dto.ArticleQueryDto;
-import competnion.domain.user.annotation.UserContext;
-import competnion.domain.user.annotation.ValidUsername;
+import competnion.global.common.annotation.UserContext;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.UpdateUsernameRequest;
@@ -71,13 +70,23 @@ public class UserController {
         return Response.success(userService.uploadProfileImage(user, image));
     }
 
+    // 작성한 게시글 조회
     @GetMapping("/get-articles-written-by")
     public Response<List<ArticleQueryDto>> findAllArticlesWrittenByUser(@UserContext final User user) {
         return Response.success(userService.findAllArticlesWrittenByUser(user));
     }
 
-    @GetMapping("/get-articles-attended")
-    public Response<List<ArticleQueryDto>> findAllArticlesUserAttended(@UserContext final User user) {
-        return Response.success(userService.findAllArticlesUserAttended(user));
+    // 반려견이 참여중인 게시글 조회
+    @GetMapping("/get-articles-attended/{pet-id}")
+    public Response<ArticleQueryDto> findAllArticlesPetAttended(
+            @UserContext                      final User user,
+            @Positive @PathVariable("pet-id") final Long petId
+    ) {
+        return Response.success(userService.findArticlesPetAttended(user, petId));
     }
+
+//    @GetMapping("/get-articles-attended")
+//    public Response<List<ArticleQueryDto>> findAllArticlesUserAttended(@UserContext final User user) {
+//        return Response.success(userService.findAllArticlesUserAttended(user));
+//    }
 }

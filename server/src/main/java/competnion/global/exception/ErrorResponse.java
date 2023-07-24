@@ -12,12 +12,19 @@ import java.util.stream.Collectors;
 public class ErrorResponse {
     private int status;
     private String message;
+    private String detailMessage;
     private List<FieldError> fieldErrors;
     private List<ConstraintViolationError> violationErrors;
 
     private ErrorResponse(int status, String message) {
         this.status = status;
         this.message = message;
+    }
+
+    private ErrorResponse(int status, String message, String detailMessage) {
+        this.status = status;
+        this.message = message;
+        this.detailMessage = detailMessage;
     }
 
     private ErrorResponse(final List<FieldError> fieldErrors,
@@ -36,6 +43,10 @@ public class ErrorResponse {
 
     public static ErrorResponse of(ExceptionCode exceptionCode) {
         return new ErrorResponse(exceptionCode.getStatus(), exceptionCode.getMessage());
+    }
+
+    public static ErrorResponse of(ExceptionCode exceptionCode, String detailMessage) {
+        return new ErrorResponse(exceptionCode.getStatus(), exceptionCode.getMessage(), detailMessage);
     }
 
     public static ErrorResponse of(HttpStatus httpStatus) {

@@ -17,8 +17,8 @@ public class RedisUtil {
 
     private final StringRedisTemplate redisTemplate;
     private final RedisTemplate<String, Object> redisBlackListTemplate;
-//  private final RedisTemplate<String, Object> redisTemplate;
 
+    // 블랙리스트
     public void set(String key, Object o, int minutes) {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(o.getClass()));
         redisTemplate.opsForValue().set(key, (String) o, minutes, TimeUnit.MINUTES);
@@ -53,7 +53,7 @@ public class RedisUtil {
         return Boolean.TRUE.equals(redisBlackListTemplate.hasKey(key));
     }
 
-    // 정민님 코드
+    // 이메일
     public String getData(String key) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return valueOperations.get(key);

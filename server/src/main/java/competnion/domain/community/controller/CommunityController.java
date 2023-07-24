@@ -8,7 +8,7 @@ import competnion.domain.community.response.MultiArticleResponse;
 import competnion.domain.community.response.SingleArticleResponseDto;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
-import competnion.domain.user.annotation.UserContext;
+import competnion.global.common.annotation.UserContext;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
 import competnion.infra.redis.lock.AttendLockFacade;
@@ -37,7 +37,7 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/articles")
 public class CommunityController {
     private final CommunityService communityService;
-    private final AttendLockFacade attendLockFacade;
+//    private final AttendLockFacade attendLockFacade;
 
     @GetMapping("/writer-info")
     public Response<WriterResponse> getWriterInfo(@UserContext final User user) {
@@ -77,7 +77,7 @@ public class CommunityController {
     // 게시글 참여
     @PostMapping("/attend")
     public Response<Void> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest request) {
-        attendLockFacade.attend(user, request);
+        communityService.attend(user, request);
         return Response.success();
     }
 

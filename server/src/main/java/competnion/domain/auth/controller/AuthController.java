@@ -1,7 +1,7 @@
 package competnion.domain.auth.controller;
 
-import competnion.domain.user.annotation.UserContext;
-import competnion.domain.user.annotation.ValidUsername;
+import competnion.global.common.annotation.UserContext;
+import competnion.global.common.annotation.ValidUsername;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
 import competnion.global.response.Response;
@@ -14,8 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
-
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @Validated
 @RestController

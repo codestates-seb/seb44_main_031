@@ -1,4 +1,4 @@
-package competnion.domain.user.annotation;
+package competnion.global.common.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
