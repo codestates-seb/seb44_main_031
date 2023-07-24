@@ -49,6 +49,8 @@ const UserCard = () => {
   const [isUserAttending, setIsUserAttending] = useState(false);
   const navigate = useNavigate();
 
+
+  
   //산책 상세페이지 get 요청
   useEffect(() => {
     const fetchData = async () => {
@@ -86,7 +88,7 @@ const UserCard = () => {
       setAttendeeInfo(response.data.result);
     } catch (error: any) {
       if (error.response && error.response.status === 409) {
-        toast.error('이미 참가한 유저입니다.'); // 이미 참가한 유저일 경우에 대한 처리
+        toast.error('이미 참가한 유저입니다.');
       } else {
         toast.error('api 가져오는 중 오류 발생:', error);
       }
@@ -224,6 +226,30 @@ const handleRegister = async () => {
       }
     }
   };
+
+  const handleWalkEnd = async () => {
+    try {
+
+      await axios.post(`${API_URL}/articles/close/${articleId}`,{} ,{
+        headers: {
+          Authorization: localStorage.getItem('accessToken'),
+        },
+      });
+      navigate('/walk-mate/all')
+      toast.success('산책이 종료되었습니다.')
+      console.log('산책이 종료되었습니다.');
+   
+    } catch (error:any) {
+      
+      console.error('산책 종료 중 오류 발생:', error);
+      if (error.response && error.response.status === 409) {
+        toast.error('산책 종료 시간이 아닙니다.');
+      } else {
+        toast.error('산책 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    }
+  };
+
   return (
     <>
       <UserCardContainer>
@@ -273,6 +299,11 @@ const handleRegister = async () => {
       <ButtonBox>
       {!isUserAttending && <button onClick={openModal}>참가하기</button>}
       <button onClick={() => handleDeleteArticle(attendees[attendees.length - 1].userId)}>글 삭제</button>
+
+      
+      {attendees.length > 0 && attendees[0].userId === parseInt(TOKEN_USERID) && (
+          <button onClick={handleWalkEnd}>산책 종료</button>
+        )}
       </ButtonBox>
 
       {showModal && (

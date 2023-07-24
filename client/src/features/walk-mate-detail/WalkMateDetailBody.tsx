@@ -224,6 +224,7 @@ const CommentSubmitButton = styled.button`
   color: white;
   font-size: 16px;
   font-weight: bold;
+
   cursor: pointer;
 `;
 
