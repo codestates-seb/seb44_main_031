@@ -1,6 +1,6 @@
-package competnion.domain.user.annotation.validator;
+package competnion.global.common.validator;
 
-import competnion.domain.user.annotation.ValidPassword;
+import competnion.global.common.annotation.ValidPassword;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

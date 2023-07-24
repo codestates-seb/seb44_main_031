@@ -20,11 +20,9 @@ public class AttendLockFacade {
         RLock lock = redissonClient.getLock(String.format("attend : %d", user.getId()));
 
         try {
-            boolean available = lock.tryLock(10, 1, SECONDS);
-            if (!available) {
-                System.out.println("redisson getLock timeout");
-                throw new IllegalArgumentException();
-            }
+            boolean available = lock.tryLock(100, 2, SECONDS);
+            if (!available)
+                throw new RuntimeException("Lock 획득 실패");
             communityService.attend(user, request);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

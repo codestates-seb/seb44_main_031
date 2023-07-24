@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static competnion.global.exception.ExceptionCode.*;
+import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -93,17 +94,26 @@ public class PetService {
     }
 
     public void checkValidPetOrThrow(final Pet pet) {
-        if (pet.getArticle() != null) throw new BusinessLogicException(PET_ALREADY_ATTENDED);
+        if (pet.getArticle() != null)
+            throw new BusinessLogicException(
+                    PET_ALREADY_ATTENDED,
+                    format("%s는 이미 다른 산책모임에 참여했습니다!", pet.getName())
+            );
     }
 
     public void checkUserHasPetOrThrow(final User user) {
-        if (user.getPets().size() == 0) throw new BusinessLogicException(PET_NOT_FOUND);
+        if (user.getPets().size() == 0)
+            throw new BusinessLogicException(PET_NOT_FOUND, "펫을 등록해주세요!");
     }
 
     public void checkPetMatchUser(final User user, final Pet findPet) {
         final boolean petMatch = user.getPets().stream()
                 .anyMatch(pet -> pet.equals(findPet));
-        if (!petMatch) throw new BusinessLogicException(PET_NOT_MATCH);
+        if (!petMatch)
+            throw new BusinessLogicException(
+                    PET_NOT_MATCH,
+                    format("%s 는 %s 님의 반려견이 아닙니다!", findPet.getName(), user.getNickname())
+            );
     }
 
     private void checkSpaceForRegisterPetOrThrow (final Long userId) {

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static competnion.global.exception.ExceptionCode.*;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
@@ -50,7 +51,7 @@ public class S3Util {
     }
 
     public String uploadImage(MultipartFile multipartFile) throws BusinessLogicException {
-        String imageName = String.format("%s-%s", UUID.randomUUID(), multipartFile.getOriginalFilename());
+        String imageName = format("%s-%s", UUID.randomUUID(), multipartFile.getOriginalFilename());
 
         // 업로드되는 객체의 속성을 설정
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -63,7 +64,7 @@ public class S3Util {
 //                            .withCannedAcl(CannedAccessControlList.PublicRead)	// PublicRead 권한으로 업로드 됨
             );
         } catch (IOException e) {
-            throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED);
+            throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED, "이미지 업로드에 실패하였습니다!");
         }
 
         URL imageUrl = amazonS3Client.getUrl(bucket, imageName);
@@ -77,7 +78,7 @@ public class S3Util {
         List<String> imgUrlList = new ArrayList<>();
 
         for (MultipartFile image : imageList) {
-            String imageName = String.format("%s-%s", UUID.randomUUID(), image.getOriginalFilename());
+            String imageName = format("%s-%s", UUID.randomUUID(), image.getOriginalFilename());
             ObjectMetadata objectMetadata = new ObjectMetadata();
             objectMetadata.setContentLength(image.getSize());
             objectMetadata.setContentType(image.getContentType());
@@ -88,7 +89,7 @@ public class S3Util {
                 );
                 imgUrlList.add(amazonS3Client.getUrl(bucket, imageName).toString());
             } catch (IOException e) {
-                throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED);
+                throw new BusinessLogicException(S3_IMAGE_UPLOAD_FAILED, "이미지 업로드에 실패하였습니다!");
             }
         }
         return imgUrlList;
@@ -112,12 +113,12 @@ public class S3Util {
                 .filter(fileExtension ->
                         !fileExtension.equals("jpg") && !fileExtension.equals("jpeg") && !fileExtension.equals("png"))
                 .forEach(fileExtension -> {
-                    throw new BusinessLogicException(INVALID_IMAGE_EXTENSION);
+                    throw new BusinessLogicException(INVALID_IMAGE_EXTENSION, format("%s 는 지원하는 이미지 파일이 아닙니다!", fileExtension));
                 });
     }
 
     public void checkImageCount(final List<MultipartFile> images) {
         long count = images.size();
-        if (count > 3) throw new BusinessLogicException(OVER_THE_IMAGE_MAX_LIST);
+        if (count > 3) throw new BusinessLogicException(OVER_THE_IMAGE_MAX_LIST, "이미지는 3개 이하로 등록해주세요!");
     }
 }

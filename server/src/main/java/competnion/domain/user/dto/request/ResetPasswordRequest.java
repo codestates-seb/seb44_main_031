@@ -1,6 +1,6 @@
 package competnion.domain.user.dto.request;
 
-import competnion.domain.user.annotation.ValidPassword;
+import competnion.global.common.annotation.ValidPassword;
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;

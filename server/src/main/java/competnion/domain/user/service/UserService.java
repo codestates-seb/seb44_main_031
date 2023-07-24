@@ -2,10 +2,13 @@ package competnion.domain.user.service;
 
 import competnion.domain.auth.service.AuthService;
 import competnion.domain.community.dto.ArticleQueryDto;
+import competnion.domain.community.dto.response.ArticleResponse;
+import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
+import competnion.domain.pet.repository.PetRepositoryCustomImpl;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.SignUpRequest;
@@ -36,7 +39,7 @@ import static competnion.global.exception.ExceptionCode.*;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final AttendRepository attendRepository;
+    private final PetRepository petRepository;
     private final ArticleRepository articleRepository;
 
     private final S3Util s3Util;
@@ -67,7 +70,7 @@ public class UserService {
         authService.checkMatchPassword(request.getPassword(), user.getPassword());
 
         if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
-            throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH);
+            throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH, "새 비밀번호를 다시 입력해주세요❗");
 
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
     }
@@ -92,9 +95,13 @@ public class UserService {
         return articleRepository.findAllArticlesWrittenByUser(user);
     }
 
-    public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
-        return attendRepository.findAllArticlesUserAttended(user);
+    public ArticleQueryDto findArticlesPetAttended(User user, Long petId) {
+        return petRepository.findArticlePetAttended(user, petId);
     }
+
+//    public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
+//        return attendRepository.findAllArticlesUserAttended(user);
+//    }
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)

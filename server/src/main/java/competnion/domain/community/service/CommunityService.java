@@ -20,6 +20,7 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
+import competnion.global.common.annotation.Lock;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.ZonedDateTimeUtil;
@@ -47,7 +48,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommunityService {
     private final PetRepository petRepository;
@@ -69,6 +69,7 @@ public class CommunityService {
     }
 
     // 산책 갈래요 작성
+    @Transactional
     public Long createArticle(
             final User user,
             final ArticlePostRequest request,
@@ -101,6 +102,7 @@ public class CommunityService {
     }
 
     // 산책 갈래요 참여
+    @Lock(key = "attend_lock")
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
@@ -114,6 +116,7 @@ public class CommunityService {
     }
 
     // 산책 완료
+    @Transactional
     public void close(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
 
@@ -121,7 +124,7 @@ public class CommunityService {
         checkAlreadyClose(article);
 
         if (dateUtil.getNow().isBefore(article.getStartDate().plusMinutes(30)))
-            throw new BusinessLogicException(CAN_NOT_CLOSE);
+            throw new BusinessLogicException(CAN_NOT_CLOSE, "산책시작 30분후 완료버튼을 눌러주세요❗");
         article.updateStatus(CLOSED);
 
         List<Pet> pets = petRepository.findAllByArticleId(articleId);
@@ -139,6 +142,7 @@ public class CommunityService {
         }
     }
 
+    @Transactional
     public void updateArticle(
             final User user,
             final Long articleId,
@@ -146,7 +150,7 @@ public class CommunityService {
             final List<MultipartFile> images
     ) {
         long count = attendRepository.countByArticleId(articleId);
-        if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+        if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED, "참여한 유저가 있어 수정이 불가능합니다❗");
 
         s3Util.checkImageCount(images);
 
@@ -162,7 +166,7 @@ public class CommunityService {
 
             if (requestStart.isAfter(article.getStartDate()) || requestStart.equals(articleStart)
                     || requestEnd.isBefore(article.getEndDate()) || requestEnd.equals(articleEnd))
-                throw new BusinessLogicException(DUPLICATE_MEETING_DATE);
+                throw new BusinessLogicException(DUPLICATE_MEETING_DATE, "겹치는 시간에 참여하시거나 작성하신 모임이 있습니다❗");
         });
 
         s3Util.isFileAnImageOrThrow(images);
@@ -186,10 +190,10 @@ public class CommunityService {
         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
         Article article = getArticleByIdOrThrow(articleId);
         if (article.getStartDate().minusMinutes(20).isBefore(dateUtil.getNow()))
-            throw new BusinessLogicException(CAN_NOT_CANCEL);
+            throw new BusinessLogicException(CAN_NOT_CANCEL, "산책시작 20분전에는 취소할 수 없습니다❗");
 
         Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId)
-                .orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
+                .orElseThrow(() -> new BusinessLogicException(ATTEND_NOT_FOUND));
 
         attendRepository.delete(attend);
 
@@ -199,13 +203,17 @@ public class CommunityService {
     }
 
     // 게시글 삭제
+    // TODO : 리팩토링 필요
     public void deleteArticle(final User user, final Long articleId) {
-        long count = attendRepository.countByArticleId(articleId);
-        if (count > 1) throw new BusinessLogicException(USER_ALREADY_ATTENDED);
-
-        Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId).orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
-        List<Pet> pets = petRepository.findAllByArticleId(articleId);
         Article article = getArticleByIdOrThrow(articleId);
+        long count = attendRepository.countByArticleId(articleId);
+
+        if (count > 1 || article.getArticleStatus().equals(CLOSED))
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED, "참여중인 유저가 있어 삭제가 불가능합니다.");
+
+        Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId)
+                .orElseThrow(() -> new BusinessLogicException(USER_ALREADY_ATTENDED));
+        List<Pet> pets = petRepository.findAllByArticleId(articleId);
 
         attendRepository.delete(attend);
         pets.forEach(Pet::deleteArticle);
@@ -233,6 +241,7 @@ public class CommunityService {
     ) {
         Page<Article> articles =
                  articleRepository.findAllByKeywordAndDistanceAndDays(
+                         user,
                          user.getPoint(),
                          keyword,
                          days,
@@ -255,24 +264,24 @@ public class CommunityService {
     }
 
     private void checkNotArticleOwner(final User user, final Article article) {
-        if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE);
+        if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE, "본인 게시글에는 참여 할 수 없습니다❗");
     }
 
     private void checkArticleOwner(final User user, final Article article) {
-        if (article.getUser() != user) throw new BusinessLogicException(NOT_ARTICLE_OWNER);
+        if (article.getUser() != user) throw new BusinessLogicException(NOT_ARTICLE_OWNER, "본인 게시글이 아닙니다❗");
     }
 
     private void checkMeetingTimeClosed(final ZonedDateTime startDate, final ZonedDateTime endDate) {
         ZonedDateTime now = dateUtil.getNow();
         if (now.plusMinutes(30).isAfter(startDate) || now.plusMinutes(30).equals(startDate))
-            throw new BusinessLogicException(MEETING_TIME_CLOSED);
+            throw new BusinessLogicException(MEETING_TIME_CLOSED, "이미 마감된 산책모임입니다❗");
     }
 
     @Transactional(readOnly = true)
     private void checkSpaceForAttend(final Long articleId, final int attendant) {
         final long count = attendRepository.countByArticleId(articleId);
         if (count >= attendant)
-            throw new BusinessLogicException(NO_SPACE_FOR_ATTEND);
+            throw new BusinessLogicException(NO_SPACE_FOR_ATTEND, "산책 참여 인원이 마감되었습니다❗");
     }
 
     @Transactional(readOnly = true)
@@ -282,14 +291,14 @@ public class CommunityService {
         final List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
 
         for (Pet pet : pets) {
-            petService.checkPetMatchUser(user, pet);
+//            petService.checkPetMatchUser(user, pet);
             petService.checkValidPetOrThrow(pet);
         }
     }
 
     private void checkUserAlreadyAttended(final User user, final Article article) {
         if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
-            throw new BusinessLogicException(USER_ALREADY_ATTENDED);
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED, "이미 참여하셨습니다❗");
     }
 
     private void checkDuplicateOwnersMeetingDate(User user, ZonedDateTime startDate, String endDate) {
@@ -304,18 +313,18 @@ public class CommunityService {
 
     private void checkAlreadyClose(Article article) {
         if (article.getArticleStatus().equals(CLOSED))
-            throw new BusinessLogicException(ALREADY_CLOSED);
+            throw new BusinessLogicException(ALREADY_CLOSED, "이미 종료된 모임입니다❗");
     }
 
     private void checkValidMeetingDate(ArticlePostRequest request) {
         final ZonedDateTime startDate = request.getStartDate().plusMinutes(29);
         final int endDate = parseInt(request.getEndDate());
 
-        if (request.getStartDate().isBefore(dateUtil.getNow().plusMinutes(25)))
-            throw new BusinessLogicException(NOT_VALID_START_DATE);
+        if (request.getStartDate().isBefore(dateUtil.getNow().plusMinutes(27)))
+            throw new BusinessLogicException(NOT_VALID_START_DATE, "산책 시작시간을 확인해주세요❗");
 
         if (startDate.isAfter(startDate.plusMinutes(endDate)) || startDate.equals(startDate.plusMinutes(endDate)))
-            throw new BusinessLogicException(NOT_VALID_MEETING_DATE);
+            throw new BusinessLogicException(NOT_VALID_MEETING_DATE, "산책 종료시간을 확인해주세요❗");
     }
 
     private Boolean checkParticipation (Article article,long userId) {
@@ -330,7 +339,7 @@ public class CommunityService {
 
     private Article getArticleByIdOrThrow(final Long articleId) {
         return articleRepository.findById(articleId)
-                .orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND));
+                .orElseThrow(() -> new BusinessLogicException(ARTICLE_NOT_FOUND, "게시글이 없습니다❗"));
     }
 
     private List<String> getImgUrlsFromArticle(final Article article) {
