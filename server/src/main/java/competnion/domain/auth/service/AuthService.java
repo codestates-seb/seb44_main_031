@@ -137,8 +137,10 @@ public class AuthService {
     }
 
     public void verifyEmailCode(final String code, final String email) {
-        if (!code.equals(redisUtil.getData(email)))
+        String data = redisUtil.getData(email);
+        if (!code.equals(data)) {
             throw new BusinessLogicException(INVALID_EMAIL_CODE, format("%s 이메일의 인증코드가 유효하지 않습니다❗", email));
+        }
     }
 
     @Transactional(readOnly = true)
