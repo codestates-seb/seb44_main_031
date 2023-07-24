@@ -299,6 +299,7 @@ const handleRegister = async () => {
       <ButtonBox>
       {!isUserAttending && <button onClick={openModal}>참가하기</button>}
       <button onClick={() => handleDeleteArticle(attendees[attendees.length - 1].userId)}>글 삭제</button>
+
       
       {attendees.length > 0 && attendees[0].userId === parseInt(TOKEN_USERID) && (
           <button onClick={handleWalkEnd}>산책 종료</button>

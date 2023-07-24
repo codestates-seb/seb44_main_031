@@ -20,7 +20,7 @@ interface PetData {
   birth: string;
   gender: boolean;
   neutralization: boolean;
-  breed: number;
+  breedId: number;
   mbti: string;
   image : File | null;
   imgUrl:string;
@@ -267,6 +267,10 @@ const PetImgRe = styled.div`
   .Dog {
     font-size: 20px;
   }
+  .show{
+    margin-top:5px;
+    color: gray;
+  }
 `;
 const PetProfile = styled.div`
 width: 200px;
@@ -274,6 +278,10 @@ display: flex;
 flex-direction: column;
 justify-content: center;
 align-items: center;
+.show{
+    margin-top:15px;
+    color:gray;
+  }
 `
 const PetSetting = styled.div`
   display: flex;
@@ -293,7 +301,8 @@ const PetAdd = styled.div`
   cursor: pointer;
   &:hover {
     transform: translateY(-1px);
-  }
+  } 
+  
 `;
 const EmailAuthForm = styled.div`
   display: flex;  
@@ -310,7 +319,7 @@ const Mypage = () => {
     birth: '',
     gender: true,
     neutralization: false,
-    breed: 2,
+    breedId: 2,
     mbti: '',
     image: null,
     imgUrl:'',
@@ -466,7 +475,7 @@ const Mypage = () => {
           setEmailCheck(false);
           localStorage.removeItem('accessToken');
           localStorage.removeItem('userId');
-          window.location.reload();
+          navigate('/');
         })
         .catch((error) => {
           console.error(error);
@@ -689,7 +698,7 @@ const Mypage = () => {
       mbti: petData.mbti,
       gender: petData.gender,
       neutralization: petData.neutralization,
-      breed: Number(petData.breed),
+      breedId: Number(petData.breedId),
 
     };
     const jsonBlob = new Blob([JSON.stringify(requestData)], {
@@ -758,6 +767,14 @@ const Mypage = () => {
     event.preventDefault();
     event.persist;
     // 서버로 formData 전송
+    let modifiedBreedId;
+  if (petData.breedId === null || petData.breedId === undefined || isNaN(petData.breedId)) {
+    modifiedBreedId = 1;
+  } else {
+    modifiedBreedId = Number(petData.breedId);
+  }
+    console.log("petData.breedId:", petData.breedId);
+    console.log("modifiedBreedId:", modifiedBreedId);
     axios
       .patch(
         //@ts-ignore
@@ -768,7 +785,7 @@ const Mypage = () => {
           mbti: petData.mbti,
           gender: petData.gender,
           neutralization: petData.neutralization,
-          breedId: Number(petData.breed),
+          breedId: modifiedBreedId,
         },
         {
           headers: {
@@ -952,7 +969,7 @@ const Mypage = () => {
         <MapPart>
         <Map />
           <div>
-            <h2>{profile.address}</h2>
+            <h2>{`${profile.address}`.split(' ').slice(0, 3).join(' ')}</h2>
             <StyledButtonPink3D onClick={handleModifyAddress}>
               변경
             </StyledButtonPink3D>
@@ -980,7 +997,7 @@ const Mypage = () => {
                       encType="multipart/form-data"
                       data-petid={pet.id}
                     >                    
-                      <label htmlFor="dogProfile">                      
+                      <label htmlFor="dogProfile" style={{cursor:'pointer'}}>                      
                         <PiDogDuotone className="Dog" />프로필선택                    
                       </label>
                       <input
@@ -990,17 +1007,19 @@ const Mypage = () => {
                         accept="image/*"
                         onChange={handlePetImgChange}
                       />
-                      <SmallButton type='submit'> 변경 </SmallButton>
+                      <SmallButton type='submit'> 적용 </SmallButton>
                     </form>
+                   
                   </PetImgRe>
+                  <p className='show'>"프로필 선택 후에 "선택 적용"을 눌러야 프로필 사진 변경이 적용됩니다"</p>
                 </PetProfile>
                 
                 <div>
                   <p>이름 : {pet.name}</p>
                   <p>강아지 mbti : {pet.mbti}</p>
                   <p>견종 : {pet.breedName}</p>
-                  <p>중성화 여부 : {pet.neutralization ? '했음' : '안했음'}</p>
-                  <p>성별 : {pet.gender ? '남자' : '여자'}</p>
+                  <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
+                  <p>성별 : {pet.gender ? '♀' : '♂'}</p>
 
                   <p>생년월일 : {pet.birth}</p>
                 </div>
@@ -1020,6 +1039,7 @@ const Mypage = () => {
                     </SmallButton>
                   </div>
                 </PetSetting>
+                
               </PetCard>
             </li>
           ))}
@@ -1091,7 +1111,7 @@ const Mypage = () => {
                       <select
                         name="breedId"
                         id="breedId"
-                        value={petData.breed}
+                        value={petData.breedId}
                         onChange={handleInputChange}
                       >
                         <option value="1">토이 푸들</option>
@@ -1192,10 +1212,13 @@ const Mypage = () => {
               }}
               encType="multipart/form-data"
             >
+              <div className='profile'>
               <PetImg></PetImg>
               <PetImgRe>
-                <label htmlFor="file">
-                  <BsFillGearFill className="Gear" />
+                <label htmlFor="file" style={{cursor:'pointer'}}>
+                  <PiDogDuotone className="Gear" />
+                  <p className='show'>"강아지를 눌러 프로필 선택을 하셔야 합니다"</p>
+
                 </label>
                 <input
                   type="file"
@@ -1206,7 +1229,9 @@ const Mypage = () => {
                   // value={petData.image}
                   onChange={handleImageChange}
                 />
-              </PetImgRe>
+              </PetImgRe>   
+              </div>
+                       
               <AddInputContainer>
                 <div>
                   <InputContainer>
@@ -1256,7 +1281,7 @@ const Mypage = () => {
                       <select
                         name="breedId"
                         id="breedId"
-                        value={petData.breed}
+                        value={petData.breedId}
                         onChange={handleInputChange}
                       >
                         <option value="1">토이 푸들</option>

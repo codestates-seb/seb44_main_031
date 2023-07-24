@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
 export const AWS_URL_PATH =
   'http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
@@ -21,7 +20,6 @@ interface Profile {
       imgUrl: string;
       breed: number;
       breedName: string;
-
     }
   ];
 }
@@ -101,6 +99,7 @@ interface FetchPssswordChangeResponse {
 export const fetchUsers = createAsyncThunk<Profile, number>(
   'users/mypage/get',
   async (userId) => {
+ 
     const response = await axios.get<FetchUsersResponse>(
       `${AWS_URL_PATH}/users/${userId}`
     );
@@ -179,6 +178,11 @@ export const myPageSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message as string;
+        console.log('qqqqqqazaasdasdaqsdas')
+        const currentPath = window.location.pathname;
+      window.location.href = `sign-in?path=${encodeURIComponent(
+        currentPath
+      )}`;
       })
       .addCase(fetchUsersname.pending, (state) => {
         state.status = 'loading';
