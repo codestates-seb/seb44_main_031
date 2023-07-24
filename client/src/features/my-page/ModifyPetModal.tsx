@@ -15,10 +15,8 @@ function AddPetModal({
       <Backdrop
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          console.log(2);
           if (onClickToggleModifyPetModal) {
             onClickToggleModifyPetModal();
-            console.log(1);
           }
         }}
       />

@@ -15,10 +15,8 @@ function MypostModal({
       <Backdrop
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          console.log(2);
           if (onClickToggleMypostModal) {
             onClickToggleMypostModal();
-            console.log(1);
           }
         }}
       />

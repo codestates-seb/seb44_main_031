@@ -5,7 +5,7 @@ import { createWalkMateURL } from '../../api/reactRouterUrl';
 const WalkMatesHeader = () => {
   return (
     <StyledTitleContainer>
-      <h1 className="page-title">🐶 우리 동네 반려견 산책 모임 찾기 🌿</h1>
+      <h1 className="page-title">🐶 우리 동네 반려견 산책 모임 🌿</h1>
       <StyeldCreateWalkMateLinkButton to={createWalkMateURL}>
         산책 모임 개설하기
       </StyeldCreateWalkMateLinkButton>

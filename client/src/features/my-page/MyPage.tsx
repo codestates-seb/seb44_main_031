@@ -357,7 +357,6 @@ const Mypage = () => {
     imgUrl:'',
     });
   
-    console.log(profile)
     const sliceContentLengthEndWithDots = (
       content: string,
       desiredLength: number
@@ -450,14 +449,11 @@ const Mypage = () => {
         .get(
           `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/check-username?username=${username}`
         )
-        .then((response) => {
-          // 아이디 확인
-          console.log(response);
+        .then((response) => {      
           setValidId(username);
           alert('사용가능한 닉네임입니다');
         })
         .catch((error: unknown | Error | AxiosError) => {
-          console.log(error);
           if (isAxiosError(error)) {
             if (error.response) {
               const errorMessage: string = error.response.data.message;
@@ -490,13 +486,12 @@ const Mypage = () => {
           // 이메일 인증에 대한 로직을 추가해주세요
           setEmailCheck(true);
 
-          console.log(response);
 
           alert('인증을 완료 하셨습니다');
-          console.log(emailCheck)
         })
         .catch((error) => {
-          console.error(error);
+          console.log(error);
+          
           alert('다시 요청해주세요');
         });
     },
@@ -506,7 +501,7 @@ const Mypage = () => {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      console.log(emailCheck)
+      
       if (emailCheck === false) {
         alert('이메일 인증을 진행해주세요');
         return;
@@ -522,7 +517,6 @@ const Mypage = () => {
         )
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
-          console.log(response);
           alert('탈퇴 되었습니다');
           setEmailCheck(false);
           localStorage.removeItem('accessToken');
@@ -530,9 +524,8 @@ const Mypage = () => {
           navigate('/');
         })
         .catch((error) => {
-          console.error(error);
-          alert('다시 요청해주세요');
-          console.log(emailCheck);
+          alert('참여중인 게시글이 있으므로 탈퇴가 불가합니다');
+          console.log(error)
         });
     },
     [validId, emailCheck,username, password, dispatch]
@@ -547,14 +540,13 @@ const Mypage = () => {
         alert('중복확인한 아이디와 일치하지 않습니다');
         return;
       }
-      console.log([username]);
+      
       dispatch(fetchUsersname({ username, password })).then(
         () => {
             alert('닉네임 변경완료');
             window.location.reload();
         }
       );
-      // .catch((err) => console.log(err.message));
     },
     [validId, username, password, dispatch]
   );
@@ -603,7 +595,6 @@ const Mypage = () => {
     event.stopPropagation();
     onClickToggleModifyPetModal();
     const petId = parseInt(event.currentTarget.dataset.petid, 10);
-    console.log(`${petId}아아ㅏ아아아아`);
     const petData = profile.pets.find((pet) => pet.id === petId);
     if (petData) {
       //@ts-ignore
@@ -618,21 +609,16 @@ const Mypage = () => {
   
 
   useEffect(() => {
-    console.log(localStorage.getItem('userId'), 'qkerkwkerkw');
+    
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
     dispatch(fetchMypostList())
   }, [dispatch]);
-  console.log(mypostList);
-  // console.log(mypostList);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
     }
 
   };
@@ -640,11 +626,9 @@ const Mypage = () => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');
+        
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
       
     }
   };
@@ -665,23 +649,18 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
         console.error(error);
-        console.log(petData);
       });
   };
   const handleUserImgChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');        
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
     }
 
   };
@@ -701,7 +680,7 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
+        
       window.location.reload();
 
       })
@@ -744,8 +723,6 @@ const Mypage = () => {
     const formData = new FormData();
     formData.append('image', petData.image || '');
 
-    console.log(petData.image);
-
     const requestData = {
       name: petData.name,
       birth: petData.birth,
@@ -773,24 +750,22 @@ const Mypage = () => {
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(response.data);
+    
         petData.petId = response.data.result.id;
 
-        console.log(petData);
+       
         setOpenAddPetModal(false);
         window.location.reload();
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.error(error);
-        console.log(petData);
       });
   };
   const handleDeletePetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const petId = event.currentTarget.dataset.petid; // Get the petId from the clicked button
     if (!petId) {
-      console.error('PetId not found.');
       return;
     }
 
@@ -805,14 +780,10 @@ const Mypage = () => {
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(petId);
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
-        console.log(petId);
-
         console.error(error);
       });
   };
@@ -827,8 +798,6 @@ const Mypage = () => {
   } else {
     modifiedBreedId = Number(petData.breedId);
   }
-    console.log("petData.breedId:", petData.breedId);
-    console.log("modifiedBreedId:", modifiedBreedId);
     axios
       .patch(
         //@ts-ignore
@@ -849,13 +818,9 @@ const Mypage = () => {
       )
       .then((response) => {
 
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
-        // 요청 처리 중에 에러가 발생했을 때 실행할 코드
-        console.log(petData.petId);
-        console.log(petData);
         console.error(error);
       });
   };

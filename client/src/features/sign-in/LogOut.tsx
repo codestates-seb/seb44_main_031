@@ -16,9 +16,8 @@ const Logout = () => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(response);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userId');
         navigate('/');

@@ -210,7 +210,6 @@ export const myPageSlice = createSlice({
       .addCase(fetchUsers.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message as string;
-        console.log('qqqqqqazaasdasdaqsdas')
         const currentPath = window.location.pathname;
       window.location.href = `sign-in?path=${encodeURIComponent(
         currentPath

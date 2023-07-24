@@ -27,7 +27,6 @@ const WalkMatesCard = React.forwardRef<HTMLElement, ArticleProps>(
     const handleCardClick = () => {
       navigate(getWalkMateDetailUrl(article.articleId));
     };
-    console.log(article);
 
     return (
       <StyledCardContainer

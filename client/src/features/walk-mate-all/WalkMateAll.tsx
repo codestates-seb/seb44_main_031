@@ -136,7 +136,7 @@ const WalkMateAll = () => {
       return (
         <StyledArticlesNotFoundInfo key={index}>
           <p>현재 위치와 필터로 개설된 모임이 없습니다 🧐</p>
-          <p>다른 필터나 키워드를 검색해주세요</p>
+          <p>다른 필터나 키워드로 검색해주세요</p>
           <br />
           <p>또는 나만의 산책 모임을 개설해 보세요 🥰</p>
           <StyeldCreateWalkMateLinkButton to={createWalkMateURL}>
