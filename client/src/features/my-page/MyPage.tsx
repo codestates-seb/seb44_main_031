@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
-import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
+import { fetchUsersname, fetchUsers, fetchPassword, fetchMypostList } from './myPageSlice';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -14,6 +14,7 @@ import ModifyPasswordModal from './ModifyPasswordModal';
 import { useNavigate } from 'react-router-dom';
 import UserWithdrawModal from './UserWithdraw';
 import { PiDogDuotone } from "react-icons/pi";
+import MypostModal from './MyPost';
 interface PetData {
   petId: number;
   name: string;
@@ -52,10 +53,8 @@ margin-top: 50px;
   align-items: center;
   background-color: white;
   font-size: 0.8rem;
-  margin-bottom: 40px;
-  
+  margin-bottom: 40px;  
 `;
-
 const UserPart = styled.div`
   display: flex;
   flex-direction: column;
@@ -67,18 +66,14 @@ const UserPart = styled.div`
   font-size: 0.8rem;
   margin-top: 10px;
 `;
-
 const UserTitle = styled.div`
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 20px;
 `;
-
 const UserCard = styled.div`
-  text-align: center;
-  
+  text-align: center;  
 `;
-
 const UserPartButtons = styled.div`
   display: flex;
   width: 280px;
@@ -90,7 +85,6 @@ const UserPartButtons = styled.div`
     margin-right:10px;
   }
 `;
-
 const UserImg = styled.img`
   width: 150px;
   height: 150px;
@@ -325,7 +319,7 @@ const Mypage = () => {
     imgUrl:'',
     });
   const navigate = useNavigate();
-
+    console.log(profile)
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
     useState<boolean>(false);
   const onClickUsernameChangeToggleModal = useCallback(() => {
@@ -336,6 +330,18 @@ const Mypage = () => {
   ) => {
     event.stopPropagation();
     onClickUsernameChangeToggleModal();
+  };
+
+  const [isOpenMypostModal, setOpenMypostModal] =
+    useState<boolean>(false);
+  const onClickToggleMypostModal = useCallback(() => {
+    setOpenMypostModal(!isOpenMypostModal);
+  }, [isOpenMypostModal]);
+  const handleMypostClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation();
+    onClickToggleMypostModal();
   };
 
   const handleModifyAddress = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -568,8 +574,9 @@ const Mypage = () => {
   useEffect(() => {
     console.log(localStorage.getItem('userId'), 'qkerkwkerkw');
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
-    
+    dispatch(fetchMypostList())
   }, [dispatch]);
+  // console.log(mypostList);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
@@ -841,6 +848,9 @@ const Mypage = () => {
             <UserName>{profile.username}</UserName>
           </UserCard>
           <UserPartButtons>
+            <StyledButtonPink3D onClick={handleMypostClick}>
+              내 게시물 보기
+            </StyledButtonPink3D>
             <StyledButtonPink3D onClick={handleUsernameChangeClick}>
               닉네임 수정
             </StyledButtonPink3D>
@@ -851,6 +861,23 @@ const Mypage = () => {
               회원탈퇴
             </StyledButtonPink3D>
           </UserPartButtons>
+          {isOpenMypostModal && (
+        <MypostModal
+        onClickToggleMypostModal={
+          onClickToggleMypostModal
+        }>
+          {/* <h1>Posts I Wrote</h1>
+          <div>
+            {samplePosts.map((post) => (
+              <PostItem key={post.id} onClick={() => handlePostClick(post.id)}>
+                <p>{post.title}</p>
+                <p>{post.date}</p>
+              </PostItem>
+            ))}
+          </div> */}
+          <button>Close</button>
+        </MypostModal>
+      )}
           {isOpenUsernameChangeModal && (
             <UsernameChangeModal
               onClickUsernameChangeToggleModal={

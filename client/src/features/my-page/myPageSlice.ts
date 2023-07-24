@@ -28,6 +28,7 @@ interface UserState {
   status: 'good' | 'loading' | 'failed';
   error: string | null;
   profile: Profile;
+  mypostList: MypostList[];
 }
 
 const initialState: UserState = {
@@ -50,12 +51,21 @@ const initialState: UserState = {
         imgUrl: '',
         breed: 1,
         breedName: 'string',
-
       },
     ],
   },
+  mypostList: []
 };
-
+interface MypostList{
+  articleId:number;
+  title: string,
+  startDate: string,
+  createdAt: string
+}
+interface FetchMypostListResponse {
+  success: true;
+  result: MypostList[];
+}
 interface FetchUsersResponse {
   success: true;
   result: {
@@ -106,6 +116,28 @@ export const fetchUsers = createAsyncThunk<Profile, number>(
     return response.data.result;
   }
 );
+export const fetchMypostList = createAsyncThunk<
+  MypostList[],
+  void,
+  {
+    rejectValue: string;
+  }
+>('users/get-articles-written-by', async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get<FetchMypostListResponse>(
+      `${AWS_URL_PATH}/users/get-articles-written-by`,
+      {
+        headers: {
+          Authorization: localStorage.getItem('accessToken'),
+        },
+      }
+    );
+    return response.data.result;
+  } catch (error) {
+    return rejectWithValue('Failed to fetch my posts.');
+  }
+});
+
 export const fetchUsersname = createAsyncThunk<
   Profile,
   FetchUsernameChangeResponse
@@ -216,6 +248,20 @@ export const myPageSlice = createSlice({
       .addCase(fetchPassword.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.error.message as string;
+      })
+      .addCase(fetchMypostList.pending, (state) => {
+        state.status='loading';
+        // You can handle loading state if necessary
+      })
+      .addCase(fetchMypostList.fulfilled, (state, action) => {
+        // You can update the state with the fetched data here
+        // For example, if you have a mypostList property in UserState:
+        state.mypostList = action.payload;
+        state.status = 'good';
+      })
+      .addCase(fetchMypostList.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string; // The rejectWithValue value will be stored here
       });
   },
 });
