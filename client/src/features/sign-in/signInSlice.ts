@@ -43,9 +43,7 @@ export const actionL = createAsyncThunk<ServerResponse, LoginData>(
           password: data.password,
         }
       );
-      console.log(response);
       const authorizationHeader = response.headers['authorization'];
-      console.log(authorizationHeader);
       if (!authorizationHeader) {
         throw new Error('Authorization header not found in the response.');
       }

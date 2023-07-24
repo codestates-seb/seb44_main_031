@@ -30,5 +30,4 @@ export function deg2rad(deg: number) {
 // const busanLat = 35.1796;
 // const busanLon = 129.0756;
 // const dist = distance(seoulLat, seoulLon, busanLat, busanLon);
-// console.log(dist);
 // 출력: 325.4961911409085

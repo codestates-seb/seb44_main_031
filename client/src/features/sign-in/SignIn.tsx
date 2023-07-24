@@ -141,31 +141,23 @@ const SignIn = () => {
   const onSubmitJoin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      
-      console.log([email, password]);
       try {
         const resultAction: any = await dispatch(actionL({ email, password }));
-        console.log(resultAction);
         const { accessToken, userId } = resultAction.payload;
         // Save the token and user ID
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userId', userId);
         const params = new URLSearchParams(location.search);
         const path = params.get('path');
-        console.log(path);
 
         if(path===null || path==='users/sign-in'){
           navigate('/walk-mate/all');
         }else{
           navigate(`${path}`);
-          console.log(path)
 
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);
-        console.log(
-          '로그인에 실패했습니다. 이메일과 비밀번호를 다시 확인해주세요.'
-        );
       }
     },
     [dispatch, email, navigate, password]

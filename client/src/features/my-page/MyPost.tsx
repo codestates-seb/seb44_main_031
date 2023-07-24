@@ -2,12 +2,11 @@ import React, { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 
 interface ModalDefaultType {
-  onClickToggleAddPetModal: () => void;
+  onClickToggleMypostModal: () => void;
 }
-//프롭스 드릴링이 머였드라
-//레이 쾌스트
-function AddPetModal({
-  onClickToggleAddPetModal,
+
+function MypostModal({
+    onClickToggleMypostModal,
   children,
 }: PropsWithChildren<ModalDefaultType>) {
   return (
@@ -16,8 +15,8 @@ function AddPetModal({
       <Backdrop
         onClick={(e: React.MouseEvent) => {
           e.preventDefault();
-          if (onClickToggleAddPetModal) {
-            onClickToggleAddPetModal();
+          if (onClickToggleMypostModal) {
+            onClickToggleMypostModal();
           }
         }}
       />
@@ -37,9 +36,8 @@ const ModalContainer = styled.div`
 `;
 
 const DialogBox = styled.dialog`
-margin-top:100px;
+margin-top:140px;
   width: 800px;
-  height: 200px;
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -49,6 +47,7 @@ margin-top:100px;
   box-sizing: border-box;
   background-color: white;
   z-index: 10000;
+  padding: 15px;
 `;
 
 const Backdrop = styled.div`
@@ -60,4 +59,4 @@ const Backdrop = styled.div`
   background-color: rgba(0, 0, 0, 0.2);
 `;
 
-export default AddPetModal;
+export default MypostModal;

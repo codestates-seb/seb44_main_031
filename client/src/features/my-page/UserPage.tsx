@@ -130,8 +130,6 @@ const Mypage = () => {
     const match = currentURL.match(regex);
     const lastNumber = match ? Number(match[1]) : 1;
     
-    console.log(lastNumber, 'qkerkwkerkw');
-    
     // 유저 아이디로 API 호출
     if (lastNumber) {
       dispatch(fetchUsers(lastNumber));

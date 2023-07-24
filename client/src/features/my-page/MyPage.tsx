@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
-import { fetchUsersname, fetchUsers, fetchPassword } from './myPageSlice';
+import { fetchUsersname, fetchUsers, fetchPassword, fetchMypostList } from './myPageSlice';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -14,6 +14,8 @@ import ModifyPasswordModal from './ModifyPasswordModal';
 import { useNavigate } from 'react-router-dom';
 import UserWithdrawModal from './UserWithdraw';
 import { PiDogDuotone } from "react-icons/pi";
+import MypostModal from './MyPost';
+import { stringToLocaleString } from '../../utils/date-utils';
 interface PetData {
   petId: number;
   name: string;
@@ -52,10 +54,8 @@ margin-top: 50px;
   align-items: center;
   background-color: white;
   font-size: 0.8rem;
-  margin-bottom: 40px;
-  
+  margin-bottom: 40px;  
 `;
-
 const UserPart = styled.div`
   display: flex;
   flex-direction: column;
@@ -67,30 +67,21 @@ const UserPart = styled.div`
   font-size: 0.8rem;
   margin-top: 10px;
 `;
-
 const UserTitle = styled.div`
   font-size: 24px;
   font-weight: 600;
   margin-bottom: 20px;
 `;
-
 const UserCard = styled.div`
-  text-align: center;
-  
+  text-align: center;  
 `;
-
 const UserPartButtons = styled.div`
   display: flex;
-  width: 280px;
+  width: 400px;
   justify-content: center;
+  gap:3px;
   margin: 10px;
-  ${StyledButtonPink3D} {
-    width: 80px;
-    padding: 3px;
-    margin-right:10px;
-  }
 `;
-
 const UserImg = styled.img`
   width: 150px;
   height: 150px;
@@ -238,7 +229,13 @@ const SmallButton = styled.button`
 
 
 `;
-
+const MapInfo = styled.div`
+  height:60px;
+  display:flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+`
 
 const PetCard = styled.div`
   width: 720px;
@@ -286,6 +283,14 @@ align-items: center;
 const PetSetting = styled.div`
   display: flex;
   flex-direction: column;
+  gap:3px;
+  .petsetting{
+    margin-left: 60px;
+    margin-bottom:120px;
+    ${SmallButton}{
+      margin:2px;
+    }
+  }
 `;
 const PetAdd = styled.div`
   margin-top: 20px;
@@ -310,8 +315,35 @@ const EmailAuthForm = styled.div`
   align-items: center;
   margin:10px;
 `;
+ const ListCard = styled.div`
+  display:flex;
+  flex-direction:column;
+  gap: 3px;
+  div{
+    border:1px solid gray;
+    border-radius: 5px;
+    padding:13px;
+    font-size:18px;
+    width: 500px;
+    cursor: pointer;
+
+  &:hover {
+    background-color: var(--pink-300);
+    
+  }
+
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pink-300);
+  }
+  }
+ `
+ 
 const Mypage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const mypostList = useSelector((state: RootState) => state.mypage.mypostList);
   const profile = useSelector((state: RootState) => state.mypage.profile);
   const [petData, setPetData] = useState<PetData>({
     petId: 0,
@@ -324,8 +356,15 @@ const Mypage = () => {
     image: null,
     imgUrl:'',
     });
-  const navigate = useNavigate();
-
+  
+    const sliceContentLengthEndWithDots = (
+      content: string,
+      desiredLength: number
+    ) => {
+      if (content.length <= 66) return content;
+    
+      return content.slice(0, desiredLength - 3) + '...';
+    };
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
     useState<boolean>(false);
   const onClickUsernameChangeToggleModal = useCallback(() => {
@@ -336,6 +375,18 @@ const Mypage = () => {
   ) => {
     event.stopPropagation();
     onClickUsernameChangeToggleModal();
+  };
+
+  const [isOpenMypostModal, setOpenMypostModal] =
+    useState<boolean>(false);
+  const onClickToggleMypostModal = useCallback(() => {
+    setOpenMypostModal(!isOpenMypostModal);
+  }, [isOpenMypostModal]);
+  const handleMypostClick = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.stopPropagation();
+    onClickToggleMypostModal();
   };
 
   const handleModifyAddress = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -398,14 +449,11 @@ const Mypage = () => {
         .get(
           `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/check-username?username=${username}`
         )
-        .then((response) => {
-          // 아이디 확인
-          console.log(response);
+        .then((response) => {      
           setValidId(username);
           alert('사용가능한 닉네임입니다');
         })
         .catch((error: unknown | Error | AxiosError) => {
-          console.log(error);
           if (isAxiosError(error)) {
             if (error.response) {
               const errorMessage: string = error.response.data.message;
@@ -438,13 +486,12 @@ const Mypage = () => {
           // 이메일 인증에 대한 로직을 추가해주세요
           setEmailCheck(true);
 
-          console.log(response);
 
           alert('인증을 완료 하셨습니다');
-          console.log(emailCheck)
         })
         .catch((error) => {
-          console.error(error);
+          console.log(error);
+          
           alert('다시 요청해주세요');
         });
     },
@@ -454,7 +501,7 @@ const Mypage = () => {
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      console.log(emailCheck)
+      
       if (emailCheck === false) {
         alert('이메일 인증을 진행해주세요');
         return;
@@ -470,7 +517,6 @@ const Mypage = () => {
         )
         .then((response) => {
           // 이메일 인증에 대한 로직을 추가해주세요
-          console.log(response);
           alert('탈퇴 되었습니다');
           setEmailCheck(false);
           localStorage.removeItem('accessToken');
@@ -478,9 +524,8 @@ const Mypage = () => {
           navigate('/');
         })
         .catch((error) => {
-          console.error(error);
-          alert('다시 요청해주세요');
-          console.log(emailCheck);
+          alert('참여중인 게시글이 있으므로 탈퇴가 불가합니다');
+          console.log(error)
         });
     },
     [validId, emailCheck,username, password, dispatch]
@@ -495,14 +540,13 @@ const Mypage = () => {
         alert('중복확인한 아이디와 일치하지 않습니다');
         return;
       }
-      console.log([username]);
+      
       dispatch(fetchUsersname({ username, password })).then(
         () => {
             alert('닉네임 변경완료');
             window.location.reload();
         }
       );
-      // .catch((err) => console.log(err.message));
     },
     [validId, username, password, dispatch]
   );
@@ -551,7 +595,6 @@ const Mypage = () => {
     event.stopPropagation();
     onClickToggleModifyPetModal();
     const petId = parseInt(event.currentTarget.dataset.petid, 10);
-    console.log(`${petId}아아ㅏ아아아아`);
     const petData = profile.pets.find((pet) => pet.id === petId);
     if (petData) {
       //@ts-ignore
@@ -566,19 +609,16 @@ const Mypage = () => {
   
 
   useEffect(() => {
-    console.log(localStorage.getItem('userId'), 'qkerkwkerkw');
-    dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
     
+    dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
+    dispatch(fetchMypostList())
   }, [dispatch]);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
     }
 
   };
@@ -586,11 +626,9 @@ const Mypage = () => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');
+        
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
       
     }
   };
@@ -611,23 +649,18 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
         console.error(error);
-        console.log(petData);
       });
   };
   const handleUserImgChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (files !== null && files.length > 0) {
       setPetData((prevData) => {
-        console.log('setPetData 실행됨');        
         return { ...prevData, image: files[0] };
       });
-      console.log(files[0]);
-      console.log('이미지바뀜');
     }
 
   };
@@ -647,7 +680,7 @@ const Mypage = () => {
         }
       )
       .then((response) => {
-        console.log(response.data);
+        
       window.location.reload();
 
       })
@@ -690,8 +723,6 @@ const Mypage = () => {
     const formData = new FormData();
     formData.append('image', petData.image || '');
 
-    console.log(petData.image);
-
     const requestData = {
       name: petData.name,
       birth: petData.birth,
@@ -719,24 +750,22 @@ const Mypage = () => {
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(response.data);
+    
         petData.petId = response.data.result.id;
 
-        console.log(petData);
+       
         setOpenAddPetModal(false);
         window.location.reload();
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
         console.error(error);
-        console.log(petData);
       });
   };
   const handleDeletePetClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const petId = event.currentTarget.dataset.petid; // Get the petId from the clicked button
     if (!petId) {
-      console.error('PetId not found.');
       return;
     }
 
@@ -751,14 +780,10 @@ const Mypage = () => {
       )
       .then((response) => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(petId);
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
-        console.log(petId);
-
         console.error(error);
       });
   };
@@ -773,8 +798,6 @@ const Mypage = () => {
   } else {
     modifiedBreedId = Number(petData.breedId);
   }
-    console.log("petData.breedId:", petData.breedId);
-    console.log("modifiedBreedId:", modifiedBreedId);
     axios
       .patch(
         //@ts-ignore
@@ -795,13 +818,9 @@ const Mypage = () => {
       )
       .then((response) => {
 
-        console.log(response.data);
         window.location.reload();
       })
       .catch((error) => {
-        // 요청 처리 중에 에러가 발생했을 때 실행할 코드
-        console.log(petData.petId);
-        console.log(petData);
         console.error(error);
       });
   };
@@ -825,7 +844,7 @@ const Mypage = () => {
               }}
               encType="multipart/form-data"                     
             > 
-              <label htmlFor="userProfile">
+              <label htmlFor="userProfile" style={{cursor:'pointer'}}>
                 <BsFillGearFill className="Gear" />
               </label>
               <input
@@ -835,22 +854,43 @@ const Mypage = () => {
                 accept="image/*"
                 onChange={handleUserImgChange}
               />
-              <SmallButton>변경</SmallButton>
+              <SmallButton>적용</SmallButton>
             </form>
             </UserImgRe>
             <UserName>{profile.username}</UserName>
           </UserCard>
           <UserPartButtons>
-            <StyledButtonPink3D onClick={handleUsernameChangeClick}>
+            <SmallButton onClick={handleMypostClick}>
+              내 게시물 보기
+            </SmallButton>
+            <SmallButton onClick={handleUsernameChangeClick}>
               닉네임 수정
-            </StyledButtonPink3D>
-            <StyledButtonPink3D onClick={handleModifyPasswordClick}>
+            </SmallButton>
+            <SmallButton onClick={handleModifyPasswordClick}>
               비밀 번호 변경
-            </StyledButtonPink3D>
-            <StyledButtonPink3D onClick={handleUserWithdrawClick}>
+            </SmallButton>
+            <SmallButton onClick={handleUserWithdrawClick}>
               회원탈퇴
-            </StyledButtonPink3D>
+            </SmallButton>
           </UserPartButtons>
+          {isOpenMypostModal && (
+        <MypostModal
+        onClickToggleMypostModal={
+          onClickToggleMypostModal
+        }>
+          <h1>내 게시글보기</h1>
+          <ListCard >
+            {mypostList.map((post) => (
+              <div key={post.articleId} onClick={()=>{navigate(`/walk-mate/${post.articleId}`)}}>
+                <p>{sliceContentLengthEndWithDots(post.title,50)}</p>
+                <br></br>
+                <p>시작시간:{stringToLocaleString(post.createdAt)}</p> 
+                <p>종료예정시간{stringToLocaleString(post.startDate)}</p>
+              </div>
+            ))}
+          </ListCard>
+        </MypostModal>
+      )}
           {isOpenUsernameChangeModal && (
             <UsernameChangeModal
               onClickUsernameChangeToggleModal={
@@ -968,12 +1008,12 @@ const Mypage = () => {
         </UserPart>
         <MapPart>
         <Map />
-          <div>
+          <MapInfo>
             <h2>{`${profile.address}`.split(' ').slice(0, 3).join(' ')}</h2>
-            <StyledButtonPink3D onClick={handleModifyAddress}>
-              변경
-            </StyledButtonPink3D>
-          </div>
+            <SmallButton onClick={handleModifyAddress}>
+              주소 변경하기
+            </SmallButton>
+          </MapInfo>
           
         </MapPart>
       </UserContainer>
@@ -1020,11 +1060,10 @@ const Mypage = () => {
                   <p>견종 : {pet.breedName}</p>
                   <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
                   <p>성별 : {pet.gender ? '♀' : '♂'}</p>
-
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>
-                  <div>
+                  <div className='petsetting'>
                     <SmallButton
                       data-petid={pet.id}
                       onClick={handleModifyPetClick}
@@ -1059,7 +1098,6 @@ const Mypage = () => {
               }}
             >
               <PetProfile>
-              //@ts-ignore
                   <PetImg src={petData.imgUrl}></PetImg>
                 </PetProfile>
               <AddInputContainer>

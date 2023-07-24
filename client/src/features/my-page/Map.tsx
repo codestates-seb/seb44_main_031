@@ -31,9 +31,6 @@ const Map = () => {
     setAddress(profile.address);
     setLatitude(profile.latitude);
     setLongitude(profile.longitude);
-    console.log(address);
-    console.log(latitude);
-    console.log(longitude);
   }, [address, latitude, longitude, profile]);
 
   useEffect(() => {

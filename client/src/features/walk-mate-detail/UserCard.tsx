@@ -122,7 +122,6 @@ const UserCard = () => {
 // 강아지 데리고 갈 목록들 post
 const handleRegister = async () => {
   if (!articleData) {
-    console.error('articleData가 유효하지 않습니다.');
     return;
   }
 
@@ -150,7 +149,6 @@ const handleRegister = async () => {
       },
     }); 
    
-    console.log('등록이 완료되었습니다.');
     window.location.reload();
     closeModal();
   } catch (error : any) {
@@ -158,7 +156,6 @@ const handleRegister = async () => {
       toast.error('이미 참가중인 펫이 존재합니다!');
     } else {
       console.error('등록 중 오류 발생:', error);
-      console.log(formattedStartDate)
     }
   }
 };
@@ -183,7 +180,6 @@ const handleRegister = async () => {
         prevAttendees.filter((attendee) => attendee.id !== userId)
       );
       window.location.reload();
-      console.log('유저 삭제가 완료되었습니다.');
     } catch (error) {
       console.error('삭제 중 오류 발생:', error);
     }
