@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import UserWithdrawModal from './UserWithdraw';
 import { PiDogDuotone } from "react-icons/pi";
 import MypostModal from './MyPost';
+import { stringToLocaleString } from '../../utils/date-utils';
 interface PetData {
   petId: number;
   name: string;
@@ -76,14 +77,10 @@ const UserCard = styled.div`
 `;
 const UserPartButtons = styled.div`
   display: flex;
-  width: 280px;
+  width: 400px;
   justify-content: center;
+  gap:3px;
   margin: 10px;
-  ${StyledButtonPink3D} {
-    width: 80px;
-    padding: 3px;
-    margin-right:10px;
-  }
 `;
 const UserImg = styled.img`
   width: 150px;
@@ -232,7 +229,13 @@ const SmallButton = styled.button`
 
 
 `;
-
+const MapInfo = styled.div`
+  height:60px;
+  display:flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: center;
+`
 
 const PetCard = styled.div`
   width: 720px;
@@ -280,6 +283,14 @@ align-items: center;
 const PetSetting = styled.div`
   display: flex;
   flex-direction: column;
+  gap:3px;
+  .petsetting{
+    margin-left: 60px;
+    margin-bottom:120px;
+    ${SmallButton}{
+      margin:2px;
+    }
+  }
 `;
 const PetAdd = styled.div`
   margin-top: 20px;
@@ -304,8 +315,35 @@ const EmailAuthForm = styled.div`
   align-items: center;
   margin:10px;
 `;
+ const ListCard = styled.div`
+  display:flex;
+  flex-direction:column;
+  gap: 3px;
+  div{
+    border:1px solid gray;
+    border-radius: 5px;
+    padding:13px;
+    font-size:18px;
+    width: 500px;
+    cursor: pointer;
+
+  &:hover {
+    background-color: var(--pink-300);
+    
+  }
+
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pink-300);
+  }
+  }
+ `
+ 
 const Mypage = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const mypostList = useSelector((state: RootState) => state.mypage.mypostList);
   const profile = useSelector((state: RootState) => state.mypage.profile);
   const [petData, setPetData] = useState<PetData>({
     petId: 0,
@@ -318,8 +356,16 @@ const Mypage = () => {
     image: null,
     imgUrl:'',
     });
-  const navigate = useNavigate();
+  
     console.log(profile)
+    const sliceContentLengthEndWithDots = (
+      content: string,
+      desiredLength: number
+    ) => {
+      if (content.length <= 66) return content;
+    
+      return content.slice(0, desiredLength - 3) + '...';
+    };
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
     useState<boolean>(false);
   const onClickUsernameChangeToggleModal = useCallback(() => {
@@ -576,6 +622,7 @@ const Mypage = () => {
     dispatch(fetchUsers(Number(localStorage.getItem('userId'))));
     dispatch(fetchMypostList())
   }, [dispatch]);
+  console.log(mypostList);
   // console.log(mypostList);
   const handleImageChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
@@ -832,7 +879,7 @@ const Mypage = () => {
               }}
               encType="multipart/form-data"                     
             > 
-              <label htmlFor="userProfile">
+              <label htmlFor="userProfile" style={{cursor:'pointer'}}>
                 <BsFillGearFill className="Gear" />
               </label>
               <input
@@ -842,40 +889,41 @@ const Mypage = () => {
                 accept="image/*"
                 onChange={handleUserImgChange}
               />
-              <SmallButton>변경</SmallButton>
+              <SmallButton>적용</SmallButton>
             </form>
             </UserImgRe>
             <UserName>{profile.username}</UserName>
           </UserCard>
           <UserPartButtons>
-            <StyledButtonPink3D onClick={handleMypostClick}>
+            <SmallButton onClick={handleMypostClick}>
               내 게시물 보기
-            </StyledButtonPink3D>
-            <StyledButtonPink3D onClick={handleUsernameChangeClick}>
+            </SmallButton>
+            <SmallButton onClick={handleUsernameChangeClick}>
               닉네임 수정
-            </StyledButtonPink3D>
-            <StyledButtonPink3D onClick={handleModifyPasswordClick}>
+            </SmallButton>
+            <SmallButton onClick={handleModifyPasswordClick}>
               비밀 번호 변경
-            </StyledButtonPink3D>
-            <StyledButtonPink3D onClick={handleUserWithdrawClick}>
+            </SmallButton>
+            <SmallButton onClick={handleUserWithdrawClick}>
               회원탈퇴
-            </StyledButtonPink3D>
+            </SmallButton>
           </UserPartButtons>
           {isOpenMypostModal && (
         <MypostModal
         onClickToggleMypostModal={
           onClickToggleMypostModal
         }>
-          {/* <h1>Posts I Wrote</h1>
-          <div>
-            {samplePosts.map((post) => (
-              <PostItem key={post.id} onClick={() => handlePostClick(post.id)}>
-                <p>{post.title}</p>
-                <p>{post.date}</p>
-              </PostItem>
+          <h1>내 게시글보기</h1>
+          <ListCard >
+            {mypostList.map((post) => (
+              <div key={post.articleId} onClick={()=>{navigate(`/walk-mate/${post.articleId}`)}}>
+                <p>{sliceContentLengthEndWithDots(post.title,50)}</p>
+                <br></br>
+                <p>시작시간:{stringToLocaleString(post.createdAt)}</p> 
+                <p>종료예정시간{stringToLocaleString(post.startDate)}</p>
+              </div>
             ))}
-          </div> */}
-          <button>Close</button>
+          </ListCard>
         </MypostModal>
       )}
           {isOpenUsernameChangeModal && (
@@ -995,12 +1043,12 @@ const Mypage = () => {
         </UserPart>
         <MapPart>
         <Map />
-          <div>
+          <MapInfo>
             <h2>{`${profile.address}`.split(' ').slice(0, 3).join(' ')}</h2>
-            <StyledButtonPink3D onClick={handleModifyAddress}>
-              변경
-            </StyledButtonPink3D>
-          </div>
+            <SmallButton onClick={handleModifyAddress}>
+              주소 변경하기
+            </SmallButton>
+          </MapInfo>
           
         </MapPart>
       </UserContainer>
@@ -1047,11 +1095,10 @@ const Mypage = () => {
                   <p>견종 : {pet.breedName}</p>
                   <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
                   <p>성별 : {pet.gender ? '♀' : '♂'}</p>
-
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>
-                  <div>
+                  <div className='petsetting'>
                     <SmallButton
                       data-petid={pet.id}
                       onClick={handleModifyPetClick}
@@ -1086,7 +1133,6 @@ const Mypage = () => {
               }}
             >
               <PetProfile>
-              //@ts-ignore
                   <PetImg src={petData.imgUrl}></PetImg>
                 </PetProfile>
               <AddInputContainer>
