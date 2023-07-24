@@ -167,10 +167,11 @@ const Mypage = () => {
                         <label htmlFor='breedName'>견종 :</label><div id='breedName'>{pet.breedName}</div>
                     </div>
                     <div className='lableAlign'>
-                        <label htmlFor='neutralization'>중성화 여부 :</label><div id='neutralization'>{pet.neutralization ? '했음' : '안했음'}</div>
+                        <label htmlFor='neutralization'>중성화 여부 :</label><div id='neutralization'>{pet.neutralization ? ' O ' : ' X '}</div>
                     </div>
+                    
                     <div className='lableAlign'>
-                        <label htmlFor='gender'>성별 :</label><div id='gender'>{pet.gender ? '남자' : '여자'}</div>
+                        <label htmlFor='gender'>성별 :</label><div id='gender'>{pet.gender ? '♀' : '♂'}</div>
                     </div>
                     <div className='lableAlign'>
                         <label htmlFor='birth'>생년월일 :</label> <div id='birth'>{pet.birth}</div>

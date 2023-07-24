@@ -148,7 +148,7 @@ const Form = () => {
           // 인포윈도우로 장소에 대한 설명을 표시합니다
           const infowindow = new kakao.maps.InfoWindow({
             content:
-              '<div style="width:150px;color:red;text-align:center;padding:6px 0;">내가 썼지롱</div>',
+              `<div style="width:150px;black:yellow;text-align:center;padding:6px 0;">선택한 위치</div>`,
           });
           infowindow.open(map, marker);
 
