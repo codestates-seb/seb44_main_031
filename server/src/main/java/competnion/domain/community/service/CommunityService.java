@@ -237,6 +237,7 @@ public class CommunityService {
     ) {
         Page<Article> articles =
                  articleRepository.findAllByKeywordAndDistanceAndDays(
+                         user,
                          user.getPoint(),
                          keyword,
                          days,

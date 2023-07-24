@@ -8,6 +8,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.QArticleQueryDto;
 import competnion.domain.community.entity.Article;
+import competnion.domain.community.entity.QAttend;
 import competnion.domain.user.entity.User;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.ZonedDateTimeUtil;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static competnion.domain.community.entity.ArticleStatus.OPEN;
 import static competnion.domain.community.entity.QArticle.article;
+import static competnion.domain.community.entity.QAttend.attend;
 import static competnion.domain.user.entity.QUser.user;
 import static competnion.global.exception.ExceptionCode.NOT_VALID_MEETING_DATE;
 
@@ -35,6 +37,7 @@ import static competnion.global.exception.ExceptionCode.NOT_VALID_MEETING_DATE;
 public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
     private final JPAQueryFactory jpaQueryFactory;
     private final ZonedDateTimeUtil dateUtil;
+
 
     private BooleanExpression all(
             String keyword,
@@ -54,14 +57,18 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
     @Override
     public Page<Article> findAllByKeywordAndDistanceAndDays(
+            User user,
             Point userPoint,
             String keyword,
             Integer days,
             Double distance,
             Pageable pageable
     ) {
+
+
         List<Article> content = jpaQueryFactory
-                .selectFrom(article)
+                .select(article)
+                .from(article,attend)
                 .where(
                         all(keyword, days),
 
@@ -70,8 +77,11 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point
                         ).loe(distance),
 
-                        article.articleStatus.eq(OPEN),
-                        article.startDate.after(dateUtil.getNow())
+                        attend.article.id.eq(article.id),
+
+                        ((article.articleStatus.eq(OPEN).and(article.startDate.after(dateUtil.getNow())))
+                                .or(attend.user.id.eq(user.getId())))
+
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
