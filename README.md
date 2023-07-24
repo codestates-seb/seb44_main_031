@@ -18,7 +18,7 @@
 
 ### BackEnd
 
-|  김정민(팀장) | 안태영 | 고인수 |
+|  임정민(팀장) | 안태영 | 고인수 |
 |--------------|----------|----------|
 |[jeongmin0218](https://github.com/jeongmin0218)|[r2alize](https://github.com/r2alize)|[insuko](https://github.com/insuko)|
 
