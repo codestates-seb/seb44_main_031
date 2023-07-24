@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import {fetchUsers } from './myPageSlice';
-import userProfileImg from '../../../public/assets/Profile.png';
+import userProfileImg from '/assets/Profile.png';
 import { styled } from 'styled-components';
 
 // import { useNavigate } from 'react-router-dom';

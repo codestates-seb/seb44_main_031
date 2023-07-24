@@ -449,7 +449,7 @@ const Mypage = () => {
         .get(
           `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/auth/check-username?username=${username}`
         )
-        .then((response) => {      
+        .then(() => {      
           setValidId(username);
           alert('사용가능한 닉네임입니다');
         })
@@ -482,16 +482,13 @@ const Mypage = () => {
             },
           }
         )
-        .then((response) => {
+        .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
           setEmailCheck(true);
-
-
           alert('인증을 완료 하셨습니다');
         })
         .catch((error) => {
-          console.log(error);
-          
+          console.log(error); 
           alert('다시 요청해주세요');
         });
     },
@@ -499,9 +496,7 @@ const Mypage = () => {
   );
   const onSubmitUserWithdraw= useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      
+      e.preventDefault();   
       if (emailCheck === false) {
         alert('이메일 인증을 진행해주세요');
         return;
@@ -515,7 +510,7 @@ const Mypage = () => {
             },
           }
         )
-        .then((response) => {
+        .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
           alert('탈퇴 되었습니다');
           setEmailCheck(false);
@@ -648,7 +643,7 @@ const Mypage = () => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         window.location.reload();
       })
       .catch((error) => {
@@ -679,7 +674,7 @@ const Mypage = () => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         
       window.location.reload();
 
@@ -778,7 +773,7 @@ const Mypage = () => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
         window.location.reload();
       })
@@ -816,8 +811,7 @@ const Mypage = () => {
           },
         }
       )
-      .then((response) => {
-
+      .then(() => {
         window.location.reload();
       })
       .catch((error) => {
