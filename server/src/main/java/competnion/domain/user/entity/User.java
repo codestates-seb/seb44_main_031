@@ -36,13 +36,13 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     @Column(name = "user_id", nullable = false, insertable = false, updatable = false)
     private Long id;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @NotBlank
     private String nickname;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @NotBlank
     private String email;
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @NotBlank
     private String password;
     @NotNull
@@ -61,9 +61,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Pet> pets = new ArrayList<>();
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Article> articles = new ArrayList<>();
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = ALL, orphanRemoval = true)
     private List<Attend> attends = new ArrayList<>();
 
     public void updateAddressAndCoordinates(final String address, final Point point, final Double latitude, final Double longitude) {
