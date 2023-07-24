@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 const Logout = () => {
   const navigate = useNavigate();
 
@@ -22,7 +23,7 @@ const Logout = () => {
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userId');
         navigate('/');
-        window.location.reload();
+        toast.success('로그아웃 완료되었습니다.')
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
