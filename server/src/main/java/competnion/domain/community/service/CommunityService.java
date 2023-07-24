@@ -20,6 +20,7 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
+import competnion.global.common.annotation.Lock;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.ZonedDateTimeUtil;
@@ -47,7 +48,6 @@ import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class CommunityService {
     private final PetRepository petRepository;
@@ -69,6 +69,7 @@ public class CommunityService {
     }
 
     // 산책 갈래요 작성
+    @Transactional
     public Long createArticle(
             final User user,
             final ArticlePostRequest request,
@@ -101,6 +102,7 @@ public class CommunityService {
     }
 
     // 산책 갈래요 참여
+    @Lock(key = "attend_lock")
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
@@ -114,6 +116,7 @@ public class CommunityService {
     }
 
     // 산책 완료
+    @Transactional
     public void close(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
 
@@ -139,6 +142,7 @@ public class CommunityService {
         }
     }
 
+    @Transactional
     public void updateArticle(
             final User user,
             final Long articleId,
@@ -286,7 +290,7 @@ public class CommunityService {
         final List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
 
         for (Pet pet : pets) {
-            petService.checkPetMatchUser(user, pet);
+//            petService.checkPetMatchUser(user, pet);
             petService.checkValidPetOrThrow(pet);
         }
     }

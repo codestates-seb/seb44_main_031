@@ -1,6 +1,6 @@
 package competnion.global.resolver;
 
-import competnion.domain.user.annotation.UserContext;
+import competnion.global.common.annotation.UserContext;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessLogicException;
 import lombok.RequiredArgsConstructor;

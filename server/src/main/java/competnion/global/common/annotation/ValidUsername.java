@@ -1,6 +1,6 @@
-package competnion.domain.user.annotation;
+package competnion.global.common.annotation;
 
-import competnion.domain.user.annotation.validator.UsernameValidator;
+import competnion.global.common.validator.UsernameValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

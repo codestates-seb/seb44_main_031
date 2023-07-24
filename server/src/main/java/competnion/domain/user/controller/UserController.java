@@ -1,9 +1,7 @@
 package competnion.domain.user.controller;
 
 import competnion.domain.community.dto.ArticleQueryDto;
-import competnion.domain.community.dto.response.ArticleResponseDto;
-import competnion.domain.user.annotation.UserContext;
-import competnion.domain.user.annotation.ValidUsername;
+import competnion.global.common.annotation.UserContext;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
 import competnion.domain.user.dto.request.UpdateUsernameRequest;
