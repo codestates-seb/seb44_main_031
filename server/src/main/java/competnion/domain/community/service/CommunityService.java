@@ -102,7 +102,6 @@ public class CommunityService {
     }
 
     // 산책 갈래요 참여
-    @Lock(key = "attend_lock")
     public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
@@ -291,7 +290,7 @@ public class CommunityService {
         final List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
 
         for (Pet pet : pets) {
-//            petService.checkPetMatchUser(user, pet);
+            petService.checkPetMatchUser(user, pet);
             petService.checkValidPetOrThrow(pet);
         }
     }
