@@ -97,8 +97,6 @@ jobs:
           echo "      secretKey: $AWS_SECRET_KEY" >> ./server/src/main/resources/application.yml
           echo "config.domain: $CONFIG_DOMAIN" >> ./server/src/main/resources/application.yml
           echo "Spring:" >> ./server/src/main/resources/application.yml
-#          echo "  jackson:" >> ./server/src/main/resources/application.yml
-#          echo "    time-zone: Asia/Seoul" >> ./server/src/main/resources/application.yml
           echo "  servlet:" >> ./server/src/main/resources/application.yml
           echo "    multipart:" >> ./server/src/main/resources/application.yml
           echo "      max-file-size: 1MB" >> ./server/src/main/resources/application.yml
