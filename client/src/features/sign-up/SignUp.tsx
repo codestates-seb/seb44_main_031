@@ -270,10 +270,15 @@ const SignUp: React.FC = () => {
         alert('서비스 이용 주소를 추가 하세요');
       }
       dispatch(
-        actionS({ username, email, password,emailAuth, latitude, longitude, address })
-      ).then(() => {        
-          alert('회원가입 성공');
-          navigate('/users/sign-in');        
+         actionS({ username, email, password,emailAuth, latitude, longitude, address })
+      ).then((response) => {     
+          if (response.payload===true) {
+            console.log(response.payload)
+            alert('회원가입 성공');
+            navigate('/users/sign-in');
+          }else{
+            alert('회원가입을 다시시도해주세요.')
+          }     
       });
     },
     [
