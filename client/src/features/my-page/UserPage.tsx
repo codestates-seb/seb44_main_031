@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import {fetchUsers } from './myPageSlice';
-import userProfileImg from '../../../public/assets/Profile.png';
 import { styled } from 'styled-components';
 
 // import { useNavigate } from 'react-router-dom';
@@ -96,7 +95,7 @@ const PetCard = styled.div`
     align-items: center;
     
     .lableAlign{
-        width:200px;
+        width:230px;
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -105,7 +104,7 @@ const PetCard = styled.div`
       margin:5px;
       font-weight: 700;
       label{
-        width: 80px;
+        width: 100px;
         text-align: right;
       }
     }
@@ -130,8 +129,6 @@ const Mypage = () => {
     const match = currentURL.match(regex);
     const lastNumber = match ? Number(match[1]) : 1;
     
-    console.log(lastNumber, 'qkerkwkerkw');
-    
     // 유저 아이디로 API 호출
     if (lastNumber) {
       dispatch(fetchUsers(lastNumber));
@@ -144,7 +141,7 @@ const Mypage = () => {
         <UserPart>
           <UserTitle>{profile.username}님의 페이지 입니다</UserTitle>
           <UserCard>
-            <UserImg src={userProfileImg}></UserImg>
+            <UserImg src={profile.imgUrl}></UserImg>
 
             <UserName>{profile.username}</UserName>
           </UserCard>         

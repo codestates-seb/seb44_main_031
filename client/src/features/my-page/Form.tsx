@@ -58,19 +58,13 @@ const Form = () => {
   const open = useDaumPostcodePopup(
     'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
   );
-  console.log(1);
 
   const handleComplete = (data: any) => {
-    console.log(1);
-
-    console.log(data);
-    console.log(data.roadAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     setAddress(data.address);
     //여기서 goaddress할필요가 없음 유즈이펙트땜
   };
   const handleClick = () => {
     open({ onComplete: handleComplete });
-    console.log(0);
   };
   const new_script = (src: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -91,7 +85,6 @@ const Form = () => {
     );
     //스크립트 읽기 완료 후 카카오맵 설정
     my_script.then(() => {
-      console.log('script loaded!!!');
       const kakao = (window as any)['kakao'];
       kakao.maps.load(() => {
         const mapContainer = document.getElementById('map');
@@ -119,9 +112,6 @@ const Form = () => {
     if (address === '') {
       return;
     }
-    console.log('들어왔다');
-    console.log(address);
-    console.log(2);
     const kakao = (window as any)['kakao'];
     kakao.maps.load(() => {
       const mapContainer = document.getElementById('map');
@@ -157,8 +147,6 @@ const Form = () => {
           marker.setMap(map);
           setMap(map);
           setMarker(marker);
-          console.log(latitude, longitude, address);
-          console.log('goAddress');
         }
       });
     });
@@ -180,15 +168,11 @@ const Form = () => {
             const address = result[0].road_address
               ? result[0].road_address.address_name
               : result[0].address.address_name;
-            console.log(address);
             setAddress(address);
             marker.setMap(null);
             marker.setPosition(mouseEvent.latLng);
             marker.setMap(map);
-
-            console.log('handleMapClick');
             setLatitude(mouseEvent.latLng.getLat());
-            console.log(latitude);
             setLongitude(mouseEvent.latLng.getLng());
           }
         }

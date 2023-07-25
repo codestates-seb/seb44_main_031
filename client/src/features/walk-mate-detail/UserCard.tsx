@@ -49,7 +49,6 @@ const UserCard = () => {
   const [isUserAttending, setIsUserAttending] = useState(false);
   const navigate = useNavigate();
 
-
   
   //산책 상세페이지 get 요청
   useEffect(() => {
@@ -61,23 +60,11 @@ const UserCard = () => {
           },
         });
 
-        // 정렬하여 렌더링할 attendees 배열 생성
-        const sortedAttendees = [...response.data.attendees];
-
-        // 첫 번째 요소를  항상 첫 번째로 표시하기 위해 정렬
-        if (sortedAttendees.length > 0) {
-          const hostIndex = sortedAttendees.findIndex(
-            (attendee) => attendee.userId === sortedAttendees[0].userId
-          );
-          if (hostIndex !== -1 && hostIndex !== 0) {
-            const [host] = sortedAttendees.splice(hostIndex, 1);
-            sortedAttendees.unshift(host);
-          }
-        }
-
-        setAttendees(sortedAttendees);
+        setAttendees(response.data.attendees);
         setArticleData(response.data.article);
-        const userIsAttending = sortedAttendees.some(
+
+  
+        const userIsAttending = response.data.attendees.some(
           (attendee: Attendee) => attendee.userId === parseInt(TOKEN_USERID)
         );
         setIsUserAttending(userIsAttending);
@@ -136,7 +123,6 @@ const UserCard = () => {
 // 강아지 데리고 갈 목록들 post
 const handleRegister = async () => {
   if (!articleData) {
-    console.error('articleData가 유효하지 않습니다.');
     return;
   }
 
@@ -164,15 +150,13 @@ const handleRegister = async () => {
       },
     }); 
    
-    console.log('등록이 완료되었습니다.');
     window.location.reload();
     closeModal();
   } catch (error : any) {
     if (error.response && error.response.status === 409) {
-      const detailMessage = error.response.data.detailMessage;
-      toast.error(detailMessage);
+      toast.error('이미 참가중인 펫이 존재합니다!');
     } else {
-      toast.error('산책 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.log(formattedStartDate)
     }
   }
 };
@@ -197,7 +181,6 @@ const handleRegister = async () => {
         prevAttendees.filter((attendee) => attendee.id !== userId)
       );
       window.location.reload();
-      console.log('유저 삭제가 완료되었습니다.');
     } catch (error) {
       console.error('삭제 중 오류 발생:', error);
     }

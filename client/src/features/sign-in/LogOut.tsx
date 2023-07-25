@@ -17,9 +17,8 @@ const Logout = () => {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         // 요청이 성공적으로 처리되었을 때 실행할 코드
-        console.log(response);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('userId');
         navigate('/');
@@ -33,7 +32,7 @@ const Logout = () => {
   }, [navigate]);
 
   return (
-    <StyledButtonPink3D onClick={handleLogout} className='logout' >
+    <StyledButtonPink3D style={{width:'120px'}} onClick={handleLogout} className='logout'>
    로그아웃
     </StyledButtonPink3D>
   );

@@ -26,35 +26,23 @@ export const actionS = createAsyncThunk(
         {
           username: data.username,
           email: data.email,
-          emailAuth:data.emailAuth,
+          code:data.emailAuth,
           password: data.password,
           latitude: data.latitude,
           longitude: data.longitude,
           address: data.address,
         }
       );
-
-      if (result.data.success === true) {
-        // console.log('박지훈');
-        // const success = result.data.success;
+      if (result.status === 200) {       
         return true;
-      } else if (result.data.success === false) {
-        return false;
+      } else{
+      
       }
     } catch (err: any) {
-      console.log(err.message);
       return err.message;
     }
-
-    // console.log(result);
   }
 );
-// interface initialStateType {
-//   isJoined: boolean | undefined;
-//   isJoining: boolean | undefined;
-//   joinUser: boolean | undefined;
-//   joinRejectReason: string | undefined;
-// }
 
 export const signupSlice = createSlice({
   name: 'signupUser',

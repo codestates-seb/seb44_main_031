@@ -49,7 +49,7 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   ${StyledButtonPink3D} {
-    width: 100px;
+    width: 120px;
     height: 30px;
     padding:3px;
     text-align: center;
@@ -269,14 +269,17 @@ const SignUp: React.FC = () => {
       } else if (address === '') {
         alert('서비스 이용 주소를 추가 하세요');
       }
-      console.log([username, email, password, latitude, longitude, address]);
       dispatch(
-        actionS({ username, email, password,emailAuth, latitude, longitude, address })
-      ).then(() => {        
-          alert('회원가입 성공');
-          navigate('/users/sign-in');        
+         actionS({ username, email, password,emailAuth, latitude, longitude, address })
+      ).then((response) => {     
+          if (response.payload===true) {
+            console.log(response.payload)
+            alert('회원가입 성공');
+            navigate('/users/sign-in');
+          }else{
+            alert('회원가입을 다시시도해주세요.')
+          }     
       });
-      // .catch((err) => console.log(err.message));
     },
     [
       validId,
@@ -300,9 +303,8 @@ const SignUp: React.FC = () => {
         .get(
           `http://${ec2URL}/auth/sign-up/send-verification-email?email=${email}`
         )
-        .then((response) => {
+        .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
-          console.log(response);
           alert('요청을 보냈습니다');
         })
         .catch((error) => {
@@ -319,9 +321,8 @@ const SignUp: React.FC = () => {
         .get(
           `http://${ec2URL}/auth/verify-email?code=${emailAuth}&email=${email}`
         )
-        .then((response) => {
+        .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
-          console.log(response);
           setValidCode(emailAuth);
           alert('인증에 성공하셨습니다');
         })
@@ -338,10 +339,8 @@ const SignUp: React.FC = () => {
       event.preventDefault();
       axios
         .get(`http://${ec2URL}/auth/check-username?username=${username}`)
-        .then((response) => {
+        .then(() => {
           // 아이디 확인
-          console.log(response);
-          console.log('id체크');
           setValidId(username);
           alert('사용 가능한 닉네임 입니다');
         })
@@ -353,15 +352,10 @@ const SignUp: React.FC = () => {
   );
   //배포후 에러 처리 해보기
   const handleComplete = (data: any) => {
-    console.log(1);
-
-    console.log(data);
-    console.log(data.roadAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     setAddress(data.address);
   };
   const handleClick = () => {
     open({ onComplete: handleComplete });
-    console.log(0);
   };
   const new_script = (src: string) => {
     return new Promise<void>((resolve, reject) => {
@@ -382,7 +376,6 @@ const SignUp: React.FC = () => {
     );
     //스크립트 읽기 완료 후 카카오맵 설정
     my_script.then(() => {
-      console.log('script loaded!!!');
     });
   }, []);
 
@@ -392,7 +385,6 @@ const SignUp: React.FC = () => {
     if (address === '') {
       return;
     }
-    console.log(2);
     const kakao = (window as any)['kakao'];
     kakao.maps.load(() => {
       const geocoder = new kakao.maps.services.Geocoder();
@@ -404,8 +396,6 @@ const SignUp: React.FC = () => {
           // const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
           setLatitude(result[0].y);
           setLongitude(result[0].x);
-          console.log(latitude);
-          console.log(longitude);
         }
       });
     });
@@ -495,7 +485,7 @@ const SignUp: React.FC = () => {
               <input
                 type="address"
                 id="address"
-                placeholder="숭례문 도로명"
+                placeholder="내주소 등록하기"
                 value={address}
                 readOnly
                 required
