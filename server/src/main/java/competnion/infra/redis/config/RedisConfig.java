@@ -21,19 +21,19 @@ public class RedisConfig {
     private String host;
     @Value("${spring.redis.port}")
     private int port;
-    private static final String REDISSON_HOST_PREFIX = "redis://";
+//    private static final String REDISSON_HOST_PREFIX = "redis://";
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(host, port);
     }
 
-    @Bean
-    public RedissonClient redissonClient() {
-        Config config = new Config();
-        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host + ":" + port);
-        return Redisson.create(config);
-    }
+//    @Bean
+//    public RedissonClient redissonClient() {
+//        Config config = new Config();
+//        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host + ":" + port);
+//        return Redisson.create(config);
+//    }
 
     @Bean // 태영 추가
     public RedisTemplate<String, Object> redisTemplate() {
