@@ -821,6 +821,12 @@ const Mypage = () => {
 
   return (
     <Container>
+      {!localStorage.getItem('accessToken') && (
+        <div style={{width: '100%', height:'800px',display:'flex',justifyContent:'center',alignItems:'center',}}>
+          <h1>로그인 하고오개</h1>
+          <img src="/assets/Profile.png" alt="asd" style={{width: '200px'} }/>
+        </div>
+      )}
       <UserContainer>
         <UserPart>
           <UserTitle>{profile.username}님의 페이지 입니다</UserTitle>
