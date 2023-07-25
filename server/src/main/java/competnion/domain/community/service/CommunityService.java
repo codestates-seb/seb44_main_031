@@ -103,7 +103,7 @@ public class CommunityService {
 
     // 산책 갈래요 참여
     @Transactional
-    public synchronized void attend(final User user, final AttendRequest request) {
+    public void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
         checkSpaceForAttend(article.getId(), article.getAttendant());
