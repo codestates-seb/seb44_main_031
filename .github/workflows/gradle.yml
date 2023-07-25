@@ -126,7 +126,7 @@ jobs:
           echo "  jpa:" >> ./server/src/main/resources/application.yml
           echo "    defer-datasource-initialization: true" >> ./server/src/main/resources/application.yml
           echo "    hibernate:" >> ./server/src/main/resources/application.yml
-          echo "      ddl-auto: update" >> ./server/src/main/resources/application.yml
+          echo "      ddl-auto: create" >> ./server/src/main/resources/application.yml
           echo "      naming:" >> ./server/src/main/resources/application.yml
           echo "        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl" >> ./server/src/main/resources/application.yml
           echo "      use-new-id-generator-mappings: false" >> ./server/src/main/resources/application.yml
