@@ -32,7 +32,7 @@ const Logout = () => {
   }, [navigate]);
 
   return (
-    <StyledButtonPink3D onClick={handleLogout} className='logout' >
+    <StyledButtonPink3D style={{width:'120px'}} onClick={handleLogout} className='logout'>
    로그아웃
     </StyledButtonPink3D>
   );

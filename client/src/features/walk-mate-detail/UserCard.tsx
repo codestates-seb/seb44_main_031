@@ -49,7 +49,6 @@ const UserCard = () => {
   const [isUserAttending, setIsUserAttending] = useState(false);
   const navigate = useNavigate();
 
-
   
   //산책 상세페이지 get 요청
   useEffect(() => {
@@ -63,6 +62,8 @@ const UserCard = () => {
 
         setAttendees(response.data.attendees);
         setArticleData(response.data.article);
+
+  
         const userIsAttending = response.data.attendees.some(
           (attendee: Attendee) => attendee.userId === parseInt(TOKEN_USERID)
         );
@@ -155,7 +156,7 @@ const handleRegister = async () => {
     if (error.response && error.response.status === 409) {
       toast.error('이미 참가중인 펫이 존재합니다!');
     } else {
-      console.error('등록 중 오류 발생:', error);
+      console.log(formattedStartDate)
     }
   }
 };
@@ -276,7 +277,7 @@ const handleRegister = async () => {
                 alt="프로필이미지"
               />
               <Username>{attendee.nickname}</Username>
-              <Role>{index === 0 ? 'Host' : 'Member'}</Role>
+          <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
                 {attendee.pets.map((pet, index) => (
                   <PetInfo key={index}>

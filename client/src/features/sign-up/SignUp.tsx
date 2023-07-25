@@ -49,7 +49,7 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   ${StyledButtonPink3D} {
-    width: 100px;
+    width: 120px;
     height: 30px;
     padding:3px;
     text-align: center;
@@ -485,7 +485,7 @@ const SignUp: React.FC = () => {
               <input
                 type="address"
                 id="address"
-                placeholder="숭례문 도로명"
+                placeholder="내주소 등록하기"
                 value={address}
                 readOnly
                 required
