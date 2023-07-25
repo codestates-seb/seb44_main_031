@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
-import { fetchUsersname, fetchUsers, fetchPassword, fetchMypostList } from './myPageSlice';
+import { fetchUsersname, fetchUsers, fetchPassword, fetchMypostList ,fetchPetWalkList} from './myPageSlice';
 import { styled } from 'styled-components';
 import { StyledButtonPink3D } from '../../components/styles/StyledButtons';
 import Map from './Map';
@@ -16,6 +16,7 @@ import UserWithdrawModal from './UserWithdraw';
 import { PiDogDuotone } from "react-icons/pi";
 import MypostModal from './MyPost';
 import { stringToLocaleString } from '../../utils/date-utils';
+import MyPetWalkModal from './MyPetWalk';
 interface PetData {
   petId: number;
   name: string;
@@ -27,6 +28,7 @@ interface PetData {
   image : File | null;
   imgUrl:string;
 }
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -196,10 +198,27 @@ const DogPart = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
-
-   
    
   }
+  .petwalkList{
+  cursor: pointer;
+  display:flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height:100px;
+  padding:17px;
+  border-radius: 5px;
+  text-align: left;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  transition: background-color 0.2s ease; 
+  &:hover {
+    background-color: #dcdcdc;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pink-300);
+  }
+}
 `;
 const SmallButton = styled.button`
   border: none;
@@ -344,6 +363,7 @@ const Mypage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const mypostList = useSelector((state: RootState) => state.mypage.mypostList);
+  const mypetList = useSelector((state: RootState) => state.mypage.mypetWalk);
   const profile = useSelector((state: RootState) => state.mypage.profile);
   const [petData, setPetData] = useState<PetData>({
     petId: 0,
@@ -602,6 +622,21 @@ const Mypage = () => {
     setOpenModifyPetModal(!isOpenModifyPetModal);
   }, [isOpenModifyPetModal]);
   
+  
+  const [isOpenPetWalkModal, setOpenPetWalkModal] =
+    useState<boolean>(false);
+  const onClickToggleMypetWalkModal = useCallback(() => {
+    setOpenPetWalkModal(!isOpenPetWalkModal);
+    }, [isOpenPetWalkModal]);
+  const handlePetWalkClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    onClickToggleMypetWalkModal();
+    const petId = event.currentTarget.dataset.petid; // Get the petId from the clicked button
+    if (!petId) {
+      return;
+    }
+    dispatch(fetchPetWalkList(petId));
+    };
 
   useEffect(() => {
     
@@ -763,7 +798,6 @@ const Mypage = () => {
     if (!petId) {
       return;
     }
-
     axios
       .delete(
         `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/pets/${petId}`,
@@ -779,7 +813,8 @@ const Mypage = () => {
       })
       .catch((error) => {
         // 요청 처리 중에 에러가 발생했을 때 실행할 코드
-        console.error(error);
+        console.log(error);
+        alert('산책계획이거나 산책중인 강아지라 삭제할수 없습니다');
       });
   };
 
@@ -1018,72 +1053,7 @@ const Mypage = () => {
         </MapPart>
       </UserContainer>
       <DogPart>
-        <ul className='petgap'>
-          {profile.pets.map((pet) => (
-            <li key={pet.id}>
-              <PetCard>
-                <PetProfile>
-                  <PetImg src={pet.imgUrl}></PetImg>
-                  <PetImgRe>
-                    <form
-                      onSubmit={handlePetImageSubmit}
-                      style={{
-                        width: '150px',
-                        height: '20px',
-                        display: 'flex',
-                        justifyContent: 'space-around',
-                        alignItems: 'center',
-                      }}
-                      encType="multipart/form-data"
-                      data-petid={pet.id}
-                    >                    
-                      <label htmlFor="dogProfile" style={{cursor:'pointer'}}>                      
-                        <PiDogDuotone className="Dog" />프로필선택                    
-                      </label>
-                      <input
-                        type="file"
-                        name="image"
-                        id="dogProfile"
-                        accept="image/*"
-                        onChange={handlePetImgChange}
-                      />
-                      <SmallButton type='submit'> 적용 </SmallButton>
-                    </form>
-                   
-                  </PetImgRe>
-                  <p className='show'>"프로필 선택 후에 "선택 적용"을 눌러야 프로필 사진 변경이 적용됩니다"</p>
-                </PetProfile>
-                
-                <div>
-                  <p>이름 : {pet.name}</p>
-                  <p>강아지 mbti : {pet.mbti}</p>
-                  <p>견종 : {pet.breedName}</p>
-                  <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
-                  <p>성별 : {pet.gender ? '♀' : '♂'}</p>
-                  <p>생년월일 : {pet.birth}</p>
-                </div>
-                <PetSetting>
-                  <div className='petsetting'>
-                    <SmallButton
-                      data-petid={pet.id}
-                      onClick={handleModifyPetClick}
-                    >
-                      변경
-                    </SmallButton>
-                    <SmallButton
-                      data-petid={pet.id}
-                      onClick={handleDeletePetClick}
-                    >
-                      삭제
-                    </SmallButton>
-                  </div>
-                </PetSetting>
-                
-              </PetCard>
-            </li>
-          ))}
-        </ul>
-        {isOpenModifyPetModal && (
+      {isOpenModifyPetModal && (
           <ModifyPetModal
             onClickToggleModifyPetModal={onClickToggleModifyPetModal}
           >
@@ -1407,8 +1377,93 @@ const Mypage = () => {
             </form>
           </AddPetModal>
         )}
+        {isOpenPetWalkModal &&(
+          <MyPetWalkModal onClickToggleMypetWalkModal={onClickToggleMypetWalkModal}>
+            <h2>참가한 산책모임</h2>
+            <div className='petwalkList' onClick={()=>{navigate(`/walk-mate/${mypetList.articleId}`)}}>
+              <p style={{fontSize:"15px"}}>{sliceContentLengthEndWithDots(mypetList.title,20)}</p>
+              <p>시작시간:{stringToLocaleString(mypetList.createdAt)}</p> 
+              <p>종료예정시간{stringToLocaleString(mypetList.startDate)}</p>
+            </div>            
+          </MyPetWalkModal>
+        )}
+        <ul className='petgap'>
+        
+          {profile.pets.map((pet) => (
+            <li key={pet.id}>
+              <PetCard>
+                <PetProfile>
+                  <PetImg src={pet.imgUrl}></PetImg>
+                  <PetImgRe>
+                    <form
+                      onSubmit={handlePetImageSubmit}
+                      style={{
+                        width: '150px',
+                        height: '20px',
+                        display: 'flex',
+                        justifyContent: 'space-around',
+                        alignItems: 'center',
+                      }}
+                      encType="multipart/form-data"
+                      data-petid={pet.id}
+                    >                    
+                      <label htmlFor="dogProfile" style={{cursor:'pointer'}}>                      
+                        <PiDogDuotone className="Dog" />프로필선택                    
+                      </label>
+                      <input
+                        type="file"
+                        name="image"
+                        id="dogProfile"
+                        accept="image/*"
+                        onChange={handlePetImgChange}
+                      />
+                      <SmallButton type='submit'> 적용 </SmallButton>
+                    </form>
+                   
+                  </PetImgRe>
+                  <p className='show'>"프로필 선택 후에 "선택 적용"을 눌러야 프로필 사진 변경이 적용됩니다"</p>
+                </PetProfile>
+                
+                <div>
+                  <p>이름 : {pet.name}</p>
+                  <p>강아지 mbti : {pet.mbti}</p>
+                  <p>견종 : {pet.breedName}</p>
+                  <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
+                  <p>성별 : {pet.gender ? '♀' : '♂'}</p>
+                  <p>생년월일 : {pet.birth}</p>
+                </div>
+                <PetSetting>
+                  <div className='petsetting'>
+                    <SmallButton
+                      data-petid={pet.id}
+                      onClick={handleModifyPetClick}
+                    >
+                      변경
+                    </SmallButton>
+                    <SmallButton
+                      data-petid={pet.id}
+                      onClick={handleDeletePetClick}
+                    >
+                      삭제
+                    </SmallButton>
+                    <SmallButton
+                     data-petid={pet.id}
+                     onClick={handlePetWalkClick}
+                     >
+                      산책
+                    </SmallButton>
+                  </div>
+                </PetSetting>
+                
+              </PetCard>
+            </li>
+          ))}
+        </ul>
+       
+        
         <PetAdd onClick={handleAddPetClick}>
           <BsPlusCircleDotted className="addPet" />
+          <h3>강아지 등록하기</h3>
         </PetAdd>
       </DogPart>
     </Container>

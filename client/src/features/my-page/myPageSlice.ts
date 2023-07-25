@@ -29,6 +29,7 @@ interface UserState {
   error: string | null;
   profile: Profile;
   mypostList: MypostList[];
+  mypetWalk:MyPetWalk[];
 }
 
 const initialState: UserState = {
@@ -54,10 +55,17 @@ const initialState: UserState = {
       },
     ],
   },
-  mypostList: []
+  mypostList: [],
+  mypetWalk:[],
 };
+interface MyPetWalk{
+  articleId:number,
+  title: string,
+  startDate: string,
+  createdAt: string
+}
 interface MypostList{
-  articleId:number;
+  articleId:number,
   title: string,
   startDate: string,
   createdAt: string
@@ -132,6 +140,29 @@ export const fetchMypostList = createAsyncThunk<
         },
       }
     );
+    return response.data.result;
+  } catch (error) {
+    return rejectWithValue('Failed to fetch my posts.');
+  }
+});
+export const fetchPetWalkList = createAsyncThunk<
+  MyPetWalk[],
+  string,
+  {
+    rejectValue: string;
+  }
+>('users/get-articles-attended', async (petId, { rejectWithValue }) => {
+  try {
+    const response = await axios
+    .get(
+      `http://ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080/users/get-articles-attended/${petId}`,
+      {
+        headers: {
+          Authorization: localStorage.getItem('accessToken'),
+        },
+      }
+    )
+    console.log(response);
     return response.data.result;
   } catch (error) {
     return rejectWithValue('Failed to fetch my posts.');
@@ -259,6 +290,20 @@ export const myPageSlice = createSlice({
         state.status = 'good';
       })
       .addCase(fetchMypostList.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload as string; // The rejectWithValue value will be stored here
+      })
+      .addCase(fetchPetWalkList.pending, (state) => {
+        state.status='loading';
+        // You can handle loading state if necessary
+      })
+      .addCase(fetchPetWalkList.fulfilled, (state, action) => {
+        // You can update the state with the fetched data here
+        // For example, if you have a mypostList property in UserState:
+        state.mypetWalk = action.payload;
+        state.status = 'good';
+      })
+      .addCase(fetchPetWalkList.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string; // The rejectWithValue value will be stored here
       });
