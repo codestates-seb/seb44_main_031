@@ -77,8 +77,8 @@ public class CommunityController {
     // 게시글 참여
     @PostMapping("/attend")
     public Response<Void> attend(@UserContext final User user, @Valid @RequestBody final AttendRequest request) {
-//        communityService.attend(user, request);
-        attendLockFacade.attend(user, request);
+        communityService.attend(user, request);
+//        attendLockFacade.attend(user, request);
         return Response.success();
     }
 
