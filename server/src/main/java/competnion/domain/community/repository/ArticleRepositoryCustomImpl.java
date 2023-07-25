@@ -57,7 +57,6 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
     @Override
     public Page<Article> findAllByKeywordAndDistanceAndDays(
-            User user,
             Point userPoint,
             String keyword,
             Integer days,
@@ -67,8 +66,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
 
 
         List<Article> content = jpaQueryFactory
-                .select(article)
-                .from(article,attend)
+                .selectFrom(article)
                 .where(
                         all(keyword, days),
 
@@ -77,10 +75,9 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                                 "ST_Distance_Sphere({0}, {1})", userPoint, article.point
                         ).loe(distance),
 
-                        attend.article.id.eq(article.id),
+                        article.articleStatus.eq(OPEN),
 
-                        ((article.articleStatus.eq(OPEN).and(article.startDate.after(dateUtil.getNow())))
-                                .or(attend.user.id.eq(user.getId())))
+                        article.startDate.after(dateUtil.getNow())
 
                 )
                 .offset(pageable.getOffset())
