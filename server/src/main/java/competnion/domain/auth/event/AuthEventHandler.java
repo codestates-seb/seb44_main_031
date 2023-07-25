@@ -17,7 +17,7 @@ public class AuthEventHandler {
     @EventListener
     public void authEmailEventListner(final AuthEmailEvent authEmailEvent) {
         final String code = emailUtil.generateRandomCode();
-        redisUtil.setDataAndExpire(authEmailEvent.getEmail(), code, 600000L);
+        redisUtil.setDataAndExpire(authEmailEvent.getEmail(), code, 60000L);
         emailUtil.sendVerificationEmail(authEmailEvent.getEmail(), code);
     }
 }
