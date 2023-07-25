@@ -41,7 +41,7 @@ export type SelectedFilter = {
 };
 
 // 한 페이지당 가져올 article 개수
-const pageSize = 4;
+const pageSize = 5;
 
 // 컴포넌트
 const WalkMateAll = () => {
@@ -92,7 +92,7 @@ const WalkMateAll = () => {
 
       if (lastArticle) intObserver.current.observe(lastArticle);
     },
-    [isFetchingNextPage, fetchNextPage, hasNextPage]
+    [isFetchingNextPage, fetchNextPage, hasNextPage],
   );
 
   // 위로가기 아이콘 눌렀을때 화면의 최상단으로 스크롤 이동
@@ -106,9 +106,8 @@ const WalkMateAll = () => {
 
     if ((error as any)?.response) {
       errorMessage =
-        `${(error as any)?.response.data.status}: ${
-          (error as any)?.response.data.message
-        }` || '네트워크 에러가 발생했습니다';
+        `${(error as any)?.response.data.status}: ${(error as any)?.response
+          .data.message}` || '네트워크 에러가 발생했습니다';
     } else {
       errorMessage = `${(error as any)?.message}`;
     }

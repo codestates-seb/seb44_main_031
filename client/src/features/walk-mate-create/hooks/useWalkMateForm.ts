@@ -9,6 +9,7 @@ import { axiosInstance, getCreateArticleUrl } from '../../../api/walkMateAxios';
 import { AxiosError, isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { MAXIMUM_IMAGE_SIZE } from '../../../constants/fileSize';
+import { myPageUrl } from '../../../api/reactRouterUrl';
 
 export interface FormDatas {
   image: File | null;
@@ -119,13 +120,24 @@ const useWalkMateForm = () => {
         });
       } catch (error: unknown | Error | AxiosError) {
         if (isAxiosError(error)) {
+          if (error?.response?.status === 404) {
+            // 작성자가 등록한 펫이 없을때 mypage 로 네비게이트됨
+            const currentPath = window.location.pathname;
+            window.location.href = `${myPageUrl}?path=${encodeURIComponent(
+              currentPath,
+            )}`;
+            alert(`먼저 펫을 등록한 후 이용해주세요 🐶`);
+          }
           if (error.response) {
-            const errorMessage: string = error.response.data.message;
+            const errorMessage: string =
+              error.response?.data?.detailMessage ||
+              error.response?.data?.message;
             const status: number = error.response.status;
 
             // Show the error message as a pop-up
             toast.error(`${status}: ${errorMessage}`);
             setError(`${status}: ${errorMessage}`);
+            return;
           } else {
             // Handle other types of errors (e.g., network error)
             toast.error(`${error.message}`);
@@ -191,7 +203,7 @@ const useWalkMateForm = () => {
     setIsTouched({ ...isTouched, title: true });
 
     const isTitleValid =
-      e.currentTarget.value.trim().length >= 15 &&
+      e.currentTarget.value.trim().length >= 5 &&
       e.currentTarget.value.trim().length <= 100;
     if (isTitleValid) {
       setValidations({ ...validations, title: true });
@@ -201,13 +213,13 @@ const useWalkMateForm = () => {
   };
 
   const handleBodyChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
-    e
+    e,
   ) => {
     setFormDatas({ ...formDatas, body: e.currentTarget.value });
     setIsTouched({ ...isTouched, body: true });
 
     const isBodyValid =
-      e.currentTarget.value.trim().length >= 30 &&
+      e.currentTarget.value.trim().length >= 15 &&
       e.currentTarget.value.trim().length <= 250;
     if (!isBodyValid) {
       setValidations({ ...validations, body: false });
@@ -245,7 +257,7 @@ const useWalkMateForm = () => {
 
     // 시간 유효성 검사
     const userInputDate = new Date(
-      `${e.currentTarget.value}T${formDatas.time}:00`
+      `${e.currentTarget.value}T${formDatas.time}:00`,
     );
     const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
     const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
@@ -271,7 +283,7 @@ const useWalkMateForm = () => {
     // 그러므로 시간만 보면 안되고 날짜와 시간을 합친 Date 전체 시간기준 + 30으로 계산해야함.
     // 유저가 입력한 Date 과 현재 시각 30분 후의 Date 을 비교하면 됨
     const userInputDate = new Date(
-      `${formDatas.date}T${e.currentTarget.value}:00`
+      `${formDatas.date}T${e.currentTarget.value}:00`,
     );
     const thirtyMinAfterNow = nowDateAfterSomeMinutes(30);
     const isDateAndTimeValid = userInputDate >= thirtyMinAfterNow;
