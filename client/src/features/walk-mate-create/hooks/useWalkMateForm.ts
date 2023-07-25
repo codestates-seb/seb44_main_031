@@ -9,6 +9,7 @@ import { axiosInstance, getCreateArticleUrl } from '../../../api/walkMateAxios';
 import { AxiosError, isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { MAXIMUM_IMAGE_SIZE } from '../../../constants/fileSize';
+import { myPageUrl } from '../../../api/reactRouterUrl';
 
 export interface FormDatas {
   image: File | null;
@@ -119,6 +120,13 @@ const useWalkMateForm = () => {
         });
       } catch (error: unknown | Error | AxiosError) {
         if (isAxiosError(error)) {
+          if (error.status === 404) {
+            // 작성자가 등록한 펫이 없을때 mypage 로 네비게이트됨
+            const currentPath = window.location.pathname;
+            window.location.href = `${myPageUrl}?path=${encodeURIComponent(
+              currentPath,
+            )}`;
+          }
           if (error.response) {
             const errorMessage: string = error.response.data.message;
             const status: number = error.response.status;
@@ -126,6 +134,7 @@ const useWalkMateForm = () => {
             // Show the error message as a pop-up
             toast.error(`${status}: ${errorMessage}`);
             setError(`${status}: ${errorMessage}`);
+            return;
           } else {
             // Handle other types of errors (e.g., network error)
             toast.error(`${error.message}`);
@@ -191,7 +200,7 @@ const useWalkMateForm = () => {
     setIsTouched({ ...isTouched, title: true });
 
     const isTitleValid =
-      e.currentTarget.value.trim().length >= 15 &&
+      e.currentTarget.value.trim().length >= 5 &&
       e.currentTarget.value.trim().length <= 100;
     if (isTitleValid) {
       setValidations({ ...validations, title: true });
@@ -207,7 +216,7 @@ const useWalkMateForm = () => {
     setIsTouched({ ...isTouched, body: true });
 
     const isBodyValid =
-      e.currentTarget.value.trim().length >= 30 &&
+      e.currentTarget.value.trim().length >= 15 &&
       e.currentTarget.value.trim().length <= 250;
     if (!isBodyValid) {
       setValidations({ ...validations, body: false });
