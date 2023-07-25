@@ -231,7 +231,14 @@ public class CommunityService {
 
         final List<User> attendees = extractUsersFromAttend(articleId);
 
-        return mapper.articleToSingleArticleResponse(images,article,attendees);
+        List<User> hostFisrt = new ArrayList<>();
+
+        for (User attendee : attendees) {
+            if (attendee.getId().equals(article.getUser().getId())) { hostFisrt.add(0, attendee); }
+            else {hostFisrt.add(attendee);}
+        }
+
+        return mapper.articleToSingleArticleResponse(images,article,hostFisrt);
     }
 
     // article 은 Qarticle 로 잡혀서 stream 안쪽은 post로 해둠
