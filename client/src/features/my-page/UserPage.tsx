@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store/store';
 import {fetchUsers } from './myPageSlice';
-import userProfileImg from '/assets/Profile.png';
 import { styled } from 'styled-components';
 
 // import { useNavigate } from 'react-router-dom';
@@ -142,7 +141,7 @@ const Mypage = () => {
         <UserPart>
           <UserTitle>{profile.username}님의 페이지 입니다</UserTitle>
           <UserCard>
-            <UserImg src={userProfileImg}></UserImg>
+            <UserImg src={profile.imgUrl}></UserImg>
 
             <UserName>{profile.username}</UserName>
           </UserCard>         

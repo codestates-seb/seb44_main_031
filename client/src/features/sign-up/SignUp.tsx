@@ -49,7 +49,7 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   ${StyledButtonPink3D} {
-    width: 100px;
+    width: 120px;
     height: 30px;
     padding:3px;
     text-align: center;
