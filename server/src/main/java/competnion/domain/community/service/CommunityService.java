@@ -381,16 +381,11 @@ public class CommunityService {
         attendRepository.save(attend);
         article.getAttends().add(attend);
 
-//        final List<Pet> pets = petRepository.findAllById(petIds);
-
-        for (Long petId : petIds) {
-            Pet pet = petService.returnExistsPetOrThrow(petId);
-            pet.updateArticle(article);
-            article.getPets().add(pet);
-        }
-
-//        pets.forEach(pet -> article.getPets().add(pet));
-//        pets.forEach(pet -> pet.updateArticle(article));
+        petService.returnExistsPetsOrThrow(petIds)
+                .forEach(pet -> {
+                    pet.updateArticle(article);
+                    article.getPets().add(pet);
+                });
     }
 
     private void saveImages(final List<String> imageUrlList, final Article article) {
