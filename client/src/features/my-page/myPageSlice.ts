@@ -58,7 +58,7 @@ const initialState: UserState = {
   mypostList: [],
   mypetWalk:[],
 };
-interface MyPetWalk{
+export interface MyPetWalk{
   articleId:number,
   title: string,
   startDate: string,
