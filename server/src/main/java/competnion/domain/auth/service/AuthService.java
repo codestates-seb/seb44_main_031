@@ -120,7 +120,8 @@ public class AuthService {
     public void signUp(final SignUpRequest request) {
         checkDuplicatedUsername(request.getUsername());
         checkDuplicatedEmail(request.getEmail());
-        verifyEmailCode(request.getCode(), request.getEmail());
+//        verifyEmailCode(request.getCode(), request.getEmail());
+        if (request.getAddress().isEmpty()) throw new BusinessLogicException(CAN_NOT_CLOSE);
 
         final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         final List<String> roles = authorityUtils.createRoles(request.getEmail());
@@ -132,6 +133,8 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public void sendVerificationEmail(final String email) {
+        boolean empty = redisUtil.getData(email).isEmpty();
+        if (!empty) throw new BusinessLogicException(ALREADY_SEND);
         checkDuplicatedEmail(email);
         eventPublisher.publishEvent(new AuthEmailEvent(email));
     }
