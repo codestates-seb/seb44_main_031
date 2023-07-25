@@ -41,7 +41,7 @@ export type SelectedFilter = {
 };
 
 // 한 페이지당 가져올 article 개수
-const pageSize = 4;
+const pageSize = 5;
 
 // 컴포넌트
 const WalkMateAll = () => {
