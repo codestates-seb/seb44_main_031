@@ -120,15 +120,18 @@ const useWalkMateForm = () => {
         });
       } catch (error: unknown | Error | AxiosError) {
         if (isAxiosError(error)) {
-          if (error.status === 404) {
+          if (error?.response?.status === 404) {
             // 작성자가 등록한 펫이 없을때 mypage 로 네비게이트됨
             const currentPath = window.location.pathname;
             window.location.href = `${myPageUrl}?path=${encodeURIComponent(
               currentPath,
             )}`;
+            alert(`먼저 펫을 등록한 후 이용해주세요 🐶`);
           }
           if (error.response) {
-            const errorMessage: string = error.response.data.message;
+            const errorMessage: string =
+              error.response?.data?.detailMessage ||
+              error.response?.data?.message;
             const status: number = error.response.status;
 
             // Show the error message as a pop-up

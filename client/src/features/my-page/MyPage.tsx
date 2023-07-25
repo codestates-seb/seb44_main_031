@@ -1098,6 +1098,7 @@ const Mypage = () => {
               }}
             >
               <PetProfile>
+              
                   <PetImg src={petData.imgUrl}></PetImg>
                 </PetProfile>
               <AddInputContainer>
