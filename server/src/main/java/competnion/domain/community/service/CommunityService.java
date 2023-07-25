@@ -64,6 +64,7 @@ public class CommunityService {
 
     @Transactional(readOnly = true)
     public WriterResponse getWriterInfo(final User user) {
+        petService.checkUserHasPetOrThrow(user);
         final List<PetResponse> petResponseList = getPetResponses(user);
         return WriterResponse.of(user, petResponseList);
     }
