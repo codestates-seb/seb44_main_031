@@ -18,10 +18,10 @@ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 
 @Getter
 public class ArticlePostRequest {
-    @Length(min = 15, max = 100)
+    @Length(min = 5, max = 100)
     @NotBlank
     private String title;
-    @Length(min = 30, max = 250)
+    @Length(min = 15, max = 250)
     @NotBlank
     private String body;
     @NotNull
