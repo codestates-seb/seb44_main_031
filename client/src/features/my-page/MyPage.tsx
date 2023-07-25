@@ -1381,13 +1381,15 @@ const Mypage = () => {
         {isOpenPetWalkModal &&(
           <MyPetWalkModal onClickToggleMypetWalkModal={onClickToggleMypetWalkModal}>
             <h2>참가한 산책모임</h2>
-            {mypetList.map((mypet) => (
-            <div key={mypet.articleId} onClick={() => navigate(`/walk-mate/${mypet.articleId}`)}>
-              <p style={{ fontSize: "15px" }}>{sliceContentLengthEndWithDots(mypet.title, 20)}</p>
-              <p>시작시간: {stringToLocaleString(mypet.createdAt)}</p>
-              <p>종료예정시간: {stringToLocaleString(mypet.startDate)}</p>
-            </div>
-          ))}      
+            {/* @ts-ignore */}
+            <div className='petwalkList' onClick={() => { navigate(`/walk-mate/${mypetList.articleId}`) }}>
+              {/* @ts-ignore */}
+              <p style={{ fontSize: "15px" }}>{sliceContentLengthEndWithDots(mypetList.title, 20)}</p>
+              {/* @ts-ignore */}
+              <p>시작시간: {stringToLocaleString(mypetList.createdAt)}</p>
+              {/* @ts-ignore */}
+              <p>종료예정시간: {stringToLocaleString(mypetList.startDate)}</p>
+            </div>           
           </MyPetWalkModal>
         )}
         <ul className='petgap'>
