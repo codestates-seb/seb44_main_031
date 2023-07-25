@@ -61,9 +61,23 @@ const UserCard = () => {
           },
         });
 
-        setAttendees(response.data.attendees);
+        // 정렬하여 렌더링할 attendees 배열 생성
+        const sortedAttendees = [...response.data.attendees];
+
+        // 첫 번째 요소를  항상 첫 번째로 표시하기 위해 정렬
+        if (sortedAttendees.length > 0) {
+          const hostIndex = sortedAttendees.findIndex(
+            (attendee) => attendee.userId === sortedAttendees[0].userId
+          );
+          if (hostIndex !== -1 && hostIndex !== 0) {
+            const [host] = sortedAttendees.splice(hostIndex, 1);
+            sortedAttendees.unshift(host);
+          }
+        }
+
+        setAttendees(sortedAttendees);
         setArticleData(response.data.article);
-        const userIsAttending = response.data.attendees.some(
+        const userIsAttending = sortedAttendees.some(
           (attendee: Attendee) => attendee.userId === parseInt(TOKEN_USERID)
         );
         setIsUserAttending(userIsAttending);
@@ -155,10 +169,10 @@ const handleRegister = async () => {
     closeModal();
   } catch (error : any) {
     if (error.response && error.response.status === 409) {
-      toast.error('이미 참가중인 펫이 존재합니다!');
+      const detailMessage = error.response.data.detailMessage;
+      toast.error(detailMessage);
     } else {
-      console.error('등록 중 오류 발생:', error);
-      console.log(formattedStartDate)
+      toast.error('산책 종료 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
 };
@@ -280,7 +294,7 @@ const handleRegister = async () => {
                 alt="프로필이미지"
               />
               <Username>{attendee.nickname}</Username>
-              <Role>{index === 0 ? 'Host' : 'Member'}</Role>
+          <Role>{index === 0 ? 'Host' : 'Member'}</Role>
               <Tooltip>
                 {attendee.pets.map((pet, index) => (
                   <PetInfo key={index}>
