@@ -95,7 +95,7 @@ const PetCard = styled.div`
     align-items: center;
     
     .lableAlign{
-        width:200px;
+        width:230px;
         display: flex;
         flex-direction: row;
         align-items: center;
@@ -104,7 +104,7 @@ const PetCard = styled.div`
       margin:5px;
       font-weight: 700;
       label{
-        width: 80px;
+        width: 100px;
         text-align: right;
       }
     }
