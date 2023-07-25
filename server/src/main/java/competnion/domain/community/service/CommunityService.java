@@ -102,6 +102,7 @@ public class CommunityService {
     }
 
     // 산책 갈래요 참여
+    @Transactional
     public synchronized void attend(final User user, final AttendRequest request) {
         final Article article = getArticleByIdOrThrow(request.getArticleId());
 
@@ -185,6 +186,7 @@ public class CommunityService {
     }
 
     // 참여 취소
+    @Transactional
     public void cancelAttend(final User user, final Long articleId) {
         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
         Article article = getArticleByIdOrThrow(articleId);
@@ -203,6 +205,7 @@ public class CommunityService {
 
     // 게시글 삭제
     // TODO : 리팩토링 필요
+    @Transactional
     public void deleteArticle(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
         long count = attendRepository.countByArticleId(articleId);
@@ -370,7 +373,7 @@ public class CommunityService {
                 .build());
     }
 
-    private void saveAttends(final User user, final Article article, final List<Long> petIds) {
+    private void saveAttends(final User user, Article article, final List<Long> petIds) {
         final Attend attend = Attend.CreateAttend()
                 .article(article)
                 .user(user)
@@ -378,10 +381,16 @@ public class CommunityService {
         attendRepository.save(attend);
         article.getAttends().add(attend);
 
-        final List<Pet> pets = petRepository.findAllById(petIds);
+//        final List<Pet> pets = petRepository.findAllById(petIds);
 
-        pets.forEach(pet -> article.getPets().add(pet));
-        pets.forEach(pet -> pet.updateArticle(article));
+        for (Long petId : petIds) {
+            Pet pet = petService.returnExistsPetOrThrow(petId);
+            pet.updateArticle(article);
+            article.getPets().add(pet);
+        }
+
+//        pets.forEach(pet -> article.getPets().add(pet));
+//        pets.forEach(pet -> pet.updateArticle(article));
     }
 
     private void saveImages(final List<String> imageUrlList, final Article article) {
