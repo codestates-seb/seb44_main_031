@@ -1059,7 +1059,7 @@ const Mypage = () => {
               }}
             >
               <PetProfile>
-              //@ts-ignore
+              
                   <PetImg src={petData.imgUrl}></PetImg>
                 </PetProfile>
               <AddInputContainer>
