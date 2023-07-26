@@ -628,14 +628,23 @@ const Mypage = () => {
   const onClickToggleMypetWalkModal = useCallback(() => {
     setOpenPetWalkModal(!isOpenPetWalkModal);
     }, [isOpenPetWalkModal]);
-  const handlePetWalkClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePetWalkClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    onClickToggleMypetWalkModal();
     const petId = event.currentTarget.dataset.petid; // Get the petId from the clicked button
     if (!petId) {
       return;
     }
-    dispatch(fetchPetWalkList(petId));
+    try {
+      const response = await dispatch(fetchPetWalkList(petId));
+      if(!response){
+        alert('바보')
+      }
+      onClickToggleMypetWalkModal();
+      // Handle successful response here
+      // Process the response.data if needed
+    } catch (error) {
+      // Handle error here
+    }
     };
 
   useEffect(() => {
@@ -1379,18 +1388,28 @@ const Mypage = () => {
         )}
         {isOpenPetWalkModal &&(
           <MyPetWalkModal onClickToggleMypetWalkModal={onClickToggleMypetWalkModal}>
+            {mypetList?(
+            <>
             <h2>참가한 산책모임</h2>
             {/* @ts-ignore */}
             <div className='petwalkList' onClick={()=>{navigate(`/walk-mate/${mypetList.articleId}`)}}>
               {/* @ts-ignore */}
-              <p style={{fontSize:"15px"}}>{sliceContentLengthEndWithDots(mypetList.title,20)}</p>
+              <p style={{fontSize:"15px"}}>{mypetList.title}</p>
               {/* @ts-ignore */}
               <p>시작시간:{stringToLocaleString(mypetList.createdAt)}</p> 
               {/* @ts-ignore */}
               <p>종료예정시간{stringToLocaleString(mypetList.startDate)}</p>
-            </div>            
+            </div>
+            </>   )
+            :(
+              <div>
+                <h2>참여한 산책이 없습니다</h2>
+              </div>
+            )}
+                     
           </MyPetWalkModal>
         )}
+        
         <ul className='petgap'>
         
           {profile.pets.map((pet) => (
@@ -1433,7 +1452,7 @@ const Mypage = () => {
                   <p>강아지 mbti : {pet.mbti}</p>
                   <p>견종 : {pet.breedName}</p>
                   <p>중성화 여부 : {pet.neutralization ? ' O ' : ' X '}</p>
-                  <p>성별 : {pet.gender ? '♀' : '♂'}</p>
+                  <p>성별 : {pet.gender ? '♂' : '♀'}</p>
                   <p>생년월일 : {pet.birth}</p>
                 </div>
                 <PetSetting>

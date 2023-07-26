@@ -142,7 +142,7 @@ export const fetchMypostList = createAsyncThunk<
     );
     return response.data.result;
   } catch (error) {
-    return rejectWithValue('Failed to fetch my posts.');
+    return rejectWithValue('개최한 모임이 없습니다');
   }
 });
 export const fetchPetWalkList = createAsyncThunk<
@@ -151,7 +151,7 @@ export const fetchPetWalkList = createAsyncThunk<
   {
     rejectValue: string;
   }
->('users/get-articles-attended', async (petId, { rejectWithValue }) => {
+>('users/get-articles-attended', async (petId) => {
   try {
     const response = await axios
     .get(
@@ -165,7 +165,7 @@ export const fetchPetWalkList = createAsyncThunk<
     console.log(response);
     return response.data.result;
   } catch (error) {
-    return rejectWithValue('Failed to fetch my posts.');
+    console.log(`에러는 ${error}`)
   }
 });
 

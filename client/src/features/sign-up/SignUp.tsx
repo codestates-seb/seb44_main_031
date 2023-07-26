@@ -15,14 +15,11 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 90vh;
   background-color: #f1f2f3;
   font-size: 0.8rem;
   form {
     width: 30em;
-  }
-  #map {
-    height: 600px;
   }
 `;
 const Contents = styled.div`
@@ -539,7 +536,6 @@ const SignUp: React.FC = () => {
             </div>
           </SignUpForm>
         </form>
-        <div id="map" className="map/"></div>
       </Contents>
     </Container>
   );

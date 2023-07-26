@@ -9,7 +9,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 85vh;
   background-color: #f1f2f3;
   font-size: 0.8rem;
   ${StyledButtonPink3D}{
