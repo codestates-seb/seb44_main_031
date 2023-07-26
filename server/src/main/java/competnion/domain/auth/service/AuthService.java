@@ -199,7 +199,7 @@ public class AuthService {
                 .point(point)
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
-                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/dog.png")
+                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/image/dog.png")
                 .roles(roles)
                 .build());
     }
