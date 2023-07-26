@@ -97,7 +97,7 @@ public class PetService {
         if (pet.getArticle() != null)
             throw new BusinessLogicException(
                     PET_ALREADY_ATTENDED,
-                    format("%s는 이미 다른 산책모임에 참여했습니다!", pet.getName())
+                    format("%s는 산책 참여 중입니다.!", pet.getName())
             );
     }
 
