@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { actionS } from './signUpSlice';
 // import { useDispatch } from 'react-redux';
 import { useAppDispatch } from '../../store/store';
+import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
 
 const ec2URL = 'ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
@@ -43,7 +44,9 @@ const SignUpForm = styled.div`
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.05),
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.05),
+    0 20px 48px rgba(0, 0, 0, 0.05),
     0 1px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 24px;
@@ -51,16 +54,16 @@ const SignUpForm = styled.div`
   ${StyledButtonPink3D} {
     width: 100px;
     height: 30px;
-    padding:3px;
+    padding: 3px;
     text-align: center;
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  .submit{
-    display:flex;
+  .submit {
+    display: flex;
     justify-content: center;
-   margin-top: 20px;
+    margin-top: 20px;
   }
 `;
 const InputUsername = styled.div`
@@ -200,21 +203,24 @@ const SignUp: React.FC = () => {
   const [usernameError, setUsernameError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const open = useDaumPostcodePopup(
-    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+    'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js',
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [isLoginEamilLoading, setIsLoginEamilLoading] = useState(false);
+  const [isEmailAuthLoading, setisEmailAuthLoading] = useState(false);
+
   const onChangeEamil = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEmail(e.target.value);
     },
-    []
+    [],
   );
   const onChangeEamilAuth = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEmailAuth(e.target.value);
     },
-    []
+    [],
   );
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -222,18 +228,17 @@ const SignUp: React.FC = () => {
       setPasswordError(null);
 
       // Password validation
-      const passwordRegex = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,16}$/;
+      const passwordRegex =
+        /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,16}$/;
       if (!passwordRegex.test(password)) {
         setPasswordError(
-          '비밀번호는 영문, 숫자, 특수문자(!@#$%^&*)를 포함하여 10~16글자로 입력해주세요.'
+          '비밀번호는 영문, 숫자, 특수문자(!@#$%^&*)를 포함하여 10~16글자로 입력해주세요.',
         );
-      }else if(passwordRegex.test(password)===true){
-        setPasswordError(
-          '유효한 비밀번호입니다'
-        );
+      } else if (passwordRegex.test(password) === true) {
+        setPasswordError('유효한 비밀번호입니다');
       }
     },
-    [password]
+    [password],
   );
   const onChangeDisplay = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -244,15 +249,13 @@ const SignUp: React.FC = () => {
       const usernameRegex = /^[a-zA-Z0-9가-힣]{2,8}$/;
       if (!usernameRegex.test(username)) {
         setUsernameError(
-          '닉네임은 2~8글자의 한글, 영어, 숫자로만 입력해주세요.'
+          '닉네임은 2~8글자의 한글, 영어, 숫자로만 입력해주세요.',
         );
-      }else if(usernameRegex.test(username)===true){
-        setUsernameError(
-          '유효한 닉네임입니다.'
-        );
+      } else if (usernameRegex.test(username) === true) {
+        setUsernameError('유효한 닉네임입니다.');
       }
     },
-    [username]
+    [username],
   );
   //배포후 에러 처리 해보기
   const onSubmitJoin = useCallback(
@@ -270,10 +273,18 @@ const SignUp: React.FC = () => {
         alert('서비스 이용 주소를 추가 하세요');
       }
       dispatch(
-        actionS({ username, email, password,emailAuth, latitude, longitude, address })
-      ).then(() => {        
-          alert('회원가입 성공');
-          navigate('/users/sign-in');        
+        actionS({
+          username,
+          email,
+          password,
+          emailAuth,
+          latitude,
+          longitude,
+          address,
+        }),
+      ).then(() => {
+        alert('회원가입 성공');
+        navigate('/users/sign-in');
       });
     },
     [
@@ -288,33 +299,54 @@ const SignUp: React.FC = () => {
       longitude,
       dispatch,
       navigate,
-    ]
+    ],
   );
   //배포후 에러 처리 해보기
   const goEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
+      setIsLoginEamilLoading(true);
+      // alert('요청을 보냈습니다');
       axios
         .get(
-          `http://${ec2URL}/auth/sign-up/send-verification-email?email=${email}`
+          `http://${ec2URL}/auth/sign-up/send-verification-email?email=${email}`,
         )
         .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
-          alert('요청을 보냈습니다');
+          alert('인증번호 발급이 완료되었습니다. 이메일을 확인해주세요 ✅');
         })
         .catch((error) => {
           console.error(error);
-          alert('다시 요청해주세요');
+          if (
+            error?.response?.data?.message === 'SEND REQUEST OVER 5 SECONDS'
+          ) {
+            alert(
+              `이미 발급된 인증번호가 있습니다. 이메일을 다시 확인해주세요.`,
+            );
+            return;
+          }
+          if (error?.response) {
+            const status = error.response?.data?.status;
+            const message = error.response?.data?.message;
+            alert(`${status} 에러: ${message}`);
+            return;
+          }
+          alert(error?.message);
+          // alert('다시 요청해주세요');
+        })
+        .finally(() => {
+          setIsLoginEamilLoading(false);
         });
     },
-    [email]
+    [email],
   );
   const checkEmail = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
+      setisEmailAuthLoading(true);
       axios
         .get(
-          `http://${ec2URL}/auth/verify-email?code=${emailAuth}&email=${email}`
+          `http://${ec2URL}/auth/verify-email?code=${emailAuth}&email=${email}`,
         )
         .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
@@ -323,10 +355,13 @@ const SignUp: React.FC = () => {
         })
         .catch((error) => {
           console.error(error);
-          alert('인증번호가 틀렸습니다.');
+          alert('인증번호가 틀렸습니다. 다시 입력해주세요.');
+        })
+        .finally(() => {
+          setisEmailAuthLoading(false);
         });
     },
-    [email, emailAuth]
+    [email, emailAuth],
   );
   //배포후 에러 처리 해보기
   const goId = useCallback(
@@ -343,7 +378,7 @@ const SignUp: React.FC = () => {
           console.error(error);
         });
     },
-    [username]
+    [username],
   );
   //배포후 에러 처리 해보기
   const handleComplete = (data: any) => {
@@ -367,11 +402,10 @@ const SignUp: React.FC = () => {
   };
   useEffect(() => {
     const my_script = new_script(
-      'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=2e9c72e22b8b9402a65bbc568e1d75b1'
+      'https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=2e9c72e22b8b9402a65bbc568e1d75b1',
     );
     //스크립트 읽기 완료 후 카카오맵 설정
-    my_script.then(() => {
-    });
+    my_script.then(() => {});
   }, []);
 
   /// mapContainer = container
@@ -421,7 +455,6 @@ const SignUp: React.FC = () => {
                 <StyledButtonPink3D onClick={goId}>
                   중복 확인 발급
                 </StyledButtonPink3D>
-               
               </IdCheckForm>
               {usernameError && <p>{usernameError}</p>}
             </InputUsername>
@@ -437,8 +470,15 @@ const SignUp: React.FC = () => {
                   onChange={onChangeEamil}
                   required
                 ></input>
-                <StyledButtonPink3D onClick={goEmail}>
-                  인증번호 발급
+                <StyledButtonPink3D
+                  onClick={goEmail}
+                  disabled={isLoginEamilLoading}
+                >
+                  {isLoginEamilLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <span>인증번호 발급</span>
+                  )}
                 </StyledButtonPink3D>
               </EmailAuthForm>
               {/* <div onClick={goEmail}>이메일 인증</div> */}
@@ -454,8 +494,15 @@ const SignUp: React.FC = () => {
                   onChange={onChangeEamilAuth}
                   required
                 ></input>
-                <StyledButtonPink3D onClick={checkEmail}>
-                  인증번호 확인
+                <StyledButtonPink3D
+                  onClick={checkEmail}
+                  disabled={isEmailAuthLoading}
+                >
+                  {isEmailAuthLoading ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <span>인증번호 확인</span>
+                  )}
                 </StyledButtonPink3D>
               </EmailAuthForm>
 
@@ -470,7 +517,7 @@ const SignUp: React.FC = () => {
                 value={password}
                 onChange={onChangePassword}
                 required
-              ></input>             
+              ></input>
             </InputPW>
             {passwordError && <p>{passwordError}</p>}
             <InputAddress>
@@ -490,7 +537,7 @@ const SignUp: React.FC = () => {
               </StyledButtonPink3D>
             </InputAddress>
 
-            <div className='submit'>
+            <div className="submit">
               <StyledButtonPink3D>회원가입</StyledButtonPink3D>
             </div>
           </SignUpForm>

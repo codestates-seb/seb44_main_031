@@ -1,8 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { SelectedFilter } from '../features/walk-mate-all/WalkMateAll';
 import { toast } from 'react-toastify';
-// import { toast } from 'react-toastify';
-// import { useNavigate, useLocation } from 'react-router-dom';
 
 // NOTE: 개발 상황에 따라 baseURL, Token 값을 설정해서 쓰면 됩니다 (영탁)
 // TODO: 백엔드 배포 완료 후 실제 서버와 연결할때는, BASE_URL 에 해당 배포된 API URL 값을 지정해서 axiosInstance의 baseURL 로 설정해 주시면 됩니다. Token 도 현재는 주석처리 되어있는 localStorage 에서 실제 토큰을 가져오는 로직으로 대체해서 사용해 주시면 됩니다
@@ -38,12 +36,12 @@ export const getArticlesUrlJsonServer = (
   page: number,
   size = 5,
   selectedFilter: SelectedFilter,
-  searchQuery: string
+  searchQuery: string,
 ) => {
   console.log(
     `articles?_page=${page}&_limit=${size}`,
     selectedFilter,
-    searchQuery
+    searchQuery,
   );
   return `articles?_page=${page}&_limit=${size}`;
 };
@@ -52,7 +50,7 @@ export const getArticlesUrl = (
   page: number,
   size: number,
   selectedFilter: SelectedFilter,
-  searchQuery: string
+  searchQuery: string,
 ) => {
   if (searchQuery === '') {
     return `articles?page=${page}&size=${size}&days=${selectedFilter.period.value}&sort=${selectedFilter.viewOrder.value}`;
@@ -65,7 +63,7 @@ export const fetchWalkMates = async (
   pageParam: number,
   size: number,
   selectedFilter: SelectedFilter,
-  searchQuery: string
+  searchQuery: string,
 ) => {
   const response = await axiosInstance.get(
     // getArticlesUrlJsonServer(pageParam, size, selectedFilter, searchQuery)
@@ -74,7 +72,7 @@ export const fetchWalkMates = async (
       headers: {
         Authorization: localStorage.getItem('accessToken'),
       },
-    }
+    },
   );
   return response;
 };
@@ -91,12 +89,12 @@ axiosInstance.interceptors.response.use(
 
       const currentPath = window.location.pathname;
       window.location.href = `${signInUrl}?path=${encodeURIComponent(
-        currentPath
+        currentPath,
       )}`;
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export const isAxiosError = (err: unknown): err is AxiosError => {

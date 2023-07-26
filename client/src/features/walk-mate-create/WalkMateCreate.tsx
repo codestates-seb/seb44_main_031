@@ -16,7 +16,7 @@ import {
   postCreateArticleUrl,
 } from '../../api/walkMateAxios';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { AxiosError } from 'axios';
+// import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { MAXIMUM_IMAGE_SIZE } from '../../constants/fileSize';
@@ -118,18 +118,23 @@ const WalkMateCreate = () => {
             headers: {
               Authorization: localStorage.getItem('accessToken'),
             },
-          }
+          },
         );
 
         toast.success('산책 모집 글 등록 성공!', { position: 'bottom-right' });
         navigate(`/walk-mate/${response.data.result}`);
-      } catch (error: unknown | Error | AxiosError) {
+      } catch (error: any) {
         if (isAxiosError(error)) {
-          if (error.response) {
+          if (error?.response?.data) {
             const responseData: unknown = error.response.data;
-            const errorMessage: string = (responseData as { message: string })
-              .message;
-            // const errorMessage: string = error.response.data.message;
+            const errorMessage: string =
+              typeof responseData === 'object' &&
+              'detailMessage' in responseData
+                ? (responseData as { detailMessage: string }).detailMessage
+                : typeof responseData === 'object' && 'message' in responseData
+                ? (responseData as { message: string }).message
+                : 'Unknown Error';
+
             const status: number = error.response.status;
 
             // Show the error message as a pop-up
@@ -143,10 +148,7 @@ const WalkMateCreate = () => {
           toast.error('An error occurred. Please try again later.');
         }
       } finally {
-        // setTimeout으로 버튼 disabled, loading spinner 되는지 가상 테스트, 나중에 setIsLoading(false); 만 남기고 지우기
-        await setTimeout(() => {
-          setIsLoading(false);
-        }, 2000);
+        setIsLoading(false);
       }
     }
   };
