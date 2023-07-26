@@ -216,7 +216,7 @@ const Form = () => {
           <input
             type="address"
             id="address"
-            placeholder="숭례문 도로명"
+            placeholder="내위치 검색하기"
             value={address}
             readOnly
           ></input>

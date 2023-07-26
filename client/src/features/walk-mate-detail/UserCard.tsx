@@ -154,10 +154,18 @@ const handleRegister = async () => {
     closeModal();
   } catch (error : any) {
     if (error.response && error.response.status === 409) {
-      toast.error('이미 참가중인 펫이 존재합니다!');
-    } else {
+      const errorMessage = error.response.data.message;
+        if (errorMessage === 'MEETING TIME CLOSED') {
+      toast.error('이미 마감된 산책모임입니다❗');
+    } if (errorMessage === 'NOT_VALID_MEETING_DATE') {
+      toast.error('이미 겹치는 시간에 참여 하였습니다.❗');
+    }  if (errorMessage === 'PET_ALREADY_ATTENDED') {
+      toast.error('선택된 강아지는 이미 참여중입니다.❗');
+    } 
+    else {
       console.log(formattedStartDate)
     }
+  }
   }
 };
 

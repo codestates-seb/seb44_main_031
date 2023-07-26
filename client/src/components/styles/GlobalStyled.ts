@@ -12,7 +12,6 @@ const GlobalStyle = createGlobalStyle`
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -.5px;
     list-style-type: none;
-
     scroll-behavior: smooth;
     }
 
