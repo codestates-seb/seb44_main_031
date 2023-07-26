@@ -476,7 +476,7 @@ const SignUp: React.FC = () => {
                   onChange={onChangeDisplay}
                   required
                 ></input>
-                <StyledButtonPink3D onClick={goId}>
+                <StyledButtonPink3D onClick={goId} disabled={!username}>
                   중복 확인 발급
                 </StyledButtonPink3D>
               </IdCheckForm>
@@ -484,7 +484,6 @@ const SignUp: React.FC = () => {
             </InputUsername>
             <InputEmail>
               <div>E-mail</div>
-
               <EmailAuthForm>
                 <input
                   type="email"
@@ -497,7 +496,7 @@ const SignUp: React.FC = () => {
                 {loginEmailTimeInSeconds !== 0 && (
                   <span>{formattedloginEmail}</span>
                 )}
-                {loginEmailTimeInSeconds === 0 ? (
+                {loginEmailTimeInSeconds === 0 || !email ? (
                   <StyledButtonPink3D
                     onClick={goEmail}
                     disabled={isLoginEamilLoading}

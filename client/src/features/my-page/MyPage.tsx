@@ -339,15 +339,14 @@ const EmailAuthForm = styled.div`
   flex-direction:column;
   gap: 3px;
   div{
-    border:1px solid gray;
     border-radius: 5px;
     padding:13px;
     font-size:18px;
     width: 500px;
     cursor: pointer;
-
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   &:hover {
-    background-color: var(--pink-300);
+    background-color: var(--pink-100);
     
   }
 
@@ -917,24 +916,44 @@ const Mypage = () => {
               회원탈퇴
             </SmallButton>
           </UserPartButtons>
+          {/* {isOpenMypostModal && (
+            <MypostModal
+            onClickToggleMypostModal={
+              onClickToggleMypostModal
+            }>
+              <h1>내 게시글보기</h1>
+              <ListCard >
+                {mypostList.map((post) => (
+                  <div key={post.articleId} onClick={()=>{navigate(`/walk-mate/${post.articleId}`)}}>
+                    <p>{sliceContentLengthEndWithDots(post.title,50)}</p>
+                    <br></br>
+                    <p>시작시간:{stringToLocaleString(post.createdAt)}</p> 
+                    <p>종료예정시간{stringToLocaleString(post.startDate)}</p>
+                  </div>
+                ))}
+              </ListCard>
+            </MypostModal>
+          )} */}
           {isOpenMypostModal && (
-        <MypostModal
-        onClickToggleMypostModal={
-          onClickToggleMypostModal
-        }>
-          <h1>내 게시글보기</h1>
-          <ListCard >
-            {mypostList.map((post) => (
-              <div key={post.articleId} onClick={()=>{navigate(`/walk-mate/${post.articleId}`)}}>
-                <p>{sliceContentLengthEndWithDots(post.title,50)}</p>
-                <br></br>
-                <p>시작시간:{stringToLocaleString(post.createdAt)}</p> 
-                <p>종료예정시간{stringToLocaleString(post.startDate)}</p>
-              </div>
-            ))}
-          </ListCard>
-        </MypostModal>
-      )}
+            <MypostModal onClickToggleMypostModal={onClickToggleMypostModal}>
+              <h1>내 게시글보기</h1>
+              {mypostList.length === 0 ? (
+                <div>
+                  <h2>작성한 산책모임이 없습니다</h2>
+                </div>
+              ) : (
+                <ListCard>
+                  {mypostList.map((post) => (
+                    <div key={post.articleId} onClick={() => {navigate(`/walk-mate/${post.articleId}`)}}>
+                      <h4>{sliceContentLengthEndWithDots(post.title, 50)}</h4>
+                      <br></br>
+                      <p>산책시간: {stringToLocaleString(post.createdAt)} ~ {stringToLocaleString(post.startDate)}</p>
+                    </div>
+                  ))}
+                </ListCard>
+              )}
+            </MypostModal>
+          )}
           {isOpenUsernameChangeModal && (
             <UsernameChangeModal
               onClickUsernameChangeToggleModal={
