@@ -341,6 +341,10 @@ const SignUp: React.FC = () => {
           if (error?.response) {
             // const status = error.response?.data?.status;
             const message = error.response?.data?.detailMessage;
+            if(message===null){
+              alert('유효한 이메일을 입력해주세요');
+              return;
+            }
             alert(message);
             return;
           }
@@ -397,6 +401,10 @@ const SignUp: React.FC = () => {
           if (error?.response) {
             // const status = error.response?.data?.status;
             const message = error.response?.data?.detailMessage;
+            if(message===null){
+              alert('유효한 닉네임을 입력해주세요');
+              return;
+            }
             alert(message);
             return;
           }

@@ -156,6 +156,7 @@ const SignIn = () => {
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);
+        alert('유효하지 않은 이메일이나 비밀번호입니다.');
       }
     },
     [dispatch, email, navigate, password],
