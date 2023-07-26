@@ -15,6 +15,7 @@
     "@tanstack/react-query-devtools": "^4.29.25",
     "@types/axios": "^0.14.0",
     "axios": "^1.4.0",
+    "clipboard": "^2.0.11",
     "copy-webpack-plugin": "^11.0.0",
     "json-server": "^0.17.3",
     "jwt-decode": "^3.1.2",
