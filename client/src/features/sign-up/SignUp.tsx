@@ -8,6 +8,7 @@ import { actionS } from './signUpSlice';
 // import { useDispatch } from 'react-redux';
 import { useAppDispatch } from '../../store/store';
 import { LoadingSpinner } from '../../components/styles/LoaodingSpinner';
+import useCountdownTimer from './useCountdownTimer';
 
 const ec2URL = 'ec2-3-36-94-225.ap-northeast-2.compute.amazonaws.com:8080';
 
@@ -146,7 +147,9 @@ const InputPW = styled.div`
 const InputAddress = styled.div`
   display: flex;
   margin: 6px 0 6px;
-  justify-content: space-between;
+  /* justify-content: space-between; */
+  justify-content: center;
+  gap: 54px;
   > div {
     text-align: left;
     margin: 2px 0 2px;
@@ -204,8 +207,22 @@ const SignUp: React.FC = () => {
   );
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  // 네트워크 요청 로딩 상태
   const [isLoginEamilLoading, setIsLoginEamilLoading] = useState(false);
   const [isEmailAuthLoading, setisEmailAuthLoading] = useState(false);
+
+  // 타이머
+  const {
+    timeInSeconds: loginEmailTimeInSeconds,
+    setTimeInSeconds: setLoginEmailTimeInSeconds,
+    formattedTime: formattedloginEmail,
+  } = useCountdownTimer();
+
+  const {
+    timeInSeconds: emailAuthTimeInSeconds,
+    setTimeInSeconds: setEmailAuthTimeInSeconds,
+    formattedTime: formattedEmailAuthTime,
+  } = useCountdownTimer();
 
   const onChangeEamil = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -270,15 +287,23 @@ const SignUp: React.FC = () => {
         alert('서비스 이용 주소를 추가 하세요');
       }
       dispatch(
-         actionS({ username, email, password,emailAuth, latitude, longitude, address })
-      ).then((response) => {     
-          if (response.payload===true) {
-            console.log(response.payload)
-            alert('회원가입 성공');
-            navigate('/users/sign-in');
-          }else{
-            alert('회원가입을 다시시도해주세요.')
-          }     
+        actionS({
+          username,
+          email,
+          password,
+          emailAuth,
+          latitude,
+          longitude,
+          address,
+        }),
+      ).then((response) => {
+        if (response.payload === true) {
+          console.log(response.payload);
+          alert('회원가입 성공');
+          navigate('/users/sign-in');
+        } else {
+          alert('회원가입을 다시시도해주세요.');
+        }
       });
     },
     [
@@ -307,26 +332,20 @@ const SignUp: React.FC = () => {
         )
         .then(() => {
           // 이메일 인증에 대한 로직을 추가해주세요
+          setLoginEmailTimeInSeconds(5);
+          setEmailAuthTimeInSeconds(5 * 60 + 1);
           alert('인증번호 발급이 완료되었습니다. 이메일을 확인해주세요 ✅');
         })
         .catch((error) => {
           console.error(error);
-          if (
-            error?.response?.data?.message === 'SEND REQUEST OVER 5 SECONDS'
-          ) {
-            alert(
-              `이미 발급된 인증번호가 있습니다. 이메일을 다시 확인해주세요.`,
-            );
-            return;
-          }
           if (error?.response) {
-            const status = error.response?.data?.status;
-            const message = error.response?.data?.message;
-            alert(`${status} 에러: ${message}`);
+            // const status = error.response?.data?.status;
+            const message = error.response?.data?.detailMessage;
+            alert(message);
             return;
           }
+
           alert(error?.message);
-          // alert('다시 요청해주세요');
         })
         .finally(() => {
           setIsLoginEamilLoading(false);
@@ -349,7 +368,12 @@ const SignUp: React.FC = () => {
         })
         .catch((error) => {
           console.error(error);
-          alert('인증번호가 틀렸습니다. 다시 입력해주세요.');
+          if (error?.response) {
+            // const status = error.response?.data?.status;
+            const message = error.response?.data?.detailMessage;
+            alert(message);
+            return;
+          }
         })
         .finally(() => {
           setisEmailAuthLoading(false);
@@ -370,6 +394,12 @@ const SignUp: React.FC = () => {
         })
         .catch((error) => {
           console.error(error);
+          if (error?.response) {
+            // const status = error.response?.data?.status;
+            const message = error.response?.data?.detailMessage;
+            alert(message);
+            return;
+          }
         });
     },
     [username],
@@ -441,7 +471,7 @@ const SignUp: React.FC = () => {
                 <input
                   type="text"
                   id="signupusername"
-                  placeholder="닉네임 만들기"
+                  placeholder="닉네임 입력"
                   value={username}
                   onChange={onChangeDisplay}
                   required
@@ -459,21 +489,28 @@ const SignUp: React.FC = () => {
                 <input
                   type="email"
                   id="loginEamil"
-                  placeholder="이메일"
+                  placeholder="이메일 입력"
                   value={email}
                   onChange={onChangeEamil}
                   required
                 ></input>
-                <StyledButtonPink3D
-                  onClick={goEmail}
-                  disabled={isLoginEamilLoading}
-                >
-                  {isLoginEamilLoading ? (
-                    <LoadingSpinner />
-                  ) : (
-                    <span>인증번호 발급</span>
-                  )}
-                </StyledButtonPink3D>
+                {loginEmailTimeInSeconds !== 0 && (
+                  <span>{formattedloginEmail}</span>
+                )}
+                {loginEmailTimeInSeconds === 0 ? (
+                  <StyledButtonPink3D
+                    onClick={goEmail}
+                    disabled={isLoginEamilLoading}
+                  >
+                    {isLoginEamilLoading ? (
+                      <LoadingSpinner />
+                    ) : (
+                      <span>인증번호 발급</span>
+                    )}
+                  </StyledButtonPink3D>
+                ) : (
+                  <div>잠시만 기다려주세요</div>
+                )}
               </EmailAuthForm>
               {/* <div onClick={goEmail}>이메일 인증</div> */}
             </InputEmail>
@@ -488,6 +525,9 @@ const SignUp: React.FC = () => {
                   onChange={onChangeEamilAuth}
                   required
                 ></input>
+                {emailAuthTimeInSeconds !== 0 && (
+                  <span>{formattedEmailAuthTime}</span>
+                )}
                 <StyledButtonPink3D
                   onClick={checkEmail}
                   disabled={isEmailAuthLoading}
@@ -507,7 +547,7 @@ const SignUp: React.FC = () => {
               <input
                 type="password"
                 id="loginPassword"
-                placeholder="비밀번호"
+                placeholder="비밀번호 입력"
                 value={password}
                 onChange={onChangePassword}
                 required
@@ -518,16 +558,18 @@ const SignUp: React.FC = () => {
               {/* <div value={address} onChange={goAddress}>
                 {address}aa
               </div> */}
-              <input
-                type="address"
-                id="address"
-                placeholder="내주소 등록하기"
-                value={address}
-                readOnly
-                required
-              ></input>
+              {address && (
+                <input
+                  type="address"
+                  id="address"
+                  // placeholder="주소 등록"
+                  value={address}
+                  readOnly
+                  required
+                />
+              )}
               <StyledButtonPink3D type="button" onClick={handleClick}>
-                Open
+                주소 등록
               </StyledButtonPink3D>
             </InputAddress>
 

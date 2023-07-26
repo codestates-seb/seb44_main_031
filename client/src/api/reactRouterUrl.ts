@@ -1,6 +1,6 @@
 // export const FE_BASE_URL = 'http://localhost:5173';
 export const FE_BASE_URL =
-  'http://frontbucketpetmily.s3-website.ap-northeast-2.amazonaws.com/';
+  'http://frontbucketpetmily.s3-website.ap-northeast-2.amazonaws.com';
 export const createWalkMateURL = '/walk-mate/create';
 export const myPageUrl = '/users/mypage';
 export const walkMateAllUrl = '/walk-mate/all';

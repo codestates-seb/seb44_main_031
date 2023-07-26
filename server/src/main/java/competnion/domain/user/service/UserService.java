@@ -92,16 +92,18 @@ public class UserService {
     }
 
     public List<ArticleQueryDto> findAllArticlesWrittenByUser(final User user) {
-        return articleRepository.findAllArticlesWrittenByUser(user);
+        List<ArticleQueryDto> writtenByUser = articleRepository.findAllArticlesWrittenByUser(user);
+        if (writtenByUser.size() == 0)
+            throw new BusinessLogicException(ARTICLE_NOT_FOUND, "등록한 게시물이 없습니다.");
+        return writtenByUser;
     }
 
     public ArticleQueryDto findArticlesPetAttended(User user, Long petId) {
-        return petRepository.findArticlePetAttended(user, petId);
+        ArticleQueryDto petAttended = petRepository.findArticlePetAttended(user, petId);
+        if (petAttended == null)
+            throw new BusinessLogicException(ARTICLE_NOT_FOUND, "참여한 산책모임이 없습니다.");
+        return petAttended;
     }
-
-//    public List<ArticleQueryDto> findAllArticlesUserAttended(final User user) {
-//        return attendRepository.findAllArticlesUserAttended(user);
-//    }
 
     public User returnExistsUserByIdOrThrow(final Long userId) {
         return userRepository.findById(userId)
