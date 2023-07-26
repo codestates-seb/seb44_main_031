@@ -17,7 +17,6 @@ import { PiDogDuotone } from "react-icons/pi";
 import MypostModal from './MyPost';
 import { stringToLocaleString } from '../../utils/date-utils';
 import MyPetWalkModal from './MyPetWalk';
-import {MyPetWalk} from './myPageSlice';
 interface PetData {
   petId: number;
   name: string;
@@ -364,7 +363,7 @@ const Mypage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const mypostList = useSelector((state: RootState) => state.mypage.mypostList);
-  const mypetList:MyPetWalk[] = useSelector((state: RootState) => state.mypage.mypetWalk);
+  const mypetList = useSelector((state: RootState) => state.mypage.mypetWalk);
   const profile = useSelector((state: RootState) => state.mypage.profile);
   const [petData, setPetData] = useState<PetData>({
     petId: 0,
@@ -1382,14 +1381,14 @@ const Mypage = () => {
           <MyPetWalkModal onClickToggleMypetWalkModal={onClickToggleMypetWalkModal}>
             <h2>참가한 산책모임</h2>
             {/* @ts-ignore */}
-            <div className='petwalkList' onClick={() => { navigate(`/walk-mate/${mypetList.articleId}`) }}>
+            <div className='petwalkList' onClick={()=>{navigate(`/walk-mate/${mypetList.articleId}`)}}>
               {/* @ts-ignore */}
-              <p style={{ fontSize: "15px" }}>{sliceContentLengthEndWithDots(mypetList.title, 20)}</p>
+              <p style={{fontSize:"15px"}}>{sliceContentLengthEndWithDots(mypetList.title,20)}</p>
               {/* @ts-ignore */}
-              <p>시작시간: {stringToLocaleString(mypetList.createdAt)}</p>
+              <p>시작시간:{stringToLocaleString(mypetList.createdAt)}</p> 
               {/* @ts-ignore */}
-              <p>종료예정시간: {stringToLocaleString(mypetList.startDate)}</p>
-            </div>           
+              <p>종료예정시간{stringToLocaleString(mypetList.startDate)}</p>
+            </div>            
           </MyPetWalkModal>
         )}
         <ul className='petgap'>
