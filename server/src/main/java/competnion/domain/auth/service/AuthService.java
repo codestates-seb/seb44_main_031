@@ -134,10 +134,13 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public void sendVerificationEmail(final String email) {
-        String data = redisUtil.getData(email);
-        if (data != null) throw new BusinessLogicException(ALREADY_SEND);
+        String requestTime = email.substring(0, email.length() - 5);
+        if (!redisUtil.checkRequestAllowed(requestTime))
+            throw new BusinessLogicException(SEND_REQUEST_OVER_5SECONDS, "5초뒤에 다시 요청해주세요!");
+
         checkDuplicatedEmail(email);
         eventPublisher.publishEvent(new AuthEmailEvent(email));
+        redisUtil.saveRequestTime(requestTime);
     }
 
     public void verifyEmailCode(final String code, final String email) {
@@ -196,7 +199,7 @@ public class AuthService {
                 .point(point)
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
-                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/dog.png")
+                .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/image/dog.png")
                 .roles(roles)
                 .build());
     }

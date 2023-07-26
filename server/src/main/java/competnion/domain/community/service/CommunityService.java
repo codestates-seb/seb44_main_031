@@ -283,7 +283,7 @@ public class CommunityService {
     private void checkMeetingTimeClosed(final ZonedDateTime startDate, final ZonedDateTime endDate) {
         ZonedDateTime now = dateUtil.getNow();
         if (now.plusMinutes(30).isAfter(startDate) || now.plusMinutes(30).equals(startDate))
-            throw new BusinessLogicException(MEETING_TIME_CLOSED, "이미 마감된 산책모임입니다❗");
+            throw new BusinessLogicException(MEETING_TIME_CLOSED, "참여 마감된 산책모임입니다❗");
     }
 
     @Transactional(readOnly = true)

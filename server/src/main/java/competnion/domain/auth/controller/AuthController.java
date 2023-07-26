@@ -1,11 +1,11 @@
 package competnion.domain.auth.controller;
 
-import competnion.global.common.annotation.UserContext;
-import competnion.global.common.annotation.ValidUsername;
+import competnion.domain.auth.service.AuthService;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
+import competnion.global.common.annotation.UserContext;
+import competnion.global.common.annotation.ValidUsername;
 import competnion.global.response.Response;
-import competnion.domain.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
