@@ -85,7 +85,7 @@ axiosInstance.interceptors.response.use(
       (error.response?.data as any)?.status === 401 ||
       (error.response?.data as any)?.message === 'USER NOT FOUND'
     ) {
-      toast.error(error.message);
+      toast.error('로그인이 필요한 서비스입니다.');
 
       const currentPath = window.location.pathname;
       window.location.href = `${signInUrl}?path=${encodeURIComponent(

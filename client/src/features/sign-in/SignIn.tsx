@@ -9,12 +9,12 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: 85vh;
   background-color: #f1f2f3;
   font-size: 0.8rem;
-  ${StyledButtonPink3D}{
+  ${StyledButtonPink3D} {
     width: 100px;
-    padding:2px;
+    padding: 2px;
   }
 `;
 const Contents = styled.div`
@@ -36,18 +36,20 @@ const LoginForm = styled.form`
   display: flex;
   flex-direction: column;
   background-color: white;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05), 0 20px 48px rgba(0, 0, 0, 0.05),
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.05),
+    0 20px 48px rgba(0, 0, 0, 0.05),
     0 1px 4px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 24px;
   margin-bottom: 24px;
-  .submit{
+  .submit {
     display: flex;
     justify-content: center;
-    ${StyledButtonPink3D}{
+    ${StyledButtonPink3D} {
       width: 100px;
       padding: 1px;
-      margin-top:10px;
+      margin-top: 10px;
     }
   }
 `;
@@ -124,20 +126,17 @@ const SignIn = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setEmail(e.target.value);
     },
-    []
+    [],
   );
 
   const onChangePassword = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setPassword(e.target.value);
     },
-    []
+    [],
   );
-  const location = useLocation();  
- 
+  const location = useLocation();
 
-     
-   
   const onSubmitJoin = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -150,17 +149,16 @@ const SignIn = () => {
         const params = new URLSearchParams(location.search);
         const path = params.get('path');
 
-        if(path===null || path==='users/sign-in'){
+        if (path === null || path === 'users/sign-in') {
           navigate('/walk-mate/all');
-        }else{
+        } else {
           navigate(`${path}`);
-
         }
       } catch (error: any) {
         console.log('로그인 에러:', error);
       }
     },
-    [dispatch, email, navigate, password]
+    [dispatch, email, navigate, password],
   );
 
   return (
@@ -193,7 +191,7 @@ const SignIn = () => {
               onChange={onChangePassword}
             />
           </InputPassword>
-          <div className='submit'>
+          <div className="submit">
             <StyledButtonPink3D type="submit">로그인</StyledButtonPink3D>
           </div>
         </LoginForm>
