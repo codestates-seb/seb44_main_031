@@ -52,7 +52,7 @@ const SignUpForm = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   ${StyledButtonPink3D} {
-    width: 100px;
+    width: 120px;
     height: 30px;
     padding: 3px;
     text-align: center;
@@ -273,18 +273,15 @@ const SignUp: React.FC = () => {
         alert('서비스 이용 주소를 추가 하세요');
       }
       dispatch(
-        actionS({
-          username,
-          email,
-          password,
-          emailAuth,
-          latitude,
-          longitude,
-          address,
-        }),
-      ).then(() => {
-        alert('회원가입 성공');
-        navigate('/users/sign-in');
+         actionS({ username, email, password,emailAuth, latitude, longitude, address })
+      ).then((response) => {     
+          if (response.payload===true) {
+            console.log(response.payload)
+            alert('회원가입 성공');
+            navigate('/users/sign-in');
+          }else{
+            alert('회원가입을 다시시도해주세요.')
+          }     
       });
     },
     [
@@ -527,7 +524,7 @@ const SignUp: React.FC = () => {
               <input
                 type="address"
                 id="address"
-                placeholder="숭례문 도로명"
+                placeholder="내주소 등록하기"
                 value={address}
                 readOnly
                 required

@@ -33,11 +33,10 @@ export const actionS = createAsyncThunk(
           address: data.address,
         }
       );
-      if (result.data.success === true) {
-       
+      if (result.status === 200) {       
         return true;
-      } else if (result.data.success === false) {
-        return false;
+      } else{
+      
       }
     } catch (err: any) {
       return err.message;
