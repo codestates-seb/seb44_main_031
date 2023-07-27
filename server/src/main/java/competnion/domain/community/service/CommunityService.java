@@ -336,6 +336,11 @@ public class CommunityService {
                 .anyMatch(attendee -> attendee.equals(userId));
     }
 
+    public void checkIsPossibleUserUpdateAddress(final User user) {
+        if (attendRepository.findByUserId(user.getId()).isPresent())
+            throw new BusinessLogicException(CAN_NOT_UPDATE_ADDRESS, "참여중인 산책모임이 있어 주소변경이 불가능합니다.");
+    }
+
     private List<User> extractUsersFromAttend(final long articleId) {
         return attendRepository.findUsersFromAttendByArticleId(articleId);
     }
