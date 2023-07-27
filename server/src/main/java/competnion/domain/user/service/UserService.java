@@ -4,8 +4,10 @@ import competnion.domain.auth.service.AuthService;
 import competnion.domain.community.dto.ArticleQueryDto;
 import competnion.domain.community.dto.response.ArticleResponse;
 import competnion.domain.community.dto.response.ArticleResponseDto;
+import competnion.domain.community.entity.Attend;
 import competnion.domain.community.repository.ArticleRepository;
 import competnion.domain.community.repository.AttendRepository;
+import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.repository.PetRepositoryCustomImpl;
@@ -44,6 +46,7 @@ public class UserService {
 
     private final S3Util s3Util;
     private final AuthService authService;
+    private final CommunityService communityService;
     private final CoordinateUtil coordinateUtil;
     
     private final PasswordEncoder passwordEncoder;
@@ -76,6 +79,7 @@ public class UserService {
     }
 
     public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
+        communityService.checkIsPossibleUserUpdateAddress(user);
         final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         user.updateAddressAndCoordinates(request.getAddress(), point, request.getLatitude(), request.getLongitude());
         return UpdateAddressResponse.of(request);
