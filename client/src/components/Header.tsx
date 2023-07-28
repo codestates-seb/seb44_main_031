@@ -118,12 +118,12 @@ const StyledNavLink = styled(NavLink)`
   &.active::after {
     content: '';
     position: absolute;
-    bottom: -8px; /* Adjust this value to control the distance of the underline from the text */
+    bottom: -8px;
     left: 0;
-    width: 100%; /* This will make the underline span the entire width of the NavLink */
-    height: 3px; /* Adjust this value to control the thickness of the underline */
+    width: 100%;
+    height: 3px; 
     border-radius: 30px;
-    background-color: var(--pink-400); /* Set the color of the underline */
+    background-color: var(--pink-400); 
   }
 `;
 
