@@ -376,14 +376,14 @@ const Mypage = () => {
     imgUrl:'',
     });
   
-    const sliceContentLengthEndWithDots = (
-      content: string,
-      desiredLength: number
-    ) => {
-      if (content.length <= 66) return content;
-    
-      return content.slice(0, desiredLength - 3) + '...';
-    };
+  const sliceContentLengthEndWithDots = (
+    content: string,
+    desiredLength: number
+  ) => {
+    if (content.length <= 66) return content;
+  
+    return content.slice(0, desiredLength - 3) + '...';
+  };
   const [isOpenUsernameChangeModal, setOpenUsernameChangeModal] =
     useState<boolean>(false);
   const onClickUsernameChangeToggleModal = useCallback(() => {
@@ -947,7 +947,8 @@ const Mypage = () => {
                     <div key={post.articleId} onClick={() => {navigate(`/walk-mate/${post.articleId}`)}}>
                       <h4>{sliceContentLengthEndWithDots(post.title, 50)}</h4>
                       <br></br>
-                      <p>산책시간: {stringToLocaleString(post.createdAt)} ~ {stringToLocaleString(post.startDate)}</p>
+                      <p>등록시간: {stringToLocaleString(post.createdAt)}</p>
+                      <p>시작시간: {stringToLocaleString(post.startDate)}</p>
                     </div>
                   ))}
                 </ListCard>
