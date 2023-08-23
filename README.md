@@ -1,7 +1,8 @@
 #  🦴Petmily🐕
 
 ## 같이 산책 가실 분?! 동네사람들과 함께 즐기는 반려견 산책!
-![강아지사진](https://cdn.imweb.me/upload/S201807025b39d1981b0b0/5cac274d00b12.jpg)
+<img width="1414" alt="image" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/bd994dd0-0948-4e89-8f1c-670d6c767183">
+
 
 ## 개발기간: 2023.06.28 ~ 2023.07.24
 ## 배포 주소 : http://frontbucketpetmily.s3-website.ap-northeast-2.amazonaws.com/
