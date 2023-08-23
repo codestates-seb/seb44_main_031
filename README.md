@@ -18,7 +18,7 @@
 |||
 |:---:|:---:|
 |**메인페이지 (질문 검색)**|**산책 글 작성 (페이지네이션)**|
-|<img width="500px" src="[https://github.com/codestates-seb/seb44_pre_031/assets/82320476/1f55638f-2e9f-4805-b9bf-00de548dcb6c](https://github.com/codestates-seb/seb44_main_031/assets/91462693/8ecd89b8-e39f-4b2b-87ea-a1409eb5f755)"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/09fb6ec7-0b69-4645-a1ef-a1b1937be034"/>|
+|<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/8ecd89b8-e39f-4b2b-87ea-a1409eb5f755"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/09fb6ec7-0b69-4645-a1ef-a1b1937be034"/>|
 |**회원가입, 로그인, 로그아웃 (이메일인증)**|**마이페이지 RUD**|
 |<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/9a520b6c-0152-4048-b7d4-14d726245a8e"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/8a7a1fe5-e24b-4dc0-8e1d-a0d68a1a7e64"/>|
 |**질문 Create**|**질문 RUD**|
