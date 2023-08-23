@@ -21,7 +21,7 @@
 |<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/8ecd89b8-e39f-4b2b-87ea-a1409eb5f755"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/09fb6ec7-0b69-4645-a1ef-a1b1937be034"/>|
 |**회원가입, 로그아웃 (이메일인증)**|**로그인**|
 |<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/ca78f911-560b-4d12-a9b8-9d7eb4338dae"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/96497c0d-6a2b-42c6-938a-5ae44c7d2916"/>|
-|**질문 Create**|**질문 RUD**|
+|**산책 상세 페이지 **|**질문 RUD**|
 |<img width="500px" src=""/>|<img width="500px" src=""/>|
 |**답변 CRUD**|**답변 정렬 필터**|
 |<img width="500px" src=""/>|<img width="500px" src=""/>|
