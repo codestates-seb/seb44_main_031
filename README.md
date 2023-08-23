@@ -13,20 +13,20 @@
   <br/>
 
 ## 🌟 Pages & Features
-![메인페이지](https://github.com/codestates-seb/seb44_main_031/assets/91462693/8ecd89b8-e39f-4b2b-87ea-a1409eb5f755)
+
 
 |||
 |:---:|:---:|
-|**메인페이지 (질문 검색)**|**산책 글 작성 (페이지네이션)**|
+|**메인페이지 (질문 검색)**|**산책 글 작성**|
 |<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/8ecd89b8-e39f-4b2b-87ea-a1409eb5f755"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/09fb6ec7-0b69-4645-a1ef-a1b1937be034"/>|
 |**회원가입, 로그인, 로그아웃 (이메일인증)**|**마이페이지 RUD**|
-|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/9a520b6c-0152-4048-b7d4-14d726245a8e"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/8a7a1fe5-e24b-4dc0-8e1d-a0d68a1a7e64"/>|
+|<img width="500px" src="https://github.com/codestates-seb/seb44_main_031/assets/91462693/ca78f911-560b-4d12-a9b8-9d7eb4338dae"/>|<img width="500px" src=""/>|
 |**질문 Create**|**질문 RUD**|
-|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/948e71a9-6693-4148-ba82-769a11f05ee4"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/b174cf6e-47d9-49fb-bab6-962086785c65"/>|
+|<img width="500px" src=""/>|<img width="500px" src=""/>|
 |**답변 CRUD**|**답변 정렬 필터**|
-|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/5628c214-5bc1-471a-a004-de87f79f772b"/>|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/cd0e5ecf-7cad-44b5-b736-28ea1fef4b6e"/>|
+|<img width="500px" src=""/>|<img width="500px" src=""/>|
 |**질문상세페이지 부가기능 (up & down투표, 북마크, 답변채택)**|**기타**|
-|<img width="500px" src="https://github.com/codestates-seb/seb44_pre_031/assets/82320476/17a76409-d727-4c0e-8708-49b6412eee65"/>|추가구현 준비중|
+|<img width="500px" src=""/>|추가구현 준비중|
 
 <br/>
 # 👨‍👩‍👧‍👦 Team Members
