@@ -4,7 +4,6 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import competnion.global.exception.BusinessLogicException;
@@ -106,7 +105,7 @@ public class S3Util {
         amazonS3Client.deleteObject(bucket, key);
     }
 
-    public void isFileAnImageOrThrow(final List<MultipartFile> images) {
+    public void checkFileIsImageOrThrow(final List<MultipartFile> images) {
         images.stream()
                 .map(image -> FilenameUtils.getExtension(
                         requireNonNull(image.getOriginalFilename()).toLowerCase()))
@@ -119,6 +118,6 @@ public class S3Util {
 
     public void checkImageCount(final List<MultipartFile> images) {
         long count = images.size();
-        if (count > 3) throw new BusinessLogicException(OVER_THE_IMAGE_MAX_LIST, "이미지는 3개 이하로 등록해주세요!");
+        if (count > 3) throw new BusinessLogicException(CANNOT_REGISTER_IMAGE, "이미지는 3개 이하로 등록해주세요!");
     }
 }

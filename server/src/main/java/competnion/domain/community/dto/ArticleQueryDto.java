@@ -15,7 +15,7 @@ public class ArticleQueryDto {
     private Long articleId;
     private String title;
     private ZonedDateTime startDate;
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
     @QueryProjection
     public ArticleQueryDto(String title, ZonedDateTime startDate) {
@@ -24,7 +24,7 @@ public class ArticleQueryDto {
     }
 
     @QueryProjection
-    public ArticleQueryDto(Long articleId, String title, ZonedDateTime startDate, LocalDateTime createdAt) {
+    public ArticleQueryDto(Long articleId, String title, ZonedDateTime startDate, ZonedDateTime createdAt) {
         this.articleId = articleId;
         this.title = title;
         this.startDate = startDate;

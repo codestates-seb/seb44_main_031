@@ -7,12 +7,11 @@ import competnion.global.common.BaseEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.util.Lazy;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,7 @@ import static competnion.domain.community.entity.ArticleStatus.OPEN;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.EnumType.STRING;
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -46,11 +46,11 @@ public class Article extends BaseEntity {
     @Column(nullable = false)
     private ZonedDateTime endDate;
     @Column(nullable = false)
-    private int attendant;
+    private int attendCapacity;
     @Enumerated(STRING)
     private ArticleStatus articleStatus;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -64,11 +64,11 @@ public class Article extends BaseEntity {
     private List<Attend> attends = new ArrayList<>();
 
     @Builder(builderMethodName = "createArticle")
-    private Article(User user, String title, String body, String location, int attendant, ZonedDateTime startDate, ZonedDateTime endDate, Point point) {
+    private Article(User user, String title, String body, String location, int attendCapacity, ZonedDateTime startDate, ZonedDateTime endDate, Point point) {
         this.user = user;
         this.title = title;
         this.body = body;
-        this.attendant = attendant;
+        this.attendCapacity = attendCapacity;
         this.location = location;
         this.point = point;
         this.startDate = startDate;

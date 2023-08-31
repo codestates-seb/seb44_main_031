@@ -11,7 +11,7 @@ public class RegisterPetRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birth;
     private Boolean gender;
-    private Boolean neutralization;
+    private Boolean isNeutralized;
     private String mbti;
     private Long breedId;
 }

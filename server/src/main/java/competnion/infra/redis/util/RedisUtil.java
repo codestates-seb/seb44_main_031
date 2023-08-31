@@ -3,7 +3,6 @@ package competnion.infra.redis.util;
 
 import competnion.global.util.ZonedDateTimeUtil;
 import lombok.RequiredArgsConstructor;
-import net.bytebuddy.asm.Advice;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -68,13 +66,13 @@ public class RedisUtil {
     }
 
     public void setDataAndExpire(String key, String value, Long duration) {
-        if (getData(key) == null) deleteData(key);
+        if (getData(key) == null) deleteEmailAndCode(key);
         ValueOperations<String, String> valueOperations = stringRedisTemplate.opsForValue();
         Duration expireDuration = Duration.ofMillis(duration);
         valueOperations.set(key, value, expireDuration);
     }
 
-    public void deleteData(String key) {
+    public void deleteEmailAndCode(String key) {
         stringRedisTemplate.delete(key);
     }
 

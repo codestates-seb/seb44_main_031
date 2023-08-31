@@ -3,7 +3,7 @@ package competnion.domain.auth.controller;
 import competnion.domain.auth.service.AuthService;
 import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.entity.User;
-import competnion.global.common.annotation.UserContext;
+import competnion.global.common.annotation.AuthenticatedUser;
 import competnion.global.common.annotation.ValidUsername;
 import competnion.global.response.Response;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +22,11 @@ import javax.validation.constraints.Email;
 public class AuthController { // VerificationFilter 이후의 처리
     private final AuthService authService;
 
-//    @PostMapping("/social-login/google")
-//    public ResponseEntity doSocialLogin(@RequestBody LoginDto loginDto) {
-//
-//        // 로그인 자체는 필터에서 구현이 다 되었는데 추가적으로 던져줘야할 정보가 있을 경우에 작성
-//
-//
-//        return ResponseEntity.ok().build();
-//    }
-
     @GetMapping("/check-username")
-    public Response<Void> checkUsername(@ValidUsername @RequestParam("username") final String username) {
-        authService.checkDuplicatedUsername(username);
+    public Response<Void> checkUsername(@ValidUsername @RequestParam("nickname") final String nickname) {
+        authService.checkIsUniqueNicknameOrThrow(nickname);
         return Response.success();
+
     }
 
     // 회원가입 이메일 중복체크 & 인증 코드 전송
@@ -64,7 +56,7 @@ public class AuthController { // VerificationFilter 이후의 처리
     // 회원탈퇴 이메일 코드 전송
     @GetMapping("/delete/send-verification-email")
     public Response<Void> checkValidateEmailAndSendEmail(
-            @UserContext                  final User user,
+            @AuthenticatedUser final User user,
             @Email @RequestParam("email") final String email
     ) {
         authService.checkValidateEmailAndSendEmail(user, email);
@@ -73,7 +65,7 @@ public class AuthController { // VerificationFilter 이후의 처리
 
     // 이메일 인증 후 유저 탈퇴
     @DeleteMapping("/delete")
-    public Response<Void> deleteUser(@UserContext final User user) {
+    public Response<Void> deleteUser(@AuthenticatedUser final User user) {
         authService.deleteUser(user);
         return Response.success();
     }

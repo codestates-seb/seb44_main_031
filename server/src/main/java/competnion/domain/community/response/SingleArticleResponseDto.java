@@ -11,12 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class SingleArticleResponseDto {
-
-
     private UserResponse.InArticleResponse owner;
-
     private ArticleResponseDto.OfSingleResponse article;
-
     private List<UserResponse.InArticleResponse> attendees;
-
 }

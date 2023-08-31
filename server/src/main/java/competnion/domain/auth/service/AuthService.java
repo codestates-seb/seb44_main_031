@@ -48,12 +48,12 @@ public class AuthService {
     private final ApplicationEventPublisher eventPublisher;
 
     public void logout(HttpServletRequest request) {
-        log.info("AuthService - logout");
-        log.info("=======================================");
-
-        // 검증은 VerificationFilter에서 선처리
-
-        log.info("DB에서 RefreshToken을 삭제하여 재발급 불가하게 만들기");
+//        log.info("AuthService - logout");
+//        log.info("=======================================");
+//
+//        // 검증은 VerificationFilter에서 선처리
+//
+//        log.info("DB에서 RefreshToken을 삭제하여 재발급 불가하게 만들기");
         long userIdInToken = JwtParseInterceptor.getAuthenticatedUserId();
         refreshTokenRepository.deleteTokenByUserId(userIdInToken);
 
@@ -61,9 +61,9 @@ public class AuthService {
         String accessToken = request.getHeader("Authorization").replace("Bearer ", "");
         long remainingTokenExpirationTime = jwtUtils.getRemainingTokenExpiration(request);
 
-        log.info("Redis에 request로 온 AccessToken BlackList에 넣기 (해당 토큰으로 오는 모든 요청 거부)");
+//        log.info("Redis에 request로 온 AccessToken BlackList에 넣기 (해당 토큰으로 오는 모든 요청 거부)");
         redisUtil.setBlackList(accessToken,"logout",remainingTokenExpirationTime);
-        log.info("Blacklist 추가 완료");
+//        log.info("Blacklist 추가 완료");
     }
 
     public void reissue(HttpServletRequest request, HttpServletResponse response) {
@@ -74,40 +74,35 @@ public class AuthService {
         // 문제점 : 재발급 전의 토큰 유효기간 남아있으면 전 토큰으로도 가능
         // but, 클라이언트 측에서 남아있는 시간 계산해서 만료되었을 때에만 재발급 요청 보내주면 해결 가능하긴 함
 
-        log.info("AuthService - reissue");
-        log.info("=========================================================");
+//        log.info("AuthService - reissue");
+//        log.info("=========================================================");
 
         if (request.getHeader("Authorization")==null) {
             throw new BusinessLogicException(ACCESS_TOKEN_NULL);
         }
 
-
         if(request.getHeader("Refresh")==null) {
             throw new BusinessLogicException(REFRESH_TOKEN_NULL);
         }
 
-
-
-        log.info("request AccessToken에서 memberId 추출 ");
+//        log.info("request AccessToken에서 memberId 추출 ");
         long userIdInToken = JwtParseInterceptor.getAuthenticatedUserId();
 
         String refreshToken = request.getHeader("Refresh");
 
         String refreshTokenInDb = refreshTokenRepository.findTokenByUserId(userIdInToken).getEncodedJws();
 
-        log.info("RefreshToken 대조 : request vs DB");
+//        log.info("RefreshToken 대조 : request vs DB");
         if(refreshToken.equals(refreshTokenInDb)) {
 
-            log.info("DB에서 존재 확인 - AccessToken 재발급 절차 진행");
-            log.info("=========================================================");
+//            log.info("DB에서 존재 확인 - AccessToken 재발급 절차 진행");
+//            log.info("=========================================================");
 
-
-            log.info("request에서 추출한 memberId로 member 조회");
+//            log.info("request에서 추출한 memberId로 member 조회");
             Optional<User> user = userRepository.findById(userIdInToken);
             User findUser = user.orElseThrow(() ->new BusinessLogicException(USER_NOT_FOUND));
 
-
-            log.info("추출한 member정보로 AccessToken 생성");
+//            log.info("추출한 member정보로 AccessToken 생성");
             String newAccessToken = jwtTokenizer.delegateAccessToken(findUser);
 
             response.setHeader("Authorization","Bearer " + newAccessToken);
@@ -118,27 +113,27 @@ public class AuthService {
     }
 
     public void signUp(final SignUpRequest request) {
-        checkDuplicatedUsername(request.getUsername());
-        checkDuplicatedEmail(request.getEmail());
+        checkIsUniqueNicknameOrThrow(request.getUsername());
+        checkIsUniqueEmailOrThrow(request.getEmail());
         verifyEmailCode(request.getCode(), request.getEmail());
         // 임시
-        if (request.getAddress() == null) throw new BusinessLogicException(CAN_NOT_CLOSE);
+        if (request.getAddress() == null) throw new BusinessLogicException(CANNOT_CLOSE);
 
         final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
         final List<String> roles = authorityUtils.createRoles(request.getEmail());
         final String encode = passwordEncoder.encode(request.getPassword());
 
         saveUser(point, encode, roles, request);
-        redisUtil.deleteData(request.getEmail());
+        redisUtil.deleteEmailAndCode(request.getEmail());
     }
 
     @Transactional(readOnly = true)
     public void sendVerificationEmail(final String email) {
         String requestTime = email.substring(0, email.length() - 5);
         if (!redisUtil.checkRequestAllowed(requestTime))
-            throw new BusinessLogicException(SEND_REQUEST_OVER_5SECONDS, "5초뒤에 다시 요청해주세요!");
+            throw new BusinessLogicException(SEND_REQUEST_TOO_EARLY, "5초뒤에 다시 요청해주세요!");
 
-        checkDuplicatedEmail(email);
+        checkIsUniqueEmailOrThrow(email);
         eventPublisher.publishEvent(new AuthEmailEvent(email));
         redisUtil.saveRequestTime(requestTime);
     }
@@ -152,35 +147,38 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public void checkValidateEmailAndSendEmail(final User user, final String email) {
-        checkEmailValidate(user, email);
+        checkEmailValidateOrThrow(user, email);
         eventPublisher.publishEvent(new AuthEmailEvent(email));
     }
 
     public void deleteUser(final User user) {
+        checkPetNotAttendedOrThrow(user);
+        userRepository.delete(user);
+    }
+
+    private void checkPetNotAttendedOrThrow(User user) {
         List<Pet> pets = user.getPets();
         for (Pet pet : pets)
             if (pet.getArticle() != null)
                 throw new BusinessLogicException(USER_ALREADY_ATTENDED, "참여중인 산책모임이 있어 탈퇴가 불가능합니다❗");
-
-        userRepository.delete(user);
     }
 
-    public void checkEmailValidate(final User user, final String email) {
+    public void checkEmailValidateOrThrow(final User user, final String email) {
         if (!user.getEmail().equals(email))
             throw new BusinessLogicException(INVALID_EMAIL, format("%s 이메일이 유효하지 않습니다❗", email));
     }
 
-    public void checkDuplicatedUsername(final String nickname) {
+    public void checkIsUniqueNicknameOrThrow(final String nickname) {
         if (userRepository.findByNickname(nickname).isPresent())
             throw new BusinessLogicException(DUPLICATE_NICKNAME, format("%s 는(은) 중복된 닉네임 입니다❗", nickname));
     }
 
-    public void checkDuplicatedEmail(final String email) {
+    public void checkIsUniqueEmailOrThrow(final String email) {
         if (userRepository.findByEmail(email).isPresent())
             throw new BusinessLogicException(DUPLICATE_EMAIL, format("%s 중복된 이메일 입니다❗", email));
     }
 
-    public void checkMatchPassword(final String password, final String encodePassword) {
+    public void checkPasswordVerificationOrThrow(final String password, final String encodePassword) {
         final boolean matches = passwordEncoder.matches(password, encodePassword);
         if (!matches) throw new BusinessLogicException(PASSWORD_NOT_MATCH, "패스워드가 틀립니다❗");
     }
@@ -197,8 +195,6 @@ public class AuthService {
                 .password(encode)
                 .address(request.getAddress())
                 .point(point)
-                .latitude(request.getLatitude())
-                .longitude(request.getLongitude())
                 .imgUrl("https://mybucketforpetmily.s3.ap-northeast-2.amazonaws.com/image/dog.png")
                 .roles(roles)
                 .build());

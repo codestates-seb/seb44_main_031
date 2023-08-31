@@ -28,7 +28,7 @@ import static competnion.domain.community.entity.ArticleStatus.OPEN;
 import static competnion.domain.community.entity.QArticle.article;
 import static competnion.domain.community.entity.QAttend.attend;
 import static competnion.domain.user.entity.QUser.user;
-import static competnion.global.exception.ExceptionCode.NOT_VALID_MEETING_DATE;
+import static competnion.global.exception.ExceptionCode.NOT_VALID_MEETING_DURATION;
 
 
 
@@ -140,7 +140,7 @@ public class ArticleRepositoryCustomImpl implements ArticleRepositoryCustom{
                 )
                 .fetch();
 
-        if (articles.size() > 0) throw new BusinessLogicException(NOT_VALID_MEETING_DATE, "이미 겹치는 시간에 참여했습니다.");
+        if (articles.size() > 0) throw new BusinessLogicException(NOT_VALID_MEETING_DURATION, "이미 겹치는 시간에 참여했습니다.");
     }
 
     @Override

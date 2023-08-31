@@ -26,7 +26,7 @@ public class ArticleResponseDto {
         private List<CommentDto.Response> comments;
 
         // ArticleResponseDto of
-        public ArticleResponseDto(Long articleId, String username, String title, String body, List<String> imageUrls) {
+        private ArticleResponseDto(Long articleId, String username, String title, String body, List<String> imageUrls) {
                 this.articleId = articleId;
                 this.username = username;
                 this.title = title;
@@ -75,7 +75,7 @@ public class ArticleResponseDto {
                                 article.getPoint().getY(),
                                 article.getPoint().getX(),
                                 article.getLocation(),
-                                article.getAttendant(),
+                                article.getAttendCapacity(),
                                 comments
                         );
                 }
@@ -96,7 +96,7 @@ public class ArticleResponseDto {
                 private int lefts;
                 private Boolean isViewerJoining;
 
-                public OfMultiResponse(List<String> imageUrls, Long articleId, ZonedDateTime startDate, long endDate, String title, String body, String location, Double latitude, Double longitude, int attendant, int lefts, Boolean isViewerJoining) {
+                private OfMultiResponse(List<String> imageUrls, Long articleId, ZonedDateTime startDate, long endDate, String title, String body, String location, Double latitude, Double longitude, int attendant, int lefts, Boolean isViewerJoining) {
                         this.imageUrls = imageUrls;
                         this.articleId = articleId;
                         this.startDate = startDate;
@@ -128,7 +128,7 @@ public class ArticleResponseDto {
                                 article.getLocation(),
                                 article.getPoint().getY(),
                                 article.getPoint().getX(),
-                                article.getAttendant(),
+                                article.getAttendCapacity(),
                                 lefts,
                                 checkJoin
 

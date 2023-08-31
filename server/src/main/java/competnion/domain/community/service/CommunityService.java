@@ -1,13 +1,12 @@
 package competnion.domain.community.service;
 
-import competnion.domain.community.dto.request.ArticlePostRequest;
+import competnion.domain.community.dto.request.ArticleRequestDto.ArticlePostRequest;
+import competnion.domain.community.dto.request.ArticleRequestDto.UpdateArticleRequest;
 import competnion.domain.community.dto.request.AttendRequest;
-import competnion.domain.community.dto.request.UpdateArticleRequest;
 import competnion.domain.community.dto.response.ArticleResponseDto;
 import competnion.domain.community.dto.response.WriterResponse;
 import competnion.domain.community.entity.Article;
 import competnion.domain.community.entity.ArticleImage;
-import competnion.domain.community.entity.ArticleStatus;
 import competnion.domain.community.entity.Attend;
 import competnion.domain.community.mapper.ArticleMapper;
 import competnion.domain.community.repository.ArticleImageRepository;
@@ -20,16 +19,15 @@ import competnion.domain.pet.entity.Pet;
 import competnion.domain.pet.repository.PetRepository;
 import competnion.domain.pet.service.PetService;
 import competnion.domain.user.entity.User;
-import competnion.global.common.annotation.Lock;
 import competnion.global.exception.BusinessLogicException;
 import competnion.global.util.CoordinateUtil;
 import competnion.global.util.ZonedDateTimeUtil;
 import competnion.infra.s3.S3Util;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +41,6 @@ import static competnion.domain.community.entity.ArticleStatus.CLOSED;
 import static competnion.global.exception.ExceptionCode.*;
 import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
-import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 
@@ -65,8 +62,8 @@ public class CommunityService {
     @Transactional(readOnly = true)
     public WriterResponse getWriterInfo(final User user) {
         petService.checkUserHasPetOrThrow(user);
-        final List<PetResponse> petResponseList = getPetResponses(user);
-        return WriterResponse.of(user, petResponseList);
+        final List<PetResponse> petResponses = getPetResponses(user);
+        return WriterResponse.of(user, petResponses);
     }
 
     // 산책 갈래요 작성
@@ -80,9 +77,8 @@ public class CommunityService {
         checkDuplicateAttendeeMeetingDate(user, request.getStartDate(),
                 request.getStartDate().plusMinutes(parseLong(request.getEndDate())));
 
-        checkPet(user, request.getPetIds());
+        verityAboutPet(user, request.getPetIds());
         checkValidMeetingDate(request);
-        checkDuplicateOwnersMeetingDate(user, request.getStartDate(), request.getEndDate());
 
         final List<String> imageUrlList = s3Util.uploadImageList(images);
 
@@ -96,36 +92,36 @@ public class CommunityService {
     public List<PetResponse> getAttendeePetInfo(final User user, final Long articleId) {
         final Article article = getArticleByIdOrThrow(articleId);
 
-        checkSpaceForAttend(article.getId(), article.getAttendant());
-        checkNotArticleOwner(user, article);
-        checkUserAlreadyAttended(user, article);
+        checkSpaceForAttend(article.getId(), article.getAttendCapacity());
+        checkIsAttendeeOrThrow(user, article);
+        checkUserAlreadyAttendedArticle(user, article);
         return getPetResponses(user);
     }
 
     // 산책 갈래요 참여
     @Transactional
-    public void attend(final User user, final AttendRequest request) {
-        final Article article = getArticleByIdOrThrow(request.getArticleId());
+    public void attendArticle(final User user, final AttendRequest request, final Long articleId) {
+        final Article article = getArticleByIdOrThrow(articleId);
 
-        checkSpaceForAttend(article.getId(), article.getAttendant());
-        checkUserAlreadyAttended(user, article);
-        checkMeetingTimeClosed(request.getStartDate(), request.getEndDate());
-        checkNotArticleOwner(user, article);
-        checkPet(user, request.getPetIds());
+        checkSpaceForAttend(article.getId(), article.getAttendCapacity());
+        checkUserAlreadyAttendedArticle(user, article);
+        checkMeetingTimeAvailableOrThrow(request.getStartDate(), request.getEndDate());
+        checkIsAttendeeOrThrow(user, article);
+        verityAboutPet(user, request.getPetIds());
 
         saveAttends(user, article, request.getPetIds());
     }
 
     // 산책 완료
     @Transactional
-    public void close(final User user, final Long articleId) {
+    public void closeArticle(final User user, final Long articleId) {
         Article article = getArticleByIdOrThrow(articleId);
 
-        checkArticleOwner(user, article);
-        checkAlreadyClose(article);
+        checkIsArticleOwnerOrThrow(user, article);
+        checkArticleAlreadyClosed(article);
 
         if (dateUtil.getNow().isBefore(article.getStartDate().plusMinutes(30)))
-            throw new BusinessLogicException(CAN_NOT_CLOSE, "산책시작 30분후 완료버튼을 눌러주세요❗");
+            throw new BusinessLogicException(CANNOT_CLOSE, "산책시작 30분후 완료버튼을 눌러주세요❗");
         article.updateStatus(CLOSED);
 
         List<Pet> pets = petRepository.findAllByArticleId(articleId);
@@ -133,7 +129,8 @@ public class CommunityService {
         article.getPets().clear();
     }
 
-    public void closeScheduled() {
+    @Scheduled(cron = "0 0/10 6-23 * * *", zone = "Asia/Seoul")
+    public void runArticleScheduler() {
         List<Article> articles = articleRepository.findArticlesOpen();
         articles.forEach(article -> article.updateStatus(CLOSED));
 
@@ -170,7 +167,7 @@ public class CommunityService {
                 throw new BusinessLogicException(DUPLICATE_MEETING_DATE, "겹치는 시간에 참여하시거나 작성하신 모임이 있습니다❗");
         });
 
-        s3Util.isFileAnImageOrThrow(images);
+        s3Util.checkFileIsImageOrThrow(images);
 
         List<ArticleImage> articleImages = findArticle.getImages();
         articleImageRepository.deleteAll(articleImages);
@@ -192,10 +189,10 @@ public class CommunityService {
         // TODO : 1. 한번 취소하면 재참여 불가능(redis 활용)
         Article article = getArticleByIdOrThrow(articleId);
         if (article.getStartDate().minusMinutes(20).isBefore(dateUtil.getNow()))
-            throw new BusinessLogicException(CAN_NOT_CANCEL, "산책시작 20분전에는 취소할 수 없습니다❗");
+            throw new BusinessLogicException(CANNOT_CANCEL, "산책시작 20분전에는 취소할 수 없습니다❗");
 
         Attend attend = attendRepository.findByUserIdAndArticleId(user.getId(), articleId)
-                .orElseThrow(() -> new BusinessLogicException(ATTEND_NOT_FOUND));
+                .orElseThrow(() -> new BusinessLogicException(USER_NOT_FOUND));
 
         attendRepository.delete(attend);
 
@@ -231,14 +228,21 @@ public class CommunityService {
 
         final List<User> attendees = extractUsersFromAttend(articleId);
 
-        List<User> hostFisrt = new ArrayList<>();
+        List<User> hostFirst = new ArrayList<>();
 
-        for (User attendee : attendees) {
-            if (attendee.getId().equals(article.getUser().getId())) { hostFisrt.add(0, attendee); }
-            else {hostFisrt.add(attendee);}
-        }
+        getHost(article, attendees, hostFirst);
 
-        return mapper.articleToSingleArticleResponse(images,article,hostFisrt);
+        return mapper.articleToSingleArticleResponse(images, article, hostFirst);
+    }
+
+    private void getHost(Article article, List<User> attendees, List<User> hostFisrt) {
+        attendees.forEach(attendee -> {
+            if (attendee.getId().equals(article.getUser().getId())) {
+                hostFisrt.add(0, attendee);
+            } else {
+                hostFisrt.add(attendee);
+            }
+        });
     }
 
     // article 은 Qarticle 로 잡혀서 stream 안쪽은 post로 해둠
@@ -264,26 +268,26 @@ public class CommunityService {
                                 .getResponse(
                                         getImgUrlsFromArticle(post),
                                         post,
-                                        countLefts(post),
-                                        checkParticipation(post,user.getId())
+                                        countSpaceInArticle(post),
+                                        IsUserAttendArticle(post,user.getId())
                                 )
                 );
 
       return mapper.articleToMultiArticleResponses(responses.getContent(),user,responses);
     }
 
-    private void checkNotArticleOwner(final User user, final Article article) {
-        if (article.getUser() == user) throw new BusinessLogicException(CAN_NOT_ATTEND_IN_OWN_ARTICLE, "본인 게시글에는 참여 할 수 없습니다❗");
+    private void checkIsAttendeeOrThrow(final User user, final Article article) {
+        if (article.getUser() == user) throw new BusinessLogicException(CANNOT_ATTEND_IN_OWN_ARTICLE, "본인 게시글에는 참여 할 수 없습니다❗");
     }
 
-    private void checkArticleOwner(final User user, final Article article) {
+    private void checkIsArticleOwnerOrThrow(final User user, final Article article) {
         if (article.getUser() != user) throw new BusinessLogicException(NOT_ARTICLE_OWNER, "본인 게시글이 아닙니다❗");
     }
 
-    private void checkMeetingTimeClosed(final ZonedDateTime startDate, final ZonedDateTime endDate) {
+    private void checkMeetingTimeAvailableOrThrow(final ZonedDateTime startDate, final ZonedDateTime endDate) {
         ZonedDateTime now = dateUtil.getNow();
         if (now.plusMinutes(30).isAfter(startDate) || now.plusMinutes(30).equals(startDate))
-            throw new BusinessLogicException(MEETING_TIME_CLOSED, "참여 마감된 산책모임입니다❗");
+            throw new BusinessLogicException(MEETINGTIME_INTERVER_TOO_CLOSE, "산책 시작시간 30분전에는 참여가 불가능합니다❗");
     }
 
     @Transactional(readOnly = true)
@@ -294,33 +298,33 @@ public class CommunityService {
     }
 
     @Transactional(readOnly = true)
-    private void checkPet(final User user, final List<Long> petIds) {
+    private void verityAboutPet(final User user, final List<Long> petIds) {
         petService.checkUserHasPetOrThrow(user);
 
         final List<Pet> pets = petService.returnExistsPetsOrThrow(petIds);
 
         for (Pet pet : pets) {
-            petService.checkPetMatchUser(user, pet);
+            petService.checkIsUsersPetOrThrow(user, pet);
             petService.checkValidPetOrThrow(pet);
         }
     }
 
-    private void checkUserAlreadyAttended(final User user, final Article article) {
+    public void checkUserAlreadyAttendedArticle(final User user, final Article article) {
         if (attendRepository.findByUserIdAndArticleId(user.getId(), article.getId()).isPresent())
-            throw new BusinessLogicException(USER_ALREADY_ATTENDED, "이미 참여하셨습니다❗");
+            throw new BusinessLogicException(USER_ALREADY_ATTENDED, "해당 게시물에 이미 참여 중입니다❗");
     }
 
-    private void checkDuplicateOwnersMeetingDate(User user, ZonedDateTime startDate, String endDate) {
-        articleRepository.findDuplicateMeetingDate(
-                user, startDate, startDate.plusMinutes(parseLong(endDate)));
-    }
+//    private void checkDuplicateOwnersMeetingDate(User user, ZonedDateTime startDate, String endDate) {
+//        articleRepository.findDuplicateMeetingDate(
+//                user, startDate, startDate.plusMinutes(parseLong(endDate)));
+//    }
 
     private void checkDuplicateAttendeeMeetingDate(User user, ZonedDateTime startDate, ZonedDateTime endDate) {
         attendRepository.findAttendeeDuplicateMeetingDate(
                 user, startDate, endDate);
     }
 
-    private void checkAlreadyClose(Article article) {
+    private void checkArticleAlreadyClosed(Article article) {
         if (article.getArticleStatus().equals(CLOSED))
             throw new BusinessLogicException(ALREADY_CLOSED, "이미 종료된 모임입니다❗");
     }
@@ -330,13 +334,13 @@ public class CommunityService {
         final int endDate = parseInt(request.getEndDate());
 
         if (request.getStartDate().isBefore(dateUtil.getNow().plusMinutes(27)))
-            throw new BusinessLogicException(NOT_VALID_START_DATE, "산책 시작시간을 확인해주세요❗");
+            throw new BusinessLogicException(NOT_VALID_START_DATE, "새로운 산책 모임 시작시간은 현 시간 30분 이후부터 설정 가능합니다❗");
 
         if (startDate.isAfter(startDate.plusMinutes(endDate)) || startDate.equals(startDate.plusMinutes(endDate)))
-            throw new BusinessLogicException(NOT_VALID_MEETING_DATE, "산책 종료시간을 확인해주세요❗");
+            throw new BusinessLogicException(NOT_VALID_MEETING_DURATION, "산책 모임 소요시간은 최소 30분부터 설정 가능합니다❗");
     }
 
-    private Boolean checkParticipation (Article article,long userId) {
+    private Boolean IsUserAttendArticle(Article article, long userId) {
         return extractUsersFromAttend(article.getId()).stream()
                 .map(User::getId)
                 .anyMatch(attendee -> attendee.equals(userId));
@@ -379,7 +383,7 @@ public class CommunityService {
                 .body(request.getBody())
                 .location(request.getLocation())
                 .point(point)
-                .attendant(request.getAttendant())
+                .attendCapacity(request.getAttendCapacity())
                 .startDate(request.getStartDate())
                 .endDate(request.getStartDate().plusMinutes(parseInt(request.getEndDate())))
                 .build());
@@ -408,7 +412,7 @@ public class CommunityService {
         }
     }
 
-    private int countLefts (Article article) {
-        return article.getAttendant() - extractUsersFromAttend(article.getId()).size();
+    private int countSpaceInArticle(Article article) {
+        return article.getAttendCapacity() - extractUsersFromAttend(article.getId()).size();
     }
 }

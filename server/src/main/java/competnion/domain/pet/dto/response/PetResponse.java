@@ -2,7 +2,6 @@ package competnion.domain.pet.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import competnion.domain.pet.entity.Pet;
-import competnion.domain.user.dto.response.UserResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,7 +18,7 @@ public class PetResponse {
     @JsonFormat(shape = STRING, pattern = "yyyy-MM-dd")
     private LocalDate birth;
     private Boolean gender;
-    private Boolean neutralization;
+    private Boolean isNeutralized;
     private String imgUrl;
     private String mbti;
     private String breedName;

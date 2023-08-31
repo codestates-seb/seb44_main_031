@@ -30,22 +30,14 @@ public class RedisConfig {
     private String host;
     @Value("${spring.redis.port}")
     private int port;
-//    private static final String REDISSON_HOST_PREFIX = "redis://";
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(host, port);
     }
 
-//    @Bean
-//    public RedissonClient redissonClient() {
-//        Config config = new Config();
-//        config.useSingleServer().setAddress(REDISSON_HOST_PREFIX + host + ":" + port);
-//        return Redisson.create(config);
-//    }
-
     @Bean // 태영 추가
-    public RedisTemplate<String, Object> redisTemplate() {
+    public RedisTemplate<String, Object> tokenRedisTemplate() {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());

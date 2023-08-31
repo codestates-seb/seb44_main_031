@@ -27,8 +27,8 @@ public class UserResponse {
                 user.getNickname(),
                 user.getAddress(),
                 user.getImgUrl(),
-                user.getLatitude(),
-                user.getLongitude(),
+                user.getPoint().getY(),
+                user.getPoint().getX(),
                 pets
         );
     }
@@ -67,8 +67,8 @@ public class UserResponse {
         public static  UserResponse.OfMultiArticleResponse getResponse(User user) {
             return new OfMultiArticleResponse(
                     user.getAddress(),
-                    user.getLatitude(),
-                    user.getLongitude()
+                    user.getPoint().getY(),
+                    user.getPoint().getX()
             );
         }
     }

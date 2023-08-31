@@ -2,18 +2,12 @@ package competnion.domain.user.service;
 
 import competnion.domain.auth.service.AuthService;
 import competnion.domain.community.dto.ArticleQueryDto;
-import competnion.domain.community.dto.response.ArticleResponse;
-import competnion.domain.community.dto.response.ArticleResponseDto;
-import competnion.domain.community.entity.Attend;
 import competnion.domain.community.repository.ArticleRepository;
-import competnion.domain.community.repository.AttendRepository;
 import competnion.domain.community.service.CommunityService;
 import competnion.domain.pet.dto.response.PetResponse;
 import competnion.domain.pet.repository.PetRepository;
-import competnion.domain.pet.repository.PetRepositoryCustomImpl;
 import competnion.domain.user.dto.request.AddressRequest;
 import competnion.domain.user.dto.request.ResetPasswordRequest;
-import competnion.domain.user.dto.request.SignUpRequest;
 import competnion.domain.user.dto.request.UpdateUsernameRequest;
 import competnion.domain.user.dto.response.UpdateAddressResponse;
 import competnion.domain.user.dto.response.UpdateUsernameResponse;
@@ -21,7 +15,6 @@ import competnion.domain.user.dto.response.UserResponse;
 import competnion.domain.user.entity.User;
 import competnion.domain.user.repository.UserRepository;
 import competnion.global.exception.BusinessLogicException;
-import competnion.global.exception.ExceptionCode;
 import competnion.global.util.CoordinateUtil;
 import competnion.infra.s3.S3Util;
 import lombok.RequiredArgsConstructor;
@@ -61,16 +54,16 @@ public class UserService {
     }
 
     public UpdateUsernameResponse updateUsername(final User user, final UpdateUsernameRequest request) {
-        authService.checkMatchPassword(request.getPassword(), user.getPassword());
+        authService.checkPasswordVerificationOrThrow(request.getPassword(), user.getPassword());
 
-        authService.checkDuplicatedUsername(request.getNewNickname());
+        authService.checkIsUniqueNicknameOrThrow(request.getNewNickname());
 
         user.updateNickname(request.getNewNickname());
         return UpdateUsernameResponse.of(user.getNickname());
     }
 
     public void resetPassword(final User user, final ResetPasswordRequest request) {
-        authService.checkMatchPassword(request.getPassword(), user.getPassword());
+        authService.checkPasswordVerificationOrThrow(request.getPassword(), user.getPassword());
 
         if (!request.getNewPassword().equals(request.getNewPasswordConfirm()))
             throw new BusinessLogicException(NEW_PASSWORD_NOT_MATCH, "새 비밀번호를 다시 입력해주세요❗");
@@ -81,12 +74,12 @@ public class UserService {
     public UpdateAddressResponse updateAddress(final User user, final AddressRequest request) {
         communityService.checkIsPossibleUserUpdateAddress(user);
         final Point point = coordinateUtil.coordinateToPoint(request.getLongitude(), request.getLatitude());
-        user.updateAddressAndCoordinates(request.getAddress(), point, request.getLatitude(), request.getLongitude());
+        user.updateAddressAndCoordinates(request.getAddress(), point);
         return UpdateAddressResponse.of(request);
     }
 
     public String uploadProfileImage(final User user, final MultipartFile image) {
-        s3Util.isFileAnImageOrThrow(List.of(image));
+        s3Util.checkFileIsImageOrThrow(List.of(image));
 
         if (user.getImgUrl() != null) s3Util.deleteImage(user.getImgUrl());
 

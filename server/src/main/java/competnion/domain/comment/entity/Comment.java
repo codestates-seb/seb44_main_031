@@ -9,41 +9,31 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PROTECTED;
+
 @Getter
 @Entity
 @Table(name = "comments")
-@NoArgsConstructor
+@NoArgsConstructor(access = PROTECTED)
 public class Comment extends BaseEntity {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private long commentId;
-
     @Column (nullable = false, length = 200)
     private String body;
-
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_ID")
+    @ManyToOne (fetch = LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
-
-    @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "ARTICLE_ID")
+    @ManyToOne (fetch = LAZY)
+    @JoinColumn(name = "article_id")
     private Article article;
 
-
-
-    @Builder(builderClassName = "createComment",builderMethodName = "createComment")
+    @Builder(builderMethodName = "createComment")
     public Comment (String body, User user, Article article) {
-        this.body=body;
-        this.user=user;
-        this.article=article;
+        this.body = body;
+        this.user = user;
+        this.article = article;
     }
-
-
-
-
-
-
-
-
 }

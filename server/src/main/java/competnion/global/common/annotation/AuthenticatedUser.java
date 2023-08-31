@@ -8,5 +8,5 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target(value = PARAMETER)
 @Retention(value = RUNTIME)
-public @interface UserContext {
+public @interface AuthenticatedUser {
 }
