@@ -33,9 +33,9 @@
 
 ### FrontEnd
 
-| 이영탁(부팀장) | 박지훈  | 전예훈 |
+| 전예훈(부팀장) | 박지훈  | 이영탁 |
 |--------------|----------|----------|
-|[youngtakleeme](https://github.com/youngtakleeme)|[jihoon2819](https://github.com/jihoon2819)|[JeonYeHun](https://github.com/JeonYeHun)|
+|[JeonYeHun](https://github.com/JeonYeHun)|[jihoon2819](https://github.com/jihoon2819)|[youngtakleeme](https://github.com/youngtakleeme)|
 
 ### BackEnd
 
